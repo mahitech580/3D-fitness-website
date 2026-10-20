@@ -30,7 +30,7 @@ function ResponsiveCamera() {
   return null;
 }
 
-export function DragonScene({ eventSource, reducedMotion = false }: { eventSource: RefObject<HTMLElement>; reducedMotion?: boolean }) {
+export function DragonScene({ eventSource, reducedMotion = false }: { eventSource: RefObject<HTMLElement | null>; reducedMotion?: boolean }) {
   const systemPrefersReducedMotion = useReducedMotion();
   const pauseAnimation = reducedMotion || Boolean(systemPrefersReducedMotion);
 
