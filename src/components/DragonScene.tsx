@@ -1,6 +1,4 @@
-import { Component, useEffect, type ReactNode, type RefObject } from 'react';
-import { useReducedMotion } from 'framer-motion';
-import { useReducedMotion } from 'framer-motion';
+import { Component, useEffect, type MutableRefObject, type ReactNode, type RefObject } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { PorcelainDragon } from './PorcelainDragon';
 import { LoadingFallback } from './LoadingFallback';
@@ -43,7 +41,7 @@ export function DragonScene({ eventSource, reducedMotion = false }: { eventSourc
           frameloop={pauseAnimation ? 'demand' : 'always'}
           camera={{ position: [0, 0, 9.5], fov: 36, near: 0.1, far: 80 }}
           gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
-          eventSource={eventSource}
+          eventSource={eventSource as unknown as MutableRefObject<HTMLElement>}
           eventPrefix="client"
           fallback={<LoadingFallback />}
         >
