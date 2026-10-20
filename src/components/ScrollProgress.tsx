@@ -6,20 +6,35 @@ export function ScrollProgress() {
   useEffect(() => {
     let frame = 0;
     const update = () => {
-      cancelAnimationFrame(frame);
+      if (frame) cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const available = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = available > 0 ? window.scrollY / available : 0;
-        barRef.current?.style.setProperty('transform', 'scaleX(' + Math.min(1, Math.max(0, progress)) + ')');
+        frame = 0;
+        const documentElement = document.documentElement;
+        const available = Math.max(0, documentElement.scrollHeight - window.innerHeight);
+        const position = Math.max(0, window.scrollY || documentElement.scrollTop);
+        const progress = available > 0 ? position / available : 0;
+        barRef.current?.style.setProperty('transform', 'scaleX(' + Math.min(1, progress) + ')');
       });
     };
+
+    const observer = typeof ResizeObserver === 'undefined'
+      ? null
+      : new ResizeObserver(update);
+    observer?.observe(document.documentElement);
+
     window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
+    window.addEventListener('resize', update, { passive: true });
+    window.addEventListener('pageshow', update);
+    window.addEventListener('load', update);
     update();
+
     return () => {
-      cancelAnimationFrame(frame);
+      if (frame) cancelAnimationFrame(frame);
+      observer?.disconnect();
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
+      window.removeEventListener('pageshow', update);
+      window.removeEventListener('load', update);
     };
   }, []);
 
