@@ -1,4 +1,5 @@
 import { Component, useEffect, type ReactNode, type RefObject } from 'react';
+import { useReducedMotion } from 'framer-motion';
 import { Canvas, useThree } from '@react-three/fiber';
 import { PorcelainDragon } from './PorcelainDragon';
 import { LoadingFallback } from './LoadingFallback';
@@ -29,14 +30,18 @@ function ResponsiveCamera() {
   return null;
 }
 
-export function DragonScene({ eventSource }: { eventSource: RefObject<HTMLElement> }) {
+export function DragonScene({ eventSource, reducedMotion = false }: { eventSource: RefObject<HTMLElement>; reducedMotion?: boolean }) {
+  const systemPrefersReducedMotion = useReducedMotion();
+  const pauseAnimation = reducedMotion || Boolean(systemPrefersReducedMotion);
+
   return (
     <div className="dragon-scene" aria-hidden="true">
       <SceneErrorBoundary>
         <Canvas
-          dpr={[1, 1.5]}
+          dpr={[1, 1.35]}
+          frameloop={pauseAnimation ? 'demand' : 'always'}
           camera={{ position: [0, 0, 9.5], fov: 36, near: 0.1, far: 80 }}
-          gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
+          gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
           eventSource={eventSource}
           eventPrefix="client"
           fallback={<LoadingFallback />}
