@@ -1,27 +1,44 @@
-# Kairo Studio — Ritually
+# Ritually — Kairo Studio
 
-An editorial, interactive 3D website based on the supplied Kairo Studio reference: warm ivory paper, cobalt watercolor, oversized italic serif typography, porcelain-inspired dragon artwork, botanical ornament, and a quiet studio navigation.
+An editorial 3D experience shaped around warm paper, cobalt pigment, botanical linework, and an original porcelain-dragon sculpture. The repository name stays in place for URL compatibility; the site's creative identity follows the supplied Kairo Studio reference.
 
 ## Run locally
 
-1. Install Node.js 20 or later.
-2. Run `npm install`.
-3. Run `npm run dev` and open the local URL printed by Vite.
-4. Run `npm run typecheck` and `npm run build` before deploying.
+Requirements: Node.js 20 or newer.
 
-## Implementation notes
+1. Install dependencies with **npm install**.
+2. Start the Vite server with **npm run dev**.
+3. Run **npm run typecheck** to check the TypeScript project.
+4. Run **npm run build** to produce the production site in **dist/**.
+5. Run **npm run preview** to review the production build locally.
+6. Run **npm run check** for the standard build validation.
 
-- React, TypeScript, Vite, Three.js, and React Three Fiber.
-- The dragon is an original procedural mesh composition with a continuous tapered body, instanced relief scales, cobalt accent clusters, articulated-looking limbs, horns, mane, whiskers, and porcelain lighting.
-- The procedural character is an art-directed fallback, not a scanned or externally sourced production GLB. A detailed, properly licensed rigged asset would be the next step toward matching every detail in the reference video.
-- The background and corner ornaments are lightweight CSS/SVG; reduced-motion and WebGL-failure fallbacks keep the page useful without 3D rendering.
-- Navigation targets real sections. The enquiry form validates locally and clearly states that it does not send data until a delivery endpoint is configured.
-- GitHub Pages deployment is configured in `.github/workflows/deploy.yml`.
+## Experience
 
-## Accessibility and performance
+- **Original procedural 3D artwork:** custom tapered body geometry, instanced relief scales, cobalt accents, articulated paws, horns, mane, and whiskers.
+- **Editorial composition:** oversized Cormorant serif typography, compact mono labels, botanical SVG framing, watercolor washes, and a subtle paper-grain layer.
+- **Responsive navigation:** mobile menu, close-on-selection behavior, and Escape-key dismissal.
+- **Accessible motion:** Framer Motion respects the system preference and the WebGL scene switches to demand rendering when reduced motion is requested.
+- **Resilient 3D:** a scene error boundary and illustrated fallback keep the rest of the page usable if WebGL is unavailable.
+- **Real section navigation:** Listen, Culture & Makers, Learn, and Reserve links target actual page sections.
+- **Honest enquiry prototype:** the form validates in the browser and explains that it does not send or persist messages until a delivery endpoint is connected.
 
-Keyboard focus styles, semantic sections, responsive layouts, reduced-motion handling, capped device pixel ratio, lazy-loaded canvas rendering, and a CSS fallback are included. No external model or font file is bundled; editorial fonts use CSS fallbacks.
+## Performance and deployment
 
-## Reference
+The artwork is created in code rather than downloaded from an external 3D model host. React Three Fiber uses a capped device-pixel ratio and the low-power WebGL hint; production bundles separate Three.js, React Three Fiber, and Framer Motion where possible. Source maps are disabled for production output.
 
-The visual direction comes from the supplied `kairo-studio-hero.mp4` and the Kairo Studio master prompt. The repository name is retained for URL compatibility, while the experience itself follows that reference's creative-studio identity.
+GitHub Pages deployment is defined in **.github/workflows/deploy.yml** and runs from **main**. The Vite base path is configured for the repository Pages URL. If Pages is not already enabled for this repository, set its publishing source to GitHub Actions in repository settings.
+
+## Project map
+
+- **src/components/PorcelainDragon.tsx** — procedural sculpture and motion.
+- **src/components/DragonScene.tsx** — WebGL scene, responsive camera, lighting, and fallback boundary.
+- **src/components/HeroSection.tsx** — title, hero framing, and canvas placement.
+- **src/components/StudioSections.tsx** — editorial content, section navigation, and enquiry form.
+- **src/styles.css** — design tokens, layout, responsive rules, and accessible focus styling.
+- **src/assets/porcelain-branch.svg** — original botanical line illustration.
+- **.github/workflows/deploy.yml** — build and GitHub Pages deployment.
+
+## Known limitation
+
+The enquiry form is front-end only. It deliberately does not claim to deliver a message; connect a trusted form endpoint or backend before using it for real enquiries.
