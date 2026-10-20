@@ -10,7 +10,6 @@ export function App() {
     <MotionConfig reducedMotion="user">
       <div className="site-shell">
         <a className="skip-link" href="#main-content">Skip to content</a>
-        <a className="skip-link" href="#main-content">Skip to content</a>
         <WatercolorBackground />
         <ScrollProgress />
         <SiteHeader />
