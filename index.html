@@ -1,28 +1,57 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f7f5ef" />
-    <meta name="color-scheme" content="light" />
-    <meta name="robots" content="index, follow" />
-    <meta name="description" content="Ritually — a living editorial study in porcelain, pigment, and contemporary culture by Kairo Studio." />
-    <meta property="og:title" content="Ritually — Kairo Studio" />
-    <meta property="og:description" content="Objects, rituals, and living culture, composed in porcelain and blue pigment." />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Kairo Studio" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Ritually — Kairo Studio" />
-    <meta name="twitter:description" content="Objects, rituals, and living culture, composed in porcelain and blue pigment." />
-    <title>Ritually — Kairo Studio</title>
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="manifest" href="./site.webmanifest" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7f5ef" />
+  <meta name="description" content="Ritually — a living editorial study in porcelain, pigment, and contemporary culture by Kairo Studio." />
+  <title>Ritually — Kairo Studio</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root{color-scheme:light;--paper:#f7f5ef;--ink:#101010;--blue:#2455b5;--serif:'Cormorant Garamond',Georgia,serif;--mono:'DM Mono',monospace}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--mono)}a{color:inherit;text-decoration:none}.paper{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at 52% 29%,rgba(36,85,181,.48),rgba(142,175,223,.34) 28%,rgba(220,232,248,.28) 47%,transparent 68%),var(--paper)}.paper:after{content:"";position:absolute;inset:0;opacity:.14;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E")}
+    header{display:flex;justify-content:space-between;align-items:center;padding:25px 4vw;font-size:10px;letter-spacing:.16em;gap:20px}nav{display:flex;gap:clamp(16px,3.5vw,55px)}nav a:hover,.small-link:hover{color:var(--blue)}.hero{position:relative;min-height:690px;height:94svh;max-height:1000px;overflow:hidden}.meta{position:absolute;top:8%;font-size:8px;line-height:1.8;letter-spacing:.12em;color:#41444a}.meta.left{left:4vw}.meta.right{right:4vw;text-align:right}.title-wrap{position:absolute;z-index:2;top:43%;left:50%;width:100%;transform:translate(-50%,-50%);text-align:center}.kicker{font-size:9px;letter-spacing:.27em}.title{font:italic 500 clamp(5rem,22vw,21rem)/.8 var(--serif);letter-spacing:-.08em;margin:0;white-space:nowrap}.dragon{position:absolute;z-index:3;left:50%;top:48%;height:min(76%,670px);width:min(54%,500px);transform:translate(-50%,-50%);filter:drop-shadow(0 18px 28px rgba(32,48,75,.13))}.botanical{position:absolute;z-index:4;width:min(27vw,360px);opacity:.9;pointer-events:none}.botanical.top{right:-65px;top:-75px}.botanical.bottom{left:-68px;bottom:-85px;transform:scaleX(-1) rotate(8deg)}.caption{position:absolute;z-index:5;bottom:36px;font:italic 18px/1.1 var(--serif)}.caption.left{left:4vw}.caption.right{right:4vw;text-align:right}.caption small{display:block;font:8px var(--mono);letter-spacing:.15em;color:#555d6a;margin-bottom:10px}.discover{position:absolute;bottom:27px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.18em;white-space:nowrap}.content{padding:105px 9vw;border-top:1px solid rgba(15,15,15,.18)}.eyebrow{font-size:9px;letter-spacing:.18em;color:#525761;margin:0 0 44px}.eyebrow span{color:var(--blue);margin-right:16px}.row{display:grid;grid-template-columns:1.2fr .8fr;gap:8vw;align-items:end}.heading{font:400 clamp(3.4rem,8vw,8rem)/.88 var(--serif);letter-spacing:-.05em;margin:0}.heading em{color:var(--blue)}.copy{max-width:430px;font-size:12px;line-height:1.9;color:#4c5057}.copy strong{display:block;font:italic 25px/1.1 var(--serif);font-weight:400;color:#111}.entries{margin-top:65px;border-top:1px solid rgba(15,15,15,.2)}.entry{display:flex;justify-content:space-between;gap:24px;padding:25px 0;border-bottom:1px solid rgba(15,15,15,.2);font:clamp(1.65rem,3vw,3rem)/1 var(--serif)}.entry span:last-child{font:9px var(--mono);color:var(--blue)}.last{background:rgba(142,175,223,.12)}footer{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:28px 4vw;border-top:1px solid rgba(15,15,15,.2);font-size:9px;letter-spacing:.08em}footer .mark{font:27px var(--serif)}
+    @media(max-width:680px){header{padding:21px 5vw;align-items:flex-start;font-size:8px}nav{gap:13px;flex-wrap:wrap;justify-content:flex-end}nav a{font-size:8px}.hero{min-height:670px;height:90svh}.meta{top:90px;font-size:7px}.title-wrap{top:43%}.title{font-size:20vw}.dragon{height:62%;width:75%;top:49%}.botanical{width:42vw}.botanical.top{right:-50px;top:-30px}.botanical.bottom{left:-45px;bottom:-42px}.caption{bottom:25px;font-size:15px}.caption.left{left:5vw}.caption.right{right:5vw}.caption small{font-size:7px}.discover{bottom:84px;font-size:7px}.content{padding:78px 6vw}.row{grid-template-columns:1fr;gap:32px}.heading{font-size:clamp(3.8rem,13vw,6rem)}.copy{font-size:11px}.entries{margin-top:44px}.entry{font-size:1.6rem}.entry span:last-child{font-size:7px}footer{padding:24px 5vw;flex-wrap:wrap}footer p{width:100%;order:3}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  </style>
+</head>
+<body>
+  <div class="paper" aria-hidden="true"></div>
+  <div id="root">
+    <header><a href="#home" aria-label="Kairo Studio home">KAIRO STUDIO / EST. 2026</a><nav aria-label="Main navigation"><a href="#listen">LISTEN</a><a href="#culture">CULTURE & MAKERS</a><a href="#learn">LEARN</a><a href="#reserve">RESERVE ↗</a></nav></header>
+    <main>
+      <section class="hero" id="home" aria-label="Ritually, a study in porcelain and pigment">
+        <img class="botanical top" src="./porcelain-branch.svg" alt="" />
+        <img class="botanical bottom" src="./porcelain-branch.svg" alt="" />
+        <div class="meta left">OBJECTS / RITUALS<br/>AN ONGOING STUDY</div><div class="meta right">VOL. 01<br/>IN BLUE & WHITE</div>
+        <div class="title-wrap"><p class="kicker">A PRACTICE OF PRESENCE</p><h1 class="title">Ritually</h1></div>
+        <svg class="dragon" viewBox="0 0 400 620" role="img" aria-label="A porcelain dragon illustration with cobalt details">
+          <defs><linearGradient id="ceramic" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#dbe2e9"/></linearGradient></defs>
+          <path d="M195 48C135 73 157 114 212 133S291 179 244 219 137 239 103 278 112 357 183 354 278 385 250 426 171 457 153 493 169 548 225 572" fill="none" stroke="#c6d1dd" stroke-width="57" stroke-linecap="round"/>
+          <path d="M195 48C135 73 157 114 212 133S291 179 244 219 137 239 103 278 112 357 183 354 278 385 250 426 171 457 153 493 169 548 225 572" fill="none" stroke="url(#ceramic)" stroke-width="48" stroke-linecap="round"/>
+          <path d="M192 49 170 16 208 37 231 12 235 51 269 65 237 86 219 71 199 88 180 71 149 78 171 52Z" fill="url(#ceramic)" stroke="#c6d1dd" stroke-width="2"/>
+          <path d="M226 62Q261 48 284 75L318 96 289 114 248 98Z" fill="url(#ceramic)" stroke="#c6d1dd" stroke-width="3"/>
+          <circle cx="260" cy="78" r="7" fill="#2455b5"/><circle cx="262" cy="77" r="2.5" fill="#0b1422"/>
+          <path d="M300 96Q339 91 355 114Q327 109 310 124M291 106Q322 129 333 151" fill="none" stroke="#d1dce8" stroke-width="4" stroke-linecap="round"/>
+          <path d="M186 111l-28-28 34 8M214 115l23-35 2 35" fill="none" stroke="#315ca9" stroke-width="8" stroke-linecap="round"/>
+          <path d="M178 127l-31-5 19 20M216 137l28-7-18 20M213 190l24 12-29 5M148 238l-32 14 30 7M106 294l-27 5 25 16M157 352l-20 22 32-8M237 420l30 12-34 7M163 475l-28 15 32 0" fill="none" stroke="#315ca9" stroke-width="7" stroke-linecap="round"/>
+          <path d="M91 280 53 251M97 298 55 320M239 425 284 455M154 491 119 521" fill="none" stroke="#e1e7ed" stroke-width="16" stroke-linecap="round"/>
+          <path d="M193 49q-52-10-37-34M224 56q33-17 45-39M287 112q38 4 41 33M284 113q21 31 9 53" fill="none" stroke="#dce3e9" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <div class="caption left"><small>01 — 03</small>Finding the extraordinary<br/>inside the everyday.</div>
+        <div class="caption right"><small>A STUDY IN FORM</small>Porcelain · pigment · time</div>
+        <a class="discover" href="#listen">SCROLL TO DISCOVER ↓</a>
+      </section>
+      <section class="content" id="listen"><p class="eyebrow"><span>01</span> THE LISTENING ROOM</p><div class="row"><h2 class="heading">A little more<br/><em>room for wonder.</em></h2><div class="copy"><strong>Some things ask to be noticed slowly.</strong><p>A listening room for small discoveries: rain crossing a tiled roof, the hush before a cup is poured, and the gestures that turn an ordinary moment into a ritual.</p></div></div></section>
+      <section class="content" id="culture"><p class="eyebrow"><span>02</span> CULTURE & MAKERS</p><div class="row"><h2 class="heading">Made by hand.<br/><em>Held by memory.</em></h2><p class="copy">An evolving notebook of objects, gestures, makers, and places that remind us what care can look like.</p></div><div class="entries"><a class="entry" href="#learn"><span>The quiet language of objects</span><span>↗</span></a><a class="entry" href="#learn"><span>A table set for slowing down</span><span>↗</span></a><a class="entry" href="#learn"><span>Blue, borrowed from the rain</span><span>↗</span></a></div></section>
+      <section class="content" id="learn"><p class="eyebrow"><span>03</span> A SLOWER KIND OF LEARNING</p><div class="row"><h2 class="heading">Attention is<br/><em>a way of knowing.</em></h2><p class="copy">What is it made of? What does it ask of us? What changes when we give it time?<br/><br/><span style="font-family:var(--serif);font-size:25px;font-style:italic;color:#2455b5">Material · Ritual · Attention</span></p></div></section>
+      <section class="content last" id="reserve"><p class="eyebrow"><span>04</span> RESERVE A MOMENT</p><div class="row"><h2 class="heading">Something worth<br/><em>making room for?</em></h2><p class="copy">The studio is taking shape. Reach out through the repository to start a conversation.</p></div></section>
+    </main>
+    <footer><a class="mark" href="#home">K·S</a><p>Made with patience, pigment, and a little wonder.</p><a href="#home">BACK TO THE BEGINNING ↑</a></footer>
+  </div>
+  <script type="module" src="./src/main.tsx"></script>
+</body>
 </html>
