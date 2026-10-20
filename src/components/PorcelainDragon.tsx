@@ -1,4 +1,4 @@
-import { type RefObject, useLayoutEffect, useMemo, useRef } from 'react';
+import { useReducedMotion, type RefObject, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -193,6 +193,7 @@ export function PorcelainDragon() {
   const whiteScalesRef = useRef<THREE.InstancedMesh>(null);
   const blueScalesRef = useRef<THREE.InstancedMesh>(null);
   const spinesRef = useRef<THREE.InstancedMesh>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useLayoutEffect(() => {
     const whiteMesh = whiteScalesRef.current;
@@ -207,6 +208,13 @@ export function PorcelainDragon() {
   }, [instances]);
 
   useFrame((state, delta) => {
+    if (prefersReducedMotion) {
+      if (rootRef.current) { rootRef.current.position.y = 0; rootRef.current.rotation.set(0, 0, 0); }
+      if (headRef.current) headRef.current.rotation.set(0, 0, 0);
+      if (whiskerRef.current) whiskerRef.current.rotation.z = 0;
+      if (maneRef.current) maneRef.current.rotation.z = 0;
+      return;
+    }
     if (rootRef.current) {
       rootRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.52) * 0.035;
       rootRef.current.rotation.z = THREE.MathUtils.damp(rootRef.current.rotation.z, state.pointer.x * 0.018, 2.4, delta);
