@@ -1,5 +1,6 @@
 import { Component, useEffect, type ReactNode, type RefObject } from 'react';
 import { useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 import { Canvas, useThree } from '@react-three/fiber';
 import { PorcelainDragon } from './PorcelainDragon';
 import { LoadingFallback } from './LoadingFallback';
