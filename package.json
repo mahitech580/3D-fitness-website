@@ -1,17 +1,13 @@
 {
   "name": "kairo-studio-ritually",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.0.0",
   "type": "module",
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run typecheck && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b --pretty",
-    "check": "npm run typecheck && npm run build"
+    "typecheck": "tsc --noEmit --pretty"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",
