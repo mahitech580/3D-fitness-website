@@ -1,9 +1,11 @@
-import { useReducedMotion, type RefObject, useLayoutEffect, useMemo, useRef } from 'react';
+import { type RefObject, useLayoutEffect, useMemo, useRef } from 'react';
+import { useReducedMotion } from 'framer-motion';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 type Vec3 = [number, number, number];
-type BodyData = { curve: THREE.CatmullRomCurve3; frames: THREE.FrenetFrames; geometry: THREE.BufferGeometry };
+type FrenetFrameData = { tangents: THREE.Vector3[]; normals: THREE.Vector3[]; binormals: THREE.Vector3[] };
+type BodyData = { curve: THREE.CatmullRomCurve3; frames: FrenetFrameData; geometry: THREE.BufferGeometry };
 type InstanceSet = { white: THREE.Matrix4[]; cobalt: THREE.Matrix4[]; spines: THREE.Matrix4[] };
 
 const ceramicColor = '#f2f0e9';
@@ -68,7 +70,7 @@ function createBodyData(): BodyData {
   return { curve, frames, geometry };
 }
 
-function createInstances(curve: THREE.CatmullRomCurve3, frames: THREE.FrenetFrames): InstanceSet {
+function createInstances(curve: THREE.CatmullRomCurve3, frames: FrenetFrameData): InstanceSet {
   const white: THREE.Matrix4[] = [];
   const cobalt: THREE.Matrix4[] = [];
   const spines: THREE.Matrix4[] = [];
