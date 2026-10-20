@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { BotanicalOrnaments } from './BotanicalOrnaments';
-import { DragonScene } from './DragonScene';
+import { DeferredDragonScene } from './DeferredDragonScene';
 
 export function HeroSection() {
   const heroRef = useRef<HTMLElement>(null);
@@ -27,7 +27,7 @@ export function HeroSection() {
           transition={{ duration: 1.1, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
         >Ritually</motion.h1>
       </div>
-      <DragonScene eventSource={heroRef} reducedMotion={Boolean(reduceMotion)} />
+      <DeferredDragonScene eventSource={heroRef} reducedMotion={Boolean(reduceMotion)} />
       <div className="hero-caption hero-caption-left">
         <span className="caption-index">01 — 03</span>
         <p>Finding the extraordinary<br />inside the everyday.</p>
