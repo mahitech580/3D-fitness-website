@@ -1,0 +1,18 @@
+{
+  "name": "Ritually — Kairo Studio",
+  "short_name": "Ritually",
+  "description": "An editorial study in porcelain, pigment, and contemporary culture.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#f7f5ef",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
