@@ -123,7 +123,7 @@ function CurveStroke({ points, radius, color }: { points: Vec3[]; radius: number
   return <mesh geometry={geometry}><meshStandardMaterial color={color} roughness={0.32} /></mesh>;
 }
 
-function Mane({ groupRef }: { groupRef: RefObject<THREE.Group> }) {
+function Mane({ groupRef }: { groupRef: RefObject<THREE.Group | null> }) {
   const strands = useMemo(() => Array.from({ length: 13 }, (_, index) => {
     const offset = index / 12;
     return [
@@ -153,7 +153,7 @@ function Paw({ position, rotation = 0 }: { position: Vec3; rotation?: number }) 
   );
 }
 
-function DragonHead({ headRef, whiskerRef }: { headRef: RefObject<THREE.Group>; whiskerRef: RefObject<THREE.Group> }) {
+function DragonHead({ headRef, whiskerRef }: { headRef: RefObject<THREE.Group | null>; whiskerRef: RefObject<THREE.Group | null> }) {
   return (
     <group ref={headRef} position={[0.22, 2.18, 0]}>
       <mesh position={[-0.025, 0.015, 0]} scale={[0.3, 0.225, 0.225]}><sphereGeometry args={[1, 28, 20]} /><meshPhysicalMaterial color="#f4f2eb" roughness={0.26} clearcoat={0.8} /></mesh>
