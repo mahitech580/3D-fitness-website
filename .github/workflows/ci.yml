@@ -3,27 +3,25 @@ name: CI
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
+  group: ci-main
   cancel-in-progress: true
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out source
+      - name: Check out main
         uses: actions/checkout@v7
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Typecheck and build
