@@ -1,39 +1,53 @@
 # Implementation notes
 
-## Product boundary
+## Product and stack
 
-KINETIK is an original fitness discovery, training and space-planning prototype informed by the public reference observations in `REFERENCE-RESEARCH.md`. It is a frontend-only app: there is no API server, user account, remote AI model, payment service, booking integration, or database.
+KINETIK is an original, local-first fitness experience built with React, TypeScript, Vite, Three.js, React Three Fiber, Drei and Framer Motion. It is an independent concept; it is not the official product of any gym chain and is not an operating gym or medical service.
 
-## Main experience
+## Main application
 
-- Responsive site navigation, theme preference, command palette and share affordance.
-- Procedural React Three Fiber hero scene with a barbell and plates, pause control, reduced-motion support, and rendering fallback.
-- Rule-based weekly workout builder with goal, experience, equipment, location, intensity, session duration, selected weekdays, and avoided-movement preferences.
-- Browser-local workout preference templates (up to eight), weekly completion marks, guided session execution, rest timer, movement substitutions, recent history, and a progress summary.
-- Curated starter movement library with search, category/equipment/muscle/difficulty/movement filters, sorting, primary and secondary muscle metadata, technique steps, common mistakes and alternatives.
-- Six illustrative gym concepts filterable by city and training focus. These are fictional sample records, not real businesses.
-- Gym layout editor with adjustable room width/length/height; 15 procedural equipment types; shared state across the 2D plan and 3D room preview; 1 m grid snapping; numeric placement and nudge controls; 3D drag placement; rotation, duplication and removal; basic bounds/overlap checks; undo/redo; local autosave and explicit save/load; JSON import/export; 2D PNG plan export and 3D preview PNG export.
-- First-session enquiry form can prefill the selected concept and prepare/copy a request in page state. It transmits nothing and does not book a visit.
+- **Application shell:** responsive section navigation, light/dark theme preference, command palette, share action, keyboard skip link, reduced-motion configuration and a semantic document structure.
+- **3D hero:** a procedural barbell/equipment study rendered with React Three Fiber; the HTML calls to action and scene pause control remain available without relying on WebGL.
+- **Workout planner:** transparent, browser-side rule-based programming using goal, level, equipment, location, intensity, time, days available and avoided-movement preferences.
+- **Workout templates:** up to eight named preference sets can be saved, loaded and deleted in browser-local storage. A loaded template regenerates its sessions from the current exercise catalogue and rules; it does not store a custom reordered routine.
+- **Workout execution:** start/pause, previous/next movement, rest timer, substitution where available, finish/cancel and completed session recording.
+- **Exercise library:** searchable and filterable authored starter data with category/equipment controls, set/repetition guidance, and short form cues. It is not a comprehensive exercise reference and does not contain filmed demonstrations.
+- **Progress dashboard:** displays values computed from the recent locally saved completion records, including session count, movement count, assigned plan minutes and a five-week activity chart. The history is capped at twelve records; planned minutes are not measured time.
+- **Gym discovery:** a searchable directory of six explicitly labeled KINETIK sample venue concepts in Hyderabad, Bengaluru and Chennai, filterable by city and training focus. No live business, address, hours, price, map, or availability feed is connected.
+- **Gym designer:** one shared layout state powers a 1 m-snapped 2D floor plan and procedural 3D room scene. Fifteen equipment types have authored procedural shapes. Users can select, drag in 3D, precisely reposition, rotate, duplicate and delete items; overlapping or out-of-bounds placements are blocked. Room dimensions, basic spacing summaries, undo/redo, local autosave, explicit local save/load, JSON import/export, 2D PNG export, and 3D preview PNG export are provided.
+- **First-session enquiry:** a validated local-only form can include a selected sample gym concept and prepare a copyable request. It does not submit to a service, send email, accept payment, or make a reservation.
 
-## Data and persistence
+## Data and privacy behavior
 
-Browser `localStorage` holds theme preference, workout checkmarks, up to eight workout templates, up to twelve recent workout-history entries, and gym planner auto-saved/saved snapshots when storage is available. These records are on the current browser/device only. There is no authentication or cross-device sync; removing browser/site storage can erase them. JSON export is the portable way to keep a gym layout separately.
+Training templates, plan completion markers, recent workout history, theme preference and gym layouts use browser-local storage. They are not synchronized across devices or users. The enquiry request only exists in page state until the user copies it. There is no configured account system, server database, booking API, map provider, hosted AI model, or gym inventory integration.
 
-The planner validates imported layouts for supported schema, dimension ranges, unique IDs, room bounds and equipment footprint overlap before applying them. Exports provide a versioned JSON layout object. PNG exports create a conceptual top-down plan or capture the rendered 3D canvas. Equipment models are procedural and simplified; they are not verified manufacturer models.
+## Asset policy
 
-## Safety and truthfulness
-
-- Workout recommendations are deterministic rules over a compact authored catalogue, not AI-generated coaching, medical advice or performance prediction.
-- Movement instructions are general informational cues, not a substitute for instruction from a qualified professional.
-- Planner collision/bounds checks are coarse geometric checks only. They do not evaluate weight/load bearing, circulation, accessibility, emergency egress, legal clearances or manufacturer requirements.
-- Gym concepts are fictional samples, not real businesses. No addresses, opening hours, prices, membership terms or reservation availability are asserted.
-- A prepared first-session request remains in current page state. The prototype does not send email, persist the request or contact a gym.
-- Build success alone does not establish UI correctness. Actual screenshot/browser testing at desktop and mobile sizes, touch-device testing, WebGL context-loss behavior, and export-download checks remain necessary before claiming production readiness.
+The hero and gym equipment models are generated from project-authored geometry and materials; no third-party GLB or GLTF model is required for the core flow. See [ASSET-CREDITS.md](./ASSET-CREDITS.md) for the asset policy and attributions.
 
 ## Local development
 
 - Node.js 20 or newer.
-- Install with `npm install`.
-- Run `npm run dev` to start Vite.
-- Run `npm run typecheck` to type-check the source.
-- Run `npm run check` for the production build and artifact smoke checks.
+- Install packages with `npm install`.
+- Start the development server with `npm run dev`.
+- Type-check with `npm run typecheck`.
+- Produce a production build and run the artifact smoke check with `npm run check`.
+- Preview built output with `npm run preview`.
+
+The GitHub Actions workflow on `main` runs the build/smoke-check workflow and publishes the static site to GitHub Pages.
+
+## Known limitations
+
+- All venue entries are sample concepts and must not be interpreted as real gyms.
+- Training recommendations are deterministic rules, not an AI coach or individualized medical advice.
+- Exercise coverage is curated starter content; there are no licensed demonstration videos, clinical claims, meal logging, or nutrition database.
+- Gym dimensions and equipment footprints are visual planning estimates, not architectural, building-code, accessibility, fire-safety, manufacturer-clearance or professional fit-out certification.
+- Saved layouts, templates and session history live in the current browser only.
+- Enquiries do not reach a business. No booking, payment, or membership purchase is completed.
+- A successful build does not substitute for browser testing on physical devices. Browser automation/screenshot inspection must be run in an environment where those tools are available.
+
+## Engineering notes
+
+- Keep all active development on `main` for this repository workflow.
+- Do not add a `CLAUDE.md` file or require one for setup.
+- Preserve the shared typed data models and keep WebGL-specific UI optional rather than making it the only way to access core content.
