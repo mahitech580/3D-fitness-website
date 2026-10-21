@@ -27,6 +27,33 @@ for (const featureText of ['BUILD MY WEEK', 'MARK SESSION DONE', 'ROTATE 90°', 
 }
 for (const asset of ['favicon.svg', 'site.webmanifest', 'robots.txt', 'sitemap.xml', '404.html']) await check(asset);
 
+// Guard the app's keyboard-accessible command palette against stale section anchors.
+const sourcePaths = [
+  'src/App.tsx',
+  'src/components/WorkoutBuilder.tsx',
+  'src/components/ExerciseLibrary.tsx',
+  'src/components/GymDiscovery.tsx',
+  'src/components/GymPlanner.tsx',
+  'src/components/TrialBooking.tsx',
+  'src/components/CommandPalette.tsx',
+];
+const sourceContents = await Promise.all(sourcePaths.map((relativePath) =>
+  readFile(path.resolve(relativePath), 'utf8').catch(() => {
+    failures.push('Could not read source needed for navigation verification: ' + relativePath);
+    return '';
+  }),
+));
+const sectionIds = new Set();
+for (const source of sourceContents.slice(0, -1)) {
+  for (const match of source.matchAll(/<section\\b[^>]*\\bid=["']([^"']+)["']/gs)) sectionIds.add(match[1]);
+}
+const paletteSource = sourceContents[sourceContents.length - 1];
+const commandTargetIds = [...paletteSource.matchAll(/\\{\\s*id:\\s*'([^']+)'/g)].map((match) => match[1]);
+for (const targetId of commandTargetIds) {
+  if (!sectionIds.has(targetId)) failures.push('Command palette target does not match a section anchor: #' + targetId);
+}
+if (!commandTargetIds.includes('gyms')) failures.push('Command palette is missing the gym discovery section.');
+
 const manifest = await readFile(path.join(root, 'site.webmanifest'), 'utf8').catch(() => '');
 if (manifest) {
   try {
