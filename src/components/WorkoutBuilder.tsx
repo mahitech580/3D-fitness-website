@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { EXERCISES, gearMatches, type Exercise, type GearOption, type TrainingGoal } from '../data/exercises';
 
 type WorkoutDay = { label: string; theme: string; exercises: Exercise[]; minutes: number };
@@ -64,12 +64,9 @@ export function WorkoutBuilder() {
   const sessionKeys = useMemo(() => plan.map((day) => [weekKey, goal, gear, day.label].join(':')), [plan, weekKey, goal, gear]);
   const completedCount = sessionKeys.filter((key) => completedIds.includes(key)).length;
 
-  useMemo(() => completedCount / Math.max(1, plan.length) * 100, [completedCount, plan.length]);
-
-  useMemo(() => {
+  useEffect(() => {
     try { window.localStorage.setItem('kinetik-session-progress', JSON.stringify(completedIds)); }
     catch { /* Progress remains available in memory when storage is disabled. */ }
-    return completedIds.length;
   }, [completedIds]);
 
   function toggleCompletion(key: string) {
@@ -124,8 +121,8 @@ export function WorkoutBuilder() {
               <button className="reset-progress" type="button" onClick={resetWeekProgress}>RESET WEEK</button>
             </div>
             <div className="workout-days">
-              {plan.map((day) => (
-                <article className={completedIds.includes(sessionKeys[plan.indexOf(day)]) ? 'workout-day is-complete' : 'workout-day'} key={day.label}>
+              {plan.map((day, dayIndex) => (
+                <article className={completedIds.includes(sessionKeys[dayIndex]) ? 'workout-day is-complete' : 'workout-day'} key={day.label}>
                   <div className="workout-day-head"><span>{day.label}</span><small>{day.theme}</small></div>
                   <h3>{goal === 'Conditioning' ? 'Conditioning set' : goal === 'Mobility' ? 'Mobility flow' : 'Strength session'}</h3>
                   <p className="day-duration">{day.minutes} MINUTES <span>·</span> {level.toUpperCase()}</p>
