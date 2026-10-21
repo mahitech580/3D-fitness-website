@@ -54,7 +54,7 @@ try {
   const firstItem = planner.locator('.planner-item').first();
   await firstItem.click();
   await planner.getByRole('button', { name: /ROTATE 90°/i }).click();
-  await planner.getByRole('button', { name: /ADD SQUAT RACK/i }).click();
+  await planner.locator('.planner-sidebar').getByRole('button', { name: /ADD SQUAT RACK/i }).click();
   assert.ok(await planner.locator('.planner-item').count() >= 5, 'The floor plan should accept new equipment.');
   await planner.getByRole('button', { name: /SAVE LAYOUT/i }).click();
   await planner.getByRole('button', { name: /LOAD SAVED/i }).click();
