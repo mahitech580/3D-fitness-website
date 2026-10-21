@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEvent } from 'react';
 import '../styles/planner.css';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import { Plane, Raycaster, Vector2, Vector3 } from 'three';
 
 const EQUIPMENT = {
   rack: { label: 'Squat rack', mark: 'R', width: 2, depth: 2, color: '#9fce3b', category: 'Strength' },
@@ -90,7 +91,7 @@ function downloadFile(filename: string, contents: Blob | string, mime = 'applica
   window.setTimeout(() => URL.revokeObjectURL(url), 1200);
 }
 
-function EquipmentModel({ item, roomWidth, roomLength, selected, onSelect }: { item: PlacedItem; roomWidth: number; roomLength: number; selected: boolean; onSelect: (id: number) => void }) {
+function EquipmentModel({ item, roomWidth, roomLength, selected, onSelect, onDragStart }: { item: PlacedItem; roomWidth: number; roomLength: number; selected: boolean; onSelect: (id: number) => void; onDragStart: (id: number) => void }) {
   const base = EQUIPMENT[item.type];
   const size = sizeOf(item);
   const position: [number, number, number] = [item.x + size.width / 2 - roomWidth / 2, 0.03, item.y + size.depth / 2 - roomLength / 2];
@@ -99,7 +100,7 @@ function EquipmentModel({ item, roomWidth, roomLength, selected, onSelect }: { i
   const metal = '#9fa7a0';
   const pad = '#313b34';
   return (
-    <group position={position} rotation={[0, item.rotated ? Math.PI / 2 : 0, 0]} onClick={(event) => { event.stopPropagation(); onSelect(item.id); }}>
+    <group position={position} rotation={[0, item.rotated ? Math.PI / 2 : 0, 0]} onClick={(event) => { event.stopPropagation(); onSelect(item.id); }} onPointerDown={(event) => { if (event.button !== 0) return; event.stopPropagation(); onSelect(item.id); onDragStart(item.id); }}>
       <mesh position={[0, 0.045, 0]} castShadow receiveShadow>
         <boxGeometry args={[base.width * 0.92, 0.07, base.depth * 0.9]} />
         <meshStandardMaterial color={selected ? '#d7ff58' : base.color} roughness={0.78} metalness={0.08} />
@@ -158,7 +159,67 @@ function EquipmentModel({ item, roomWidth, roomLength, selected, onSelect }: { i
   );
 }
 
-function PlannerScene({ items, roomWidth, roomLength, roomHeight, selectedId, onSelect }: { items: PlacedItem[]; roomWidth: number; roomLength: number; roomHeight: number; selectedId: number | null; onSelect: (id: number) => void }) {
+function PlannerScene({ items, roomWidth, roomLength, roomHeight, selectedId, onSelect, onDragPreview, onDragEnd }: {
+  items: PlacedItem[];
+  roomWidth: number;
+  roomLength: number;
+  roomHeight: number;
+  selectedId: number | null;
+  onSelect: (id: number) => void;
+  onDragPreview: (id: number, x: number, y: number) => void;
+  onDragEnd: (id: number) => void;
+}) {
+  const { camera, gl } = useThree();
+  const [dragging, setDragging] = useState(false);
+  const dragIdRef = useRef<number | null>(null);
+  const dragContextRef = useRef({ items, roomWidth, roomLength, onDragPreview, onDragEnd });
+  dragContextRef.current = { items, roomWidth, roomLength, onDragPreview, onDragEnd };
+  const raycaster = useMemo(() => new Raycaster(), []);
+  const pointer = useMemo(() => new Vector2(), []);
+  const dragPlane = useMemo(() => new Plane(new Vector3(0, 1, 0), -0.03), []);
+  const worldPoint = useMemo(() => new Vector3(), []);
+
+  useEffect(() => {
+    function movePointer(event: PointerEvent) {
+      const id = dragIdRef.current;
+      if (id === null) return;
+      const rect = gl.domElement.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -(((event.clientY - rect.top) / rect.height) * 2 - 1));
+      raycaster.setFromCamera(pointer, camera);
+      if (!raycaster.ray.intersectPlane(dragPlane, worldPoint)) return;
+      const context = dragContextRef.current;
+      const item = context.items.find((candidate) => candidate.id === id);
+      if (!item) return;
+      const size = sizeOf(item);
+      const x = Math.round(worldPoint.x + context.roomWidth / 2 - size.width / 2);
+      const y = Math.round(worldPoint.z + context.roomLength / 2 - size.depth / 2);
+      context.onDragPreview(id, x, y);
+    }
+
+    function finishPointer() {
+      const id = dragIdRef.current;
+      if (id === null) return;
+      dragIdRef.current = null;
+      setDragging(false);
+      dragContextRef.current.onDragEnd(id);
+    }
+
+    window.addEventListener('pointermove', movePointer, { passive: true });
+    window.addEventListener('pointerup', finishPointer);
+    window.addEventListener('pointercancel', finishPointer);
+    return () => {
+      window.removeEventListener('pointermove', movePointer);
+      window.removeEventListener('pointerup', finishPointer);
+      window.removeEventListener('pointercancel', finishPointer);
+    };
+  }, [camera, gl, pointer, raycaster, dragPlane, worldPoint]);
+
+  function beginDrag(id: number) {
+    dragIdRef.current = id;
+    setDragging(true);
+  }
+
   return (
     <>
       <ambientLight intensity={1.3} />
@@ -172,7 +233,8 @@ function PlannerScene({ items, roomWidth, roomLength, roomHeight, selectedId, on
       <gridHelper args={[Math.max(roomWidth, roomLength), Math.max(roomWidth, roomLength), '#626d60', '#919b8d']} position={[0, -0.045, 0]} />
       <mesh position={[0, roomHeight / 2, -roomLength / 2]} receiveShadow><boxGeometry args={[roomWidth, roomHeight, 0.12]} /><meshStandardMaterial color="#d9ddd4" transparent opacity={0.35} roughness={0.92} /></mesh>
       <mesh position={[-roomWidth / 2, roomHeight / 2, 0]} receiveShadow><boxGeometry args={[0.12, roomHeight, roomLength]} /><meshStandardMaterial color="#c5cec2" transparent opacity={0.24} roughness={0.92} /></mesh>
-      {items.map((item) => <EquipmentModel key={item.id} item={item} roomWidth={roomWidth} roomLength={roomLength} selected={selectedId === item.id} onSelect={onSelect} />)}
+      {items.map((item) => <EquipmentModel key={item.id} item={item} roomWidth={roomWidth} roomLength={roomLength} selected={selectedId === item.id} onSelect={onSelect} onDragStart={beginDrag} />)}
+      <OrbitControls makeDefault enabled={!dragging} enableDamping dampingFactor={0.12} minPolarAngle={0.12} maxPolarAngle={1.47} minDistance={Math.max(4, roomWidth * 0.35)} maxDistance={Math.max(24, roomWidth * 2.8)} />
     </>
   );
 }
@@ -184,6 +246,7 @@ export function GymPlanner() {
   const [roomHeight, setRoomHeight] = useState(stored?.roomHeight ?? 3);
   const [items, setItems] = useState<PlacedItem[]>(stored?.items ?? DEFAULT_ITEMS);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [draggingIn3d, setDraggingIn3d] = useState(false);
   const [tool, setTool] = useState<EquipmentType>('rack');
   const [view, setView] = useState<'plan' | '3d' | 'split'>('split');
   const [status, setStatus] = useState('Add an item, select it in either view, then use the property controls to position it precisely.');
@@ -191,6 +254,7 @@ export function GymPlanner() {
   const [future, setFuture] = useState<PlacedItem[][]>([]);
   const previewRef = useRef<HTMLDivElement>(null);
   const importRef = useRef<HTMLInputElement>(null);
+  const dragOriginRef = useRef<PlacedItem[] | null>(null);
   const nextId = useRef(Math.max(0, ...(stored?.items ?? DEFAULT_ITEMS).map((item) => item.id)) + 1);
   const selectedItem = items.find((item) => item.id === selectedId) ?? null;
   const selectedSize = selectedItem ? sizeOf(selectedItem) : null;
@@ -214,6 +278,42 @@ export function GymPlanner() {
     setPast((current) => [...current, items.map((item) => ({ ...item }))].slice(-40));
     setFuture([]);
     setItems(next);
+  }
+
+  function start3dDrag(id: number) {
+    dragOriginRef.current = items.map((item) => ({ ...item }));
+    setSelectedId(id);
+    setDraggingIn3d(true);
+    setStatus('Dragging equipment in 3D. Release to place it; invalid or overlapping positions are blocked.');
+  }
+
+  function preview3dDrag(id: number, x: number, y: number) {
+    const current = items.find((item) => item.id === id);
+    if (!current || (current.x === x && current.y === y)) return;
+    const candidate = { ...current, x, y };
+    if (!placementFits(candidate, items.filter((item) => item.id !== id), roomWidth, roomLength)) {
+      setStatus('3D move blocked: the equipment would overlap another footprint or leave the room.');
+      return;
+    }
+    setItems((currentItems) => currentItems.map((item) => item.id === id ? candidate : item));
+  }
+
+  function finish3dDrag(id: number) {
+    setDraggingIn3d(false);
+    const before = dragOriginRef.current;
+    dragOriginRef.current = null;
+    const changed = Boolean(before && before.some((prior) => {
+      const current = items.find((item) => item.id === prior.id);
+      return !current || current.x !== prior.x || current.y !== prior.y || current.rotated !== prior.rotated;
+    }));
+    if (changed && before) {
+      setPast((current) => [...current, before].slice(-40));
+      setFuture([]);
+      const item = items.find((entry) => entry.id === id);
+      setStatus(item ? EQUIPMENT[item.type].label + ' repositioned in 3D. The 2D plan is synchronized.' : '3D layout updated. The 2D plan is synchronized.');
+    } else {
+      setStatus('Equipment selected. Drag it in the 3D room, or use the precise coordinate controls.');
+    }
   }
 
   function snapshot(): LayoutSnapshot {
@@ -415,7 +515,7 @@ export function GymPlanner() {
             <div className="planner-block"><p className="planner-label">EQUIPMENT CATALOG / {TYPES.length} ITEMS</p><div className="equipment-palette">{TYPES.map((type) => <button key={type} type="button" className={tool === type ? 'palette-tool is-active' : 'palette-tool'} aria-pressed={tool === type} onClick={() => { setTool(type); setStatus('Selected ' + EQUIPMENT[type].label + '. Add it to an open grid position.'); }}><span>{EQUIPMENT[type].mark}</span><small>{EQUIPMENT[type].label}</small></button>)}</div><button type="button" className="button button-primary full-width" onClick={() => addAtNextOpenSpot(tool)}>ADD {EQUIPMENT[tool].label.toUpperCase()} <span aria-hidden="true">＋</span></button></div>
             <div className="planner-block selected-controls">
               <p className="planner-label">SELECTED EQUIPMENT</p><p className="selected-title">{selectedItem ? EQUIPMENT[selectedItem.type].label : 'Nothing selected'}</p>
-              <p className="planner-note">{selectedSize ? selectedSize.width + ' m × ' + selectedSize.depth + ' m footprint · grid (' + selectedItem!.x + ', ' + selectedItem!.y + ')' : 'Select the same item from either the 2D plan or 3D room.'}</p>
+              <p className="planner-note">{selectedSize ? selectedSize.width + ' m × ' + selectedSize.depth + ' m footprint · grid (' + selectedItem!.x + ', ' + selectedItem!.y + ')' : 'Select an item in either view. Drag it in 3D or use numerical and arrow controls.'}</p>
               {selectedItem && <div className="coordinate-controls"><label>X / COLUMN<input type="number" min="0" max={roomWidth - 1} step="1" value={selectedItem.x} onChange={(event) => setCoordinate('x', Number(event.target.value))} /></label><label>Y / ROW<input type="number" min="0" max={roomLength - 1} step="1" value={selectedItem.y} onChange={(event) => setCoordinate('y', Number(event.target.value))} /></label></div>}
               <div className="move-pad"><button type="button" disabled={!selectedItem} onClick={() => moveSelected(0, -1)} aria-label="Move equipment toward front">↑</button><button type="button" disabled={!selectedItem} onClick={() => moveSelected(-1, 0)} aria-label="Move equipment left">←</button><button type="button" disabled={!selectedItem} onClick={() => moveSelected(0, 1)} aria-label="Move equipment toward back">↓</button><button type="button" disabled={!selectedItem} onClick={() => moveSelected(1, 0)} aria-label="Move equipment right">→</button></div>
               <div className="selected-actions"><button type="button" disabled={!selectedItem} onClick={rotateSelected}>ROTATE 90°</button><button type="button" disabled={!selectedItem} onClick={duplicateSelected}>DUPLICATE</button><button type="button" disabled={!selectedItem} onClick={removeSelected}>REMOVE</button></div>
@@ -433,11 +533,10 @@ export function GymPlanner() {
                 </div></div>
               </div>
               <div className={'planner-view planner-3d-view' + activeViewClass('3d')}>
-                <div className="planner-view-label"><span>02 / PERSPECTIVE VIEW</span><span>DRAG TO ORBIT · SCROLL TO ZOOM</span></div>
+                <div className="planner-view-label"><span>02 / PERSPECTIVE VIEW</span><span>DRAG EQUIPMENT TO MOVE · DRAG FLOOR TO ORBIT · SCROLL TO ZOOM</span></div>
                 <div className="planner-3d-canvas" ref={previewRef}>
                   <Canvas shadows dpr={[1, 1.5]} camera={{ position: [roomWidth * 0.92, roomHeight * 1.5 + 3, roomLength * 1.05], fov: 38, near: 0.1, far: 120 }} gl={{ antialias: true, powerPreference: 'low-power', preserveDrawingBuffer: true }} fallback={<p>3D preview is not supported by this browser. Use the 2D floor plan.</p>}>
-                    <PlannerScene items={items} roomWidth={roomWidth} roomLength={roomLength} roomHeight={roomHeight} selectedId={selectedId} onSelect={(id) => { setSelectedId(id); const item = items.find((entry) => entry.id === id); if (item) setStatus(EQUIPMENT[item.type].label + ' selected in 3D. Use the coordinate fields and move controls to edit it.'); }} />
-                    <OrbitControls makeDefault enableDamping dampingFactor={0.12} minPolarAngle={0.12} maxPolarAngle={1.47} minDistance={Math.max(4, roomWidth * 0.35)} maxDistance={Math.max(24, roomWidth * 2.8)} />
+                    <PlannerScene items={items} roomWidth={roomWidth} roomLength={roomLength} roomHeight={roomHeight} selectedId={selectedId} onSelect={(id) => { setSelectedId(id); const item = items.find((entry) => entry.id === id); if (item) setStatus(EQUIPMENT[item.type].label + ' selected in 3D. Drag to move it, or use the coordinate controls.'); }} onDragPreview={preview3dDrag} onDragEnd={finish3dDrag} />
                   </Canvas>
                 </div>
               </div>
