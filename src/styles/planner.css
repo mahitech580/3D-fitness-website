@@ -1,0 +1,60 @@
+/* KINETIK gym planner: synchronized 2D/3D workspace and editing controls */
+.planner-workspace { display: grid; min-width: 0; }
+.planner-workspace.is-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.planner-view { min-width: 0; }
+.planner-view.is-hidden { display: none; }
+.planner-view + .planner-view { border-left: 1px solid var(--line); }
+.planner-view-label { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 15px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 7px; font-weight: 700; letter-spacing: .12em; }
+.planner-plan-view .planner-grid-scroll { padding: 10px; }
+.planner-plan-view .planner-grid { min-width: 450px; grid-auto-flow: row; }
+.planner-plan-view .planner-slot { min-height: 34px; }
+.planner-3d-canvas { position: relative; height: 450px; min-height: 320px; overflow: hidden; background: radial-gradient(ellipse at 55% 40%, color-mix(in srgb, var(--accent) 11%, var(--panel)), var(--panel) 72%); }
+.planner-3d-canvas > div, .planner-3d-canvas canvas { display: block; width: 100% !important; height: 100% !important; }
+.planner-3d-canvas canvas { outline: none; }
+.planner-view-controls { display: flex; gap: 3px; }
+.planner-view-controls button, .planner-history-actions button, .planner-export-actions button { padding: 8px 9px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; font-size: 7px; font-weight: 700; letter-spacing: .07em; }
+.planner-view-controls button.is-active, .planner-view-controls button:hover, .planner-history-actions button:not(:disabled):hover, .planner-export-actions button:hover { border-color: var(--accent); color: var(--accent); }
+.planner-view-controls button.is-active { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+.room-dimensions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 17px; }
+.room-dimensions label, .coordinate-controls label { display: grid; gap: 6px; min-width: 0; color: var(--muted); font-size: 7px; font-weight: 700; letter-spacing: .08em; }
+.room-dimensions input, .coordinate-controls input { width: 100%; min-width: 0; min-height: 36px; padding: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 12px; font-variant-numeric: tabular-nums; }
+.coordinate-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+.move-pad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; margin-top: 12px; }
+.move-pad button { min-height: 35px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; font-size: 15px; }
+.move-pad button:not(:disabled):hover { border-color: var(--accent); color: var(--accent); }
+.move-pad button:disabled, .planner-history-actions button:disabled { opacity: .35; cursor: not-allowed; }
+.planner-actions { display: grid; gap: 10px; padding: 15px 18px; border-top: 1px solid var(--line); }
+.planner-history-actions, .planner-export-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.planner-export-actions button { color: var(--ink); }
+.planner-file-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; clip-path: inset(50%); }
+.planner-disclaimer { padding: 0 18px 15px; margin: 0; }
+.planner-item { font-size: 8px; }
+.planner-item small { white-space: normal; overflow-wrap: anywhere; text-align: center; }
+.planner-item.is-rotated::after { content: '↻'; position: absolute; right: 3px; top: 2px; color: var(--ink); font-size: 11px; }
+.planner-item-rack, .planner-item-bench, .planner-item-dumbbells, .planner-item-barbell, .planner-item-kettlebell, .planner-item-cable, .planner-item-legpress, .planner-item-latpulldown { background: color-mix(in srgb, var(--accent) 13%, var(--panel)); }
+.planner-item-treadmill, .planner-item-bike, .planner-item-rower, .planner-item-elliptical { background: color-mix(in srgb, #8dafff 14%, var(--panel)); }
+.planner-footer { flex-wrap: wrap; }
+.planner-footer > div { min-width: 120px; }
+@media (max-width: 1150px) {
+  .planner-layout { grid-template-columns: 230px minmax(0, 1fr); }
+  .planner-workspace.is-split { grid-template-columns: minmax(0, 1fr); }
+  .planner-view + .planner-view { border-left: 0; border-top: 1px solid var(--line); }
+  .planner-3d-canvas { height: 400px; }
+}
+@media (max-width: 760px) {
+  .planner-layout { grid-template-columns: minmax(0, 1fr); }
+  .planner-toolbar { align-items: flex-start; }
+  .planner-toolbar > div:nth-child(2) { width: 100%; margin-left: 0; }
+  .planner-view-controls { flex-wrap: wrap; }
+  .planner-3d-canvas { height: 350px; min-height: 270px; }
+  .planner-plan-view .planner-grid { min-width: 420px; }
+  .planner-actions { padding: 13px; }
+  .planner-history-actions button, .planner-export-actions button { flex: 1 1 auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .planner-view-controls button, .planner-history-actions button, .planner-export-actions button { transition: none; }
+}
+@media (forced-colors: active) {
+  .planner-view-controls button, .planner-history-actions button, .planner-export-actions button, .move-pad button { border: 1px solid ButtonText; }
+  .planner-item.is-selected { outline: 2px solid Highlight; }
+}
