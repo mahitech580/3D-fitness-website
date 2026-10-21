@@ -12,12 +12,14 @@ function currentWeekKey(): string {
   return String(date.getFullYear()) + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
 }
 
-function buildPlan(goal: TrainingGoal, level: string, gear: GearOption, days: number, minutes: number): WorkoutDay[] {
-  const eligible = EXERCISES.filter((exercise) => exercise.goals.includes(goal) && gearMatches(exercise, gear));
-  const fallback = EXERCISES.filter((exercise) => gearMatches(exercise, gear));
+function buildPlan(goal: TrainingGoal, level: string, gear: GearOption, days: number, minutes: number, intensity: string, location: string, avoidedIds: string[], availableDays: string[]): WorkoutDay[] {
+  const isAvailable = (exercise: Exercise) => !avoidedIds.includes(exercise.id) && gearMatches(exercise, gear) && (location !== 'Outdoors' || exercise.gear.includes('Bodyweight'));
+  const eligible = EXERCISES.filter((exercise) => exercise.goals.includes(goal) && isAvailable(exercise));
+  const fallback = EXERCISES.filter(isAvailable);
   const source = eligible.length >= 4 ? eligible : fallback;
   const weekdays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-  const sessionCount = Math.min(days, 5);
+  const selectedWeekdays = availableDays.length ? weekdays.filter((weekday) => availableDays.includes(weekday)) : weekdays;
+  const sessionCount = Math.min(days, selectedWeekdays.length);
   const size = minutes <= 25 ? 4 : minutes <= 40 ? 5 : 6;
   const result: WorkoutDay[] = [];
 
@@ -31,10 +33,10 @@ function buildPlan(goal: TrainingGoal, level: string, gear: GearOption, days: nu
     }
     const adjusted = chosen.map((exercise) => ({
       ...exercise,
-      sets: level === 'New to training' ? '2' : level === 'Experienced' ? '4' : exercise.sets,
+      sets: intensity === 'Low' || level === 'New to training' ? '2' : intensity === 'High' || level === 'Experienced' ? '4' : exercise.sets,
     }));
     result.push({
-      label: weekdays[Math.round(day * 6 / Math.max(1, sessionCount - 1))],
+      label: selectedWeekdays[day] ?? weekdays[day],
       theme: goal === 'Conditioning' ? (day % 2 === 0 ? 'ENGINE / INTERVALS' : 'PACE / CAPACITY') : goal === 'Mobility' ? 'RANGE / CONTROL' : (day % 2 === 0 ? 'FOUNDATION / A' : 'FOUNDATION / B'),
       exercises: adjusted,
       minutes,
@@ -49,7 +51,11 @@ export function WorkoutBuilder() {
   const [gear, setGear] = useState<GearOption>('Dumbbells');
   const [days, setDays] = useState(3);
   const [minutes, setMinutes] = useState(40);
-  const [plan, setPlan] = useState<WorkoutDay[]>(() => buildPlan('Strength', 'Regular', 'Dumbbells', 3, 40));
+  const [intensity, setIntensity] = useState<'Low' | 'Moderate' | 'High'>('Moderate');
+  const [location, setLocation] = useState<'Home' | 'Gym' | 'Outdoors'>('Home');
+  const [avoidedIds, setAvoidedIds] = useState<string[]>([]);
+  const [availableDays, setAvailableDays] = useState<string[]>(['MON', 'WED', 'FRI']);
+  const [plan, setPlan] = useState<WorkoutDay[]>(() => buildPlan('Strength', 'Regular', 'Dumbbells', 3, 40, 'Moderate', 'Home', [], ['MON', 'WED', 'FRI']));
   const [copyStatus, setCopyStatus] = useState('');
   const [activeDay, setActiveDay] = useState<WorkoutDay | null>(null);
   const [history, setHistory] = useState<CompletedWorkoutRecord[]>(() => {
@@ -102,7 +108,7 @@ export function WorkoutBuilder() {
   }
 
   async function copyPlan() {
-    const text = ['KINETIK / WEEK PLAN', 'Goal: ' + goal, 'Level: ' + level, 'Equipment: ' + gear, ''].concat(
+    const text = ['KINETIK / WEEK PLAN', 'Goal: ' + goal, 'Level: ' + level, 'Equipment: ' + gear, 'Location: ' + location, 'Intensity: ' + intensity, 'Available days: ' + (availableDays.join(', ') || 'Flexible'), 'Avoided movements: ' + (avoidedIds.map((id) => EXERCISES.find((exercise) => exercise.id === id)?.name ?? id).join(', ') || 'None selected'), ''].concat(
       ...plan.map((day) => [day.label + ' — ' + day.theme + ' — ' + day.minutes + ' MIN', ...day.exercises.map((item) => item.name + ' · ' + item.sets + ' sets · ' + item.reps), '']),
     ).join('\n');
     try {
@@ -114,9 +120,9 @@ export function WorkoutBuilder() {
   }
 
   function generate() {
-    setPlan(buildPlan(goal, level, gear, days, minutes));
+    setPlan(buildPlan(goal, level, gear, days, minutes, intensity, location, avoidedIds, availableDays));
     setShowPlan(true);
-    setCopyStatus('');
+    setCopyStatus('PLAN BUILT FOR ' + location.toUpperCase() + ' · ' + intensity.toUpperCase() + ' INTENSITY.');
   }
 
   return (
@@ -131,12 +137,16 @@ export function WorkoutBuilder() {
             <div className="field-group"><label htmlFor="goal-select">WHAT ARE WE WORKING TOWARD?</label><select id="goal-select" value={goal} onChange={(event) => setGoal(event.target.value as TrainingGoal)}><option value="Strength">Build strength</option><option value="Muscle">Build muscle</option><option value="Conditioning">Improve conditioning</option><option value="Mobility">Move more freely</option></select></div>
             <div className="field-group"><label htmlFor="level-select">YOUR STARTING POINT</label><select id="level-select" value={level} onChange={(event) => setLevel(event.target.value)}><option>New to training</option><option>Regular</option><option>Experienced</option></select></div>
             <div className="field-group"><label htmlFor="gear-select">AVAILABLE EQUIPMENT</label><select id="gear-select" value={gear} onChange={(event) => setGear(event.target.value as GearOption)}><option>Bodyweight</option><option>Dumbbells</option><option>Resistance bands</option><option>Full gym</option></select></div>
+            <div className="field-group"><label htmlFor="location-select">TRAINING LOCATION</label><select id="location-select" value={location} onChange={(event) => setLocation(event.target.value as 'Home' | 'Gym' | 'Outdoors')}><option>Home</option><option>Gym</option><option>Outdoors</option></select></div>
+            <div className="field-group"><label htmlFor="intensity-select">PREFERRED INTENSITY</label><select id="intensity-select" value={intensity} onChange={(event) => setIntensity(event.target.value as 'Low' | 'Moderate' | 'High')}><option>Low</option><option>Moderate</option><option>High</option></select></div>
             <div className="field-group"><label htmlFor="days-select">SESSIONS EACH WEEK</label><select id="days-select" value={days} onChange={(event) => setDays(Number(event.target.value))}><option value={2}>2 sessions</option><option value={3}>3 sessions</option><option value={4}>4 sessions</option><option value={5}>5 sessions</option></select></div>
             <div className="field-group"><label htmlFor="minutes-select">TIME PER SESSION</label><select id="minutes-select" value={minutes} onChange={(event) => setMinutes(Number(event.target.value))}><option value={25}>25 minutes</option><option value={40}>40 minutes</option><option value={55}>55 minutes</option></select></div>
+            <div className="field-group"><span className="field-label">AVAILABLE TRAINING DAYS</span><div className="weekday-choice">{['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((weekday) => <label key={weekday}><input type="checkbox" checked={availableDays.includes(weekday)} onChange={(event) => setAvailableDays((current) => event.target.checked ? [...current, weekday] : current.filter((day) => day !== weekday))} /><span>{weekday}</span></label>)}</div><small className="field-help">The plan uses selected days, up to your session count. Select extra days to create the full week.</small></div>
+            <div className="field-group"><label htmlFor="avoid-select">MOVEMENTS TO AVOID</label><select id="avoid-select" multiple size={4} value={avoidedIds} onChange={(event) => setAvoidedIds(Array.from(event.currentTarget.selectedOptions, (option) => option.value))}>{EXERCISES.map((exercise) => <option key={exercise.id} value={exercise.id}>{exercise.name}</option>)}</select><small className="field-help">Use Ctrl (Windows) or Command (Mac) to choose more than one. Generate again to apply.</small></div>
             <button className="button button-primary builder-generate" type="button" onClick={generate}>BUILD MY WEEK <span aria-hidden="true">↗</span></button>
           </div>
           <div className="builder-result" aria-live="polite">
-            <div className="result-topline"><span>YOUR STARTER WEEK</span><span>{plan.length} SESSIONS / {totalMoves} MOVEMENT SLOTS</span></div>
+            <div className="result-topline"><span>YOUR STARTER WEEK</span><span>{plan.length} SESSIONS / {totalMoves} MOVEMENT SLOTS · {intensity.toUpperCase()}</span></div>
             <div className="progress-summary">
               <div className="progress-summary-label"><strong>{completedCount} / {plan.length}</strong><span>SESSIONS COMPLETED THIS WEEK</span></div>
               <div className="progress-track" role="progressbar" aria-label="Weekly sessions completed" aria-valuemin={0} aria-valuemax={plan.length} aria-valuenow={completedCount}><span style={{ width: (completedCount / Math.max(1, plan.length) * 100) + '%' }} /></div>
@@ -162,7 +172,7 @@ export function WorkoutBuilder() {
             </div>
             <div className="result-actions"><p>Rule-based demo plan. Adjust loads, technique and recovery to your needs; this is not medical advice or a remote AI coach.</p><button className="button button-quiet" type="button" onClick={copyPlan}>COPY WEEK <span aria-hidden="true">↗</span></button></div>
             {copyStatus && <p className="inline-status" role="status">{copyStatus}</p>}
-            {showPlan && <p className="inline-status" role="status">WEEK UPDATED FOR {goal.toUpperCase()} · {days} SESSIONS · {gear.toUpperCase()}.</p>}
+            {showPlan && <p className="inline-status" role="status">WEEK UPDATED FOR {goal.toUpperCase()} · {plan.length} SESSIONS · {location.toUpperCase()} · {gear.toUpperCase()}.</p>}
           </div>
         </div>
       </div>
