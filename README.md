@@ -1,30 +1,37 @@
 # KINETIK — Fitness, built around you
 
-An original fitness experience combining a procedural 3D equipment centerpiece, rule-based workout planning, a searchable movement starter library, an interactive gym layout concept, and a transparent first-session enquiry flow.
+An original fitness-planning prototype that combines a procedural 3D equipment hero, explainable workout programming, guided sessions, movement education, illustrative gym concepts, and a synchronized 2D/3D gym layout planner.
 
 ## Features
-- **3D equipment hero:** procedural barbell and plates, pointer/touch rotation, graceful fallback, reduced-motion behavior.
-- **Workout builder:** choose goal, training level, available gear, session count and duration; generate an explainable browser-side weekly plan and mark sessions complete with browser-local weekly tracking.
-- **Movement library:** search and filter authored starter entries by focus and equipment.
-- **Gym layout planner:** place, rotate, select, and remove equipment within a measured 12 m × 8 m grid.
-- **First-session enquiry:** a validated local-only prototype that does not claim to submit a real booking.
-- **Responsive accessibility:** mobile navigation, keyboard focus, reduced-motion support, and high-contrast consideration.
-- **Build guardrails:** production-output smoke verification alongside TypeScript and Vite build.
+
+- **Interactive 3D hero:** a procedural barbell and weight-plate study built with Three.js / React Three Fiber, a pause control, reduced-motion support, and a rendering fallback.
+- **Workout builder:** configure goal, level, equipment, location, preferred intensity, session duration, available weekdays, and movements to avoid. The browser-side rule engine builds a repeatable week; it is not a hosted AI coach.
+- **Reusable workout templates:** save, reload, and remove up to eight named preference templates in this browser. Templates regenerate sessions from the current movement catalog.
+- **Guided session execution:** start, pause/resume, previous/next movement, change to an alternative movement, start/skip a rest timer, and finish a session.
+- **Training history and progress:** completed sessions and weekly checkmarks are stored locally and summarized in a small progress view. Clearing site storage can remove this data.
+- **Movement library:** searchable authored starter content, filters for category, equipment, primary muscle, difficulty and movement pattern, plus sorting, coaching instructions, common mistakes, and suggested alternatives.
+- **Gym concept explorer:** six illustrative venue concepts can be filtered by city and training focus. They are fictional product concepts, not real businesses or verified venues.
+- **2D/3D gym planner:** shared room/equipment state across a 1 m floor grid and a procedural 3D room; edit room dimensions, add/select/move/rotate/duplicate/remove objects, use numeric position controls, and check basic bounds/overlap.
+- **Planner persistence and export:** undo/redo, auto-save, explicit browser-local save/load, validated JSON import/export, 2D floor-plan PNG export, and 3D preview PNG export. Browser-local data is not cloud-synced.
+- **First-session enquiry prototype:** prefill the concept of interest, validate an enquiry, then review/copy the prepared request. It does not contact a gym or create a booking.
+- **Accessibility and layout:** responsive navigation, keyboard-focus indicators, reduced-motion handling, semantic section headings, status announcements, and responsive planner/training controls.
 
 ## Run locally
-1. Install with `npm install`.
-2. Start Vite with `npm run dev`.
-3. Check TypeScript with `npm run typecheck`.
-4. Build and verify with `npm run check`.
-5. Preview the built site with `npm run preview`.
+
+1. Install dependencies with `npm install` (Node.js 20 or newer).
+2. Start the development server with `npm run dev`.
+3. Type-check with `npm run typecheck`.
+4. Build and run production-output checks with `npm run check`.
+5. Preview the production bundle with `npm run preview`.
 
 ## Documentation
-- `docs/REFERENCE-RESEARCH.md` records observations and design decisions for the provided fitness and immersive-web references.
-- `docs/IMPLEMENTATION.md` describes the product architecture and current limitations.
-- `docs/ASSET-CREDITS.md` records the project's authored assets and third-party asset policy.
-- `CLAUDE.md` contains the permanent product, accessibility, and engineering rules.
 
-## Product honesty
-This is a front-end demo. The workout builder uses local rules, not a hosted AI model. The planner is a 2D concept sketch, not a construction plan. The enquiry form does not send or store a booking. No customer count, gym availability, membership price, or outcome is claimed.
+- `docs/REFERENCE-RESEARCH.md` records the accessible findings and design decisions drawn from the supplied fitness and immersive-web references.
+- `docs/IMPLEMENTATION.md` documents architecture, local persistence, and known limitations.
+- `docs/ASSET-CREDITS.md` records authored assets and the third-party asset policy.
 
-GitHub Pages deploys from `main` at https://mahitech580.github.io/3D-fitness-website/.
+## Product honesty and limitations
+
+This is a browser-side prototype, not an operating gym, paid membership product, medical service, or account-backed fitness platform. No booking, email, payment, cloud synchronization, real-world venue directory, verified gym availability, or actual membership price is connected. Workout recommendations use deterministic rules and hand-authored data; users should adapt any exercise to their own ability and stop if they feel pain. Gym planner footprints, dimensions, and estimated gaps are approximate concepts only—not CAD, building-code compliance, manufacturer clearances, or safety approval. WebGL rendering and camera behavior should be checked in a real browser and on target mobile devices before production use.
+
+GitHub Pages deploys from `main`: https://mahitech580.github.io/3D-fitness-website/
