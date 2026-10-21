@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { MotionConfig } from 'framer-motion';
 import { SiteHeader } from './components/SiteHeader';
 import { WatercolorBackground } from './components/WatercolorBackground';
@@ -7,13 +8,23 @@ import { ScrollProgress } from './components/ScrollProgress';
 import { CommandPalette } from './components/CommandPalette';
 
 export function App() {
+  const [theme, setTheme] = useState<'light' | 'night'>(() => {
+    try { return window.localStorage.getItem('kairo-theme') === 'night' ? 'night' : 'light'; }
+    catch { return 'light'; }
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    try { window.localStorage.setItem('kairo-theme', theme); } catch { /* Storage can be disabled. */ }
+  }, [theme]);
+
   return (
     <MotionConfig reducedMotion="user">
-      <div className="site-shell">
+      <div className="site-shell" data-theme={theme}>
         <a className="skip-link" href="#main-content">Skip to content</a>
         <WatercolorBackground />
         <ScrollProgress />
-        <SiteHeader />
+        <SiteHeader theme={theme} onToggleTheme={() => setTheme((current) => current === 'light' ? 'night' : 'light')} />
         <CommandPalette />
         <main id="main-content" tabIndex={-1}>
           <HeroSection />

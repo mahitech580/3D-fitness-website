@@ -6,7 +6,9 @@ const links = [
   { href: '#learn', label: 'LEARN' },
 ];
 
-export function SiteHeader() {
+type SiteHeaderProps = { theme: 'light' | 'night'; onToggleTheme: () => void };
+
+export function SiteHeader({ theme, onToggleTheme }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   function closeMenu() {
@@ -48,6 +50,9 @@ export function SiteHeader() {
         ))}
         <a className="nav-reserve" href="#reserve" onClick={closeMenu}>RESERVE <span aria-hidden="true">↗</span></a>
       </nav>
+      <button className="theme-toggle" type="button" onClick={onToggleTheme} aria-pressed={theme === 'night'} aria-label={theme === 'night' ? 'Switch to paper theme' : 'Switch to night reading theme'}>
+        <span aria-hidden="true">{theme === 'night' ? '◐' : '◑'}</span> {theme === 'night' ? 'PAPER' : 'NIGHT'}
+      </button>
     </header>
   );
 }
