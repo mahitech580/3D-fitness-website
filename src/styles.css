@@ -348,3 +348,13 @@ a { color: inherit; text-decoration: none; }
 .share-site-status { color:var(--muted-ink); font:7px/1.5 var(--mono); }
 @media (max-width:720px) { .share-site-wrap { order:4; width:100%; justify-content:flex-start; } .share-site-status { font-size:7px; } }
 @media (forced-colors:active) { .share-site-button { border:1px solid ButtonText; } }
+
+
+/* User-controlled motion pause for the 3D centerpiece */
+.hero-motion-toggle { position:absolute; z-index:8; top:122px; left:50%; display:inline-flex; align-items:center; gap:9px; transform:translateX(-50%); padding:8px 10px; border:1px solid rgba(36,85,181,.26); background:rgba(247,245,239,.48); color:#4e5868; cursor:pointer; font:7px var(--mono); letter-spacing:.15em; backdrop-filter:blur(8px); white-space:nowrap; }
+.hero-motion-toggle span { color:var(--cobalt); font-size:11px; }
+.hero-motion-toggle:hover { color:var(--cobalt); border-color:var(--cobalt); }
+[data-theme="night"] .hero-motion-toggle { background:rgba(19,26,36,.72); color:#d8e2f2; border-color:rgba(145,181,255,.4); }
+@media (max-width:720px) { .hero-motion-toggle { top:144px; font-size:7px; } }
+@media (prefers-reduced-motion:reduce) { .hero-motion-toggle { display:none !important; } }
+@media (forced-colors:active) { .hero-motion-toggle { border:1px solid ButtonText; } }

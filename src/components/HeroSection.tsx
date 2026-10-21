@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { BotanicalOrnaments } from './BotanicalOrnaments';
 import { DeferredDragonScene } from './DeferredDragonScene';
@@ -6,6 +6,7 @@ import { DeferredDragonScene } from './DeferredDragonScene';
 export function HeroSection() {
   const heroRef = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
+  const [animationPaused, setAnimationPaused] = useState(false);
 
   return (
     <section ref={heroRef} className="hero" id="home" aria-labelledby="hero-title">
@@ -27,11 +28,12 @@ export function HeroSection() {
           transition={{ duration: 1.1, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
         >Ritually</motion.h1>
       </div>
-      <DeferredDragonScene eventSource={heroRef} reducedMotion={Boolean(reduceMotion)} />
+      <DeferredDragonScene eventSource={heroRef} reducedMotion={Boolean(reduceMotion) || animationPaused} />
       <div className="hero-caption hero-caption-left">
         <span className="caption-index">01 — 03</span>
         <p>Finding the extraordinary<br />inside the everyday.</p>
       </div>
+      {!reduceMotion && <button className="hero-motion-toggle" type="button" aria-pressed={animationPaused} onClick={() => setAnimationPaused((paused) => !paused)}>{animationPaused ? "RESUME DRIFT" : "PAUSE DRIFT"} <span aria-hidden="true">{animationPaused ? "▶" : "Ⅱ"}</span></button>}
       <a className="hero-discover" href="#listen"><span>SCROLL TO DISCOVER</span><span className="discover-line" aria-hidden="true" /></a>
       <div className="hero-caption hero-caption-right">
         <span className="caption-index">A STUDY IN FORM</span>
