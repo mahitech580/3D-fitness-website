@@ -26,3 +26,27 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Typecheck and build
         run: npm run check
+      - name: Install Chromium for browser smoke tests
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Run interaction smoke checks
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/kinetik-preview.log 2>&1 &
+          echo $! > /tmp/kinetik-preview.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:4173/3D-fitness-website/ > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4173/3D-fitness-website/ > /dev/null
+          node scripts/browser-smoke.mjs
+          kill "$(cat /tmp/kinetik-preview.pid)" || true
+      - name: Upload browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kinetik-browser-smoke-screenshots
+          path: artifacts/*.png
+          if-no-files-found: warn
