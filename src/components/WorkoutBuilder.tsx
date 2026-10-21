@@ -1,9 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 import { EXERCISES, gearMatches, type Exercise, type GearOption, type TrainingGoal } from '../data/exercises';
 import { WorkoutSession, type PlannedWorkoutDay, type CompletedWorkoutRecord } from './WorkoutSession';
+import { ProgressDashboard } from './ProgressDashboard';
 import '../styles/workout-session.css';
 
 type WorkoutDay = PlannedWorkoutDay;
+type WorkoutSettings = {
+  goal: TrainingGoal;
+  level: string;
+  gear: GearOption;
+  days: number;
+  minutes: number;
+  intensity: 'Low' | 'Moderate' | 'High';
+  location: 'Home' | 'Gym' | 'Outdoors';
+  avoidedIds: string[];
+  availableDays: string[];
+};
+type SavedWorkoutTemplate = WorkoutSettings & { id: string; name: string; savedAt: string };
 
 function currentWeekKey(): string {
   const date = new Date();
@@ -65,6 +78,18 @@ export function WorkoutBuilder() {
     } catch { return []; }
   });
   const [showPlan, setShowPlan] = useState(false);
+  const [templateName, setTemplateName] = useState('My training week');
+  const [selectedTemplateId, setSelectedTemplateId] = useState('');
+  const [savedTemplates, setSavedTemplates] = useState<SavedWorkoutTemplate[]>(() => {
+    try {
+      const stored: unknown = JSON.parse(window.localStorage.getItem('kinetik-workout-templates') ?? '[]');
+      if (!Array.isArray(stored)) return [];
+      return stored.filter((entry: unknown): entry is SavedWorkoutTemplate => Boolean(entry) && typeof entry === 'object'
+        && 'id' in entry && typeof entry.id === 'string' && 'name' in entry && typeof entry.name === 'string'
+        && 'goal' in entry && 'level' in entry && 'gear' in entry && 'days' in entry && 'minutes' in entry
+        && 'intensity' in entry && 'location' in entry && 'availableDays' in entry && 'avoidedIds' in entry).slice(0, 8);
+    } catch { return []; }
+  });
   const [weekKey] = useState(currentWeekKey);
   const [completedIds, setCompletedIds] = useState<string[]>(() => {
     try {
@@ -88,6 +113,46 @@ export function WorkoutBuilder() {
     try { window.localStorage.setItem('kinetik-workout-history', JSON.stringify(history)); }
     catch { /* History remains available in memory if local storage is blocked. */ }
   }, [history]);
+
+  useEffect(() => {
+    try { window.localStorage.setItem('kinetik-workout-templates', JSON.stringify(savedTemplates)); }
+    catch { /* Saved templates remain usable in memory when storage is disabled. */ }
+  }, [savedTemplates]);
+
+  function saveTemplate() {
+    const name = templateName.trim();
+    if (!name) { setCopyStatus('ENTER A NAME BEFORE SAVING THIS WORKOUT TEMPLATE.'); return; }
+    const savedAt = new Date().toISOString();
+    const template: SavedWorkoutTemplate = {
+      id: savedAt + ':' + name.toLowerCase(),
+      name,
+      savedAt,
+      goal, level, gear, days, minutes, intensity, location,
+      avoidedIds: [...avoidedIds],
+      availableDays: [...availableDays],
+    };
+    setSavedTemplates((current) => [template, ...current.filter((item) => item.name.toLowerCase() !== name.toLowerCase())].slice(0, 8));
+    setSelectedTemplateId(template.id);
+    setCopyStatus('TEMPLATE SAVED IN THIS BROWSER. LOADING IT REBUILDS THE WEEK FROM THE CURRENT EXERCISE CATALOGUE.');
+  }
+
+  function loadTemplate() {
+    const template = savedTemplates.find((item) => item.id === selectedTemplateId);
+    if (!template) { setCopyStatus('CHOOSE A SAVED TEMPLATE FIRST.'); return; }
+    setGoal(template.goal); setLevel(template.level); setGear(template.gear); setDays(template.days);
+    setMinutes(template.minutes); setIntensity(template.intensity); setLocation(template.location);
+    setAvoidedIds([...template.avoidedIds]); setAvailableDays([...template.availableDays]);
+    setPlan(buildPlan(template.goal, template.level, template.gear, template.days, template.minutes, template.intensity, template.location, template.avoidedIds, template.availableDays));
+    setShowPlan(true);
+    setCopyStatus('TEMPLATE LOADED. THE WEEK HAS BEEN REBUILT FROM ITS SAVED PREFERENCES.');
+  }
+
+  function deleteTemplate() {
+    if (!selectedTemplateId) return;
+    setSavedTemplates((current) => current.filter((item) => item.id !== selectedTemplateId));
+    setSelectedTemplateId('');
+    setCopyStatus('SAVED TEMPLATE REMOVED FROM THIS BROWSER.');
+  }
 
   function completeSession(record: CompletedWorkoutRecord) {
     setHistory((current) => [record, ...current.filter((item) => item.id !== record.id)].slice(0, 12));
@@ -166,10 +231,22 @@ export function WorkoutBuilder() {
                 </article>
               ))}
             </div>
+            <div className="workout-template-tools" aria-labelledby="workout-template-title">
+              <div className="workout-template-heading"><div><p className="template-kicker">REUSABLE PROGRAMMING</p><h3 id="workout-template-title">Save this week as a template.</h3></div><span>{savedTemplates.length} / 8 SAVED</span></div>
+              <div className="workout-template-controls">
+                <label><span>TEMPLATE NAME</span><input value={templateName} maxLength={48} onChange={(event) => setTemplateName(event.target.value)} aria-label="Workout template name" placeholder="My training week" /></label>
+                <button className="button button-quiet" type="button" onClick={saveTemplate}>SAVE TEMPLATE <span aria-hidden="true">＋</span></button>
+                <label><span>SAVED TEMPLATES</span><select aria-label="Select saved workout template" value={selectedTemplateId} onChange={(event) => setSelectedTemplateId(event.target.value)}><option value="">Choose a template</option>{savedTemplates.map((template) => <option key={template.id} value={template.id}>{template.name}</option>)}</select></label>
+                <button className="button button-quiet" type="button" disabled={!selectedTemplateId} onClick={loadTemplate}>LOAD</button>
+                <button className="template-delete-button" type="button" disabled={!selectedTemplateId} onClick={deleteTemplate}>DELETE</button>
+              </div>
+              <p className="workout-template-note">Templates save preferences in this browser and regenerate sessions from the current movement catalogue; they are not synced between devices.</p>
+            </div>
             <div className="workout-history">
               <div className="workout-history-header"><h3>Recent training history</h3><span>{history.length} SAVED LOCALLY / MAX 12</span></div>
               {history.length === 0 ? <p className="workout-history-empty">Completed sessions will appear here after you start and finish a workout. Records stay in this browser.</p> : <div className="workout-history-list">{history.slice(0, 5).map((record) => <article className="workout-history-entry" key={record.id}><div><strong>{record.dayLabel} / {record.goal} session</strong><small>{new Date(record.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} · {record.exerciseCount} movements · {record.minutes} min recorded</small></div><span>{String(record.exerciseCount).padStart(2, '0')}</span></article>)}</div>}
             </div>
+            <ProgressDashboard history={history} />
             <div className="result-actions"><p>Rule-based demo plan. Adjust loads, technique and recovery to your needs; this is not medical advice or a remote AI coach.</p><button className="button button-quiet" type="button" onClick={copyPlan}>COPY WEEK <span aria-hidden="true">↗</span></button></div>
             {copyStatus && <p className="inline-status" role="status">{copyStatus}</p>}
             {showPlan && <p className="inline-status" role="status">WEEK UPDATED FOR {goal.toUpperCase()} · {plan.length} SESSIONS · {location.toUpperCase()} · {gear.toUpperCase()}.</p>}
