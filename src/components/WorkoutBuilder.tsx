@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { EXERCISES, gearMatches, type Exercise, type GearOption, type TrainingGoal } from '../data/exercises';
+import { WorkoutSession, type PlannedWorkoutDay, type CompletedWorkoutRecord } from './WorkoutSession';
+import '../styles/workout-session.css';
 
-type WorkoutDay = { label: string; theme: string; exercises: Exercise[]; minutes: number };
+type WorkoutDay = PlannedWorkoutDay;
 
 function currentWeekKey(): string {
   const date = new Date();
@@ -49,6 +51,13 @@ export function WorkoutBuilder() {
   const [minutes, setMinutes] = useState(40);
   const [plan, setPlan] = useState<WorkoutDay[]>(() => buildPlan('Strength', 'Regular', 'Dumbbells', 3, 40));
   const [copyStatus, setCopyStatus] = useState('');
+  const [activeDay, setActiveDay] = useState<WorkoutDay | null>(null);
+  const [history, setHistory] = useState<CompletedWorkoutRecord[]>(() => {
+    try {
+      const stored: unknown = JSON.parse(window.localStorage.getItem('kinetik-workout-history') ?? '[]');
+      return Array.isArray(stored) ? stored.filter((entry: unknown): entry is CompletedWorkoutRecord => Boolean(entry) && typeof entry === 'object' && 'id' in entry && 'completedAt' in entry && 'dayLabel' in entry && 'goal' in entry).slice(0, 12) : [];
+    } catch { return []; }
+  });
   const [showPlan, setShowPlan] = useState(false);
   const [weekKey] = useState(currentWeekKey);
   const [completedIds, setCompletedIds] = useState<string[]>(() => {
@@ -68,6 +77,19 @@ export function WorkoutBuilder() {
     try { window.localStorage.setItem('kinetik-session-progress', JSON.stringify(completedIds)); }
     catch { /* Progress remains available in memory when storage is disabled. */ }
   }, [completedIds]);
+
+  useEffect(() => {
+    try { window.localStorage.setItem('kinetik-workout-history', JSON.stringify(history)); }
+    catch { /* History remains available in memory if local storage is blocked. */ }
+  }, [history]);
+
+  function completeSession(record: CompletedWorkoutRecord) {
+    setHistory((current) => [record, ...current.filter((item) => item.id !== record.id)].slice(0, 12));
+    const key = [weekKey, goal, gear, record.dayLabel].join(':');
+    setCompletedIds((current) => current.includes(key) ? current : [...current, key]);
+    setActiveDay(null);
+    setCopyStatus('SESSION FINISHED AND SAVED TO THIS BROWSER.');
+  }
 
   function toggleCompletion(key: string) {
     setCompletedIds((current) => current.includes(key) ? current.filter((item) => item !== key) : [...current, key]);
@@ -130,8 +152,13 @@ export function WorkoutBuilder() {
                   <button className={completedIds.includes(sessionKeys[plan.indexOf(day)]) ? 'session-done-button is-done' : 'session-done-button'} type="button" aria-pressed={completedIds.includes(sessionKeys[plan.indexOf(day)])} onClick={() => toggleCompletion(sessionKeys[plan.indexOf(day)])}>
                     {completedIds.includes(sessionKeys[plan.indexOf(day)]) ? 'SESSION COMPLETED' : 'MARK SESSION DONE'} <span aria-hidden="true">{completedIds.includes(sessionKeys[plan.indexOf(day)]) ? '✓' : '＋'}</span>
                   </button>
+                  <button className="session-start-day" type="button" onClick={() => setActiveDay(day)}>START THIS SESSION <span aria-hidden="true">▶</span></button>
                 </article>
               ))}
+            </div>
+            <div className="workout-history">
+              <div className="workout-history-header"><h3>Recent training history</h3><span>{history.length} SAVED LOCALLY / MAX 12</span></div>
+              {history.length === 0 ? <p className="workout-history-empty">Completed sessions will appear here after you start and finish a workout. Records stay in this browser.</p> : <div className="workout-history-list">{history.slice(0, 5).map((record) => <article className="workout-history-entry" key={record.id}><div><strong>{record.dayLabel} / {record.goal} session</strong><small>{new Date(record.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} · {record.exerciseCount} movements · {record.minutes} min recorded</small></div><span>{String(record.exerciseCount).padStart(2, '0')}</span></article>)}</div>}
             </div>
             <div className="result-actions"><p>Rule-based demo plan. Adjust loads, technique and recovery to your needs; this is not medical advice or a remote AI coach.</p><button className="button button-quiet" type="button" onClick={copyPlan}>COPY WEEK <span aria-hidden="true">↗</span></button></div>
             {copyStatus && <p className="inline-status" role="status">{copyStatus}</p>}
@@ -139,6 +166,7 @@ export function WorkoutBuilder() {
           </div>
         </div>
       </div>
+      {activeDay && <WorkoutSession key={activeDay.label + ':' + goal + ':' + gear} day={activeDay} goal={goal} gear={gear} onClose={() => setActiveDay(null)} onComplete={completeSession} />}
     </section>
   );
 }
