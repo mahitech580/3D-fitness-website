@@ -1,9 +1,14 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 
 export function TrialBooking({ selectedGym = '' }: { selectedGym?: string }) {
   const [prepared, setPrepared] = useState(false);
   const [copyStatus, setCopyStatus] = useState('');
   const [requestText, setRequestText] = useState('');
+
+  useEffect(() => {
+    setPrepared(false);
+    setCopyStatus('');
+  }, [selectedGym]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,7 +41,7 @@ export function TrialBooking({ selectedGym = '' }: { selectedGym?: string }) {
   return (
     <section className="section start-section" id="start" aria-labelledby="start-title">
       <div className="section-shell start-grid">
-        <div className="start-copy"><p className="eyebrow"><span>04</span> YOUR NEXT SESSION</p><h2 id="start-title">Ready to<br /><em>start moving?</em></h2><p>Tell us what a good first session looks like. This prototype prepares a request locally so you can review or copy it.</p><div className="start-steps"><p><span>01</span> Choose your direction.</p><p><span>02</span> Set a realistic first step.</p><p><span>03</span> Keep showing up.</p></div></div>
+        <div className="start-copy"><p className="eyebrow"><span>05</span> YOUR NEXT SESSION</p><h2 id="start-title">Ready to<br /><em>start moving?</em></h2><p>Tell us what a good first session looks like. This prototype prepares a request locally so you can review or copy it.</p><div className="start-steps"><p><span>01</span> Choose your direction.</p><p><span>02</span> Set a realistic first step.</p><p><span>03</span> Keep showing up.</p></div></div>
         <form className="trial-form" onSubmit={handleSubmit}>
           <div className="trial-form-head"><span>FIRST SESSION / ENQUIRY</span><span>01 — 04</span></div>
           <label htmlFor="trial-name">YOUR NAME *</label><input id="trial-name" name="name" autoComplete="name" placeholder="Name" required onChange={() => setPrepared(false)} />
