@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const links = [
   { href: '#listen', label: 'LISTEN' },
@@ -10,6 +10,7 @@ type SiteHeaderProps = { theme: 'light' | 'night'; onToggleTheme: () => void };
 
 export function SiteHeader({ theme, onToggleTheme }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
   function closeMenu() {
     setMenuOpen(false);
@@ -26,8 +27,17 @@ export function SiteHeader({ theme, onToggleTheme }: SiteHeaderProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    function closeWhenOutside(event: PointerEvent) {
+      if (event.target instanceof Node && !headerRef.current?.contains(event.target)) setMenuOpen(false);
+    }
+    document.addEventListener('pointerdown', closeWhenOutside);
+    return () => document.removeEventListener('pointerdown', closeWhenOutside);
+  }, [menuOpen]);
+
   return (
-    <header className="site-header">
+    <header ref={headerRef} className="site-header">
       <a className="wordmark" href="#home" onClick={closeMenu} aria-label="Kairo Studio home">
         <span>KAIRO STUDIO</span>
         <span className="wordmark-divider" aria-hidden="true">/</span>

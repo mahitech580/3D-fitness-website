@@ -358,3 +358,8 @@ a { color: inherit; text-decoration: none; }
 @media (max-width:720px) { .hero-motion-toggle { top:144px; font-size:7px; } }
 @media (prefers-reduced-motion:reduce) { .hero-motion-toggle { display:none !important; } }
 @media (forced-colors:active) { .hero-motion-toggle { border:1px solid ButtonText; } }
+
+
+/* Strong, predictable keyboard focus for menu and interaction controls */
+.primary-navigation a:focus-visible,.menu-toggle:focus-visible,.command-close:focus-visible,.journal-dialog-top button:focus-visible { outline:2px solid var(--cobalt); outline-offset:5px; }
+@media (hover:none) { .primary-navigation a:hover::after { right:100%; } .journal-entry-button:hover { color:var(--ink); } }
