@@ -14,7 +14,7 @@ KINETIK is an original, local-first fitness experience built with React, TypeScr
 - **Exercise library:** searchable and filterable authored starter data with category/equipment controls, set/repetition guidance, and short form cues. It is not a comprehensive exercise reference and does not contain filmed demonstrations.
 - **Progress dashboard:** displays values computed from the recent locally saved completion records, including session count, movement count, assigned plan minutes and a five-week activity chart. The history is capped at twelve records; planned minutes are not measured time.
 - **Gym discovery:** a searchable directory of six explicitly labeled KINETIK sample venue concepts in Hyderabad, Bengaluru and Chennai, filterable by city and training focus. No live business, address, hours, price, map, or availability feed is connected.
-- **Gym designer:** one shared layout state powers a 1 m-snapped 2D floor plan and procedural 3D room scene. Fifteen equipment types have authored procedural shapes. Users can select, drag in 3D, precisely reposition, rotate, duplicate and delete items; overlapping or out-of-bounds placements are blocked. Room dimensions, basic spacing summaries, undo/redo, local autosave, explicit local save/load, JSON import/export, 2D PNG export, and 3D preview PNG export are provided.
+- **Gym designer:** one shared layout state powers a 1 m-snapped 2D floor plan and procedural 3D room scene. Fifteen equipment types have authored procedural shapes. Users can select, drag in 3D, precisely reposition, rotate, duplicate and delete items; overlapping or out-of-bounds placements are blocked. Room width, length and height, selectable rubber/concrete/wood floor finishes, chalk/sage/graphite wall tones, reset/top/front/side/focus camera presets, basic spacing summaries, undo/redo, local autosave, explicit local save/load, JSON import/export, 2D PNG export, and 3D preview PNG export are provided.
 - **First-session enquiry:** a validated local-only form can include a selected sample gym concept and prepare a copyable request. It does not submit to a service, send email, accept payment, or make a reservation.
 
 ## Data and privacy behavior
@@ -42,7 +42,7 @@ The GitHub Actions workflow on `main` runs the build/smoke-check workflow and pu
 - Training recommendations are deterministic rules, not an AI coach or individualized medical advice.
 - Exercise coverage is curated starter content; there are no licensed demonstration videos, clinical claims, meal logging, or nutrition database.
 - Gym dimensions and equipment footprints are visual planning estimates, not architectural, building-code, accessibility, fire-safety, manufacturer-clearance or professional fit-out certification.
-- Saved layouts, templates and session history live in the current browser only.
+- Saved layouts (including room finish settings), templates and session history live in the current browser only.
 - Enquiries do not reach a business. No booking, payment, or membership purchase is completed.
 - A successful build does not substitute for browser testing on physical devices. Browser automation/screenshot inspection must be run in an environment where those tools are available.
 
