@@ -3,11 +3,12 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboa
 type JumpTarget = { id: string; title: string; eyebrow: string; description: string; keywords: string };
 
 const targets: JumpTarget[] = [
-  { id: 'home', title: 'The beginning', eyebrow: '00 / INTRODUCTION', description: 'Return to the Kinetik training experience.', keywords: 'home hero training kinetik beginning' },
-  { id: 'listen', title: 'Training desk', eyebrow: '01 / LISTEN', description: 'Build a starting plan around your time and equipment.', keywords: 'training workout plan strength conditioning' },
-  { id: 'culture', title: 'Movement index', eyebrow: '02 / NOTEBOOK', description: 'Search exercises by focus, equipment, and movement type.', keywords: 'library exercises movement strength conditioning mobility' },
-  { id: 'learn', title: 'Gym planner', eyebrow: '03 / LEARN', description: 'Place equipment within a measured room sketch.', keywords: 'space room equipment floorplan planner' },
-  { id: 'reserve', title: 'First session', eyebrow: '04 / CONTACT', description: 'Prepare a local-only first-session enquiry.', keywords: 'start trial session enquiry' },
+  { id: 'home', title: 'The beginning', eyebrow: '00 / INTRODUCTION', description: 'Return to the Kinetik fitness experience.', keywords: 'home hero training kinetik beginning' },
+  { id: 'training', title: 'Training desk', eyebrow: '01 / TRAINING', description: 'Build a starter week around your time, gear and training preferences.', keywords: 'workout plan strength muscle conditioning mobility rest timer' },
+  { id: 'library', title: 'Movement index', eyebrow: '02 / MOVEMENT', description: 'Search movements by muscle group, equipment, level and movement pattern.', keywords: 'library exercises technique common mistakes alternatives sort filter' },
+  { id: 'gyms', title: 'Gym concepts', eyebrow: '03 / DISCOVERY', description: 'Explore searchable sample gym concepts and training focus.', keywords: 'gym venue city location concept sample facilities enquire Hyderabad Bengaluru Chennai' },
+  { id: 'space', title: 'Gym planner', eyebrow: '04 / SPACE DESIGN', description: 'Edit the shared 2D and 3D layout, arrange equipment and export the concept.', keywords: 'room equipment floorplan planner three js 3d rotate drag camera finish save load export' },
+  { id: 'start', title: 'First session', eyebrow: '05 / FIRST STEP', description: 'Prepare a local-only first-session enquiry.', keywords: 'trial session enquiry contact gym concept' },
 ];
 
 export function CommandPalette() {
@@ -86,7 +87,7 @@ export function CommandPalette() {
                   <span className="command-result-arrow" aria-hidden="true">↗</span>
                 </button>
               ))}
-              {filteredTargets.length === 0 && <p className="command-empty" role="status">No section matches. Try “ritual”, “learn”, or “contact”.</p>}
+              {filteredTargets.length === 0 && <p className="command-empty" role="status">No section matches. Try “training”, “gym”, or “space”.</p>}
             </div>
             <p className="command-hint">↑ / ↓ TO NAVIGATE <span>·</span> CTRL / ⌘ + K TO TOGGLE</p>
           </section>
