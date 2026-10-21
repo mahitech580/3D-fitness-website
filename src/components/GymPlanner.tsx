@@ -246,7 +246,6 @@ export function GymPlanner() {
   const [roomHeight, setRoomHeight] = useState(stored?.roomHeight ?? 3);
   const [items, setItems] = useState<PlacedItem[]>(stored?.items ?? DEFAULT_ITEMS);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [draggingIn3d, setDraggingIn3d] = useState(false);
   const [tool, setTool] = useState<EquipmentType>('rack');
   const [view, setView] = useState<'plan' | '3d' | 'split'>('split');
   const [status, setStatus] = useState('Add an item, select it in either view, then use the property controls to position it precisely.');
@@ -283,7 +282,6 @@ export function GymPlanner() {
   function start3dDrag(id: number) {
     dragOriginRef.current = items.map((item) => ({ ...item }));
     setSelectedId(id);
-    setDraggingIn3d(true);
     setStatus('Dragging equipment in 3D. Release to place it; invalid or overlapping positions are blocked.');
   }
 
@@ -299,7 +297,6 @@ export function GymPlanner() {
   }
 
   function finish3dDrag(id: number) {
-    setDraggingIn3d(false);
     const before = dragOriginRef.current;
     dragOriginRef.current = null;
     const changed = Boolean(before && before.some((prior) => {
