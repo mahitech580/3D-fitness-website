@@ -6,6 +6,8 @@ import { WorkoutBuilder } from './components/WorkoutBuilder';
 import { ExerciseLibrary } from './components/ExerciseLibrary';
 import { GymPlanner } from './components/GymPlanner';
 import { TrialBooking } from './components/TrialBooking';
+import { CommandPalette } from './components/CommandPalette';
+import { ShareSiteButton } from './components/ShareSiteButton';
 
 const navigation = [
   { href: '#training', label: 'TRAINING' },
@@ -41,9 +43,10 @@ export function App() {
         <a className="skip-link" href="#main-content">Skip to content</a>
         <div className="ambient-grid" aria-hidden="true" />
         <ScrollProgress />
+        <CommandPalette />
         <header className="site-header">
           <a className="brand-lockup" href="#home" aria-label="Kinetik home"><span className="brand-mark" aria-hidden="true">K</span><span>KINETIK<span className="brand-sub">TRAINING, BUILT AROUND YOU</span></span></a>
-          <nav className={menuOpen ? 'site-nav is-open' : 'site-nav'} aria-label="Main navigation">
+          <nav id="site-navigation" className={menuOpen ? 'site-nav is-open' : 'site-nav'} aria-label="Main navigation">
             {navigation.map((item) => <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}</a>)}
           </nav>
           <div className="header-actions">
@@ -81,6 +84,7 @@ export function App() {
           <a className="footer-brand" href="#home"><span className="brand-mark" aria-hidden="true">K</span>KINETIK</a>
           <p>Train with intent. Keep showing up.</p>
           <div className="footer-links">{navigation.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}</div>
+          <ShareSiteButton />
           <span className="footer-legal">© {new Date().getFullYear()} KINETIK / INDEPENDENT FITNESS CONCEPT</span>
         </footer>
       </div>

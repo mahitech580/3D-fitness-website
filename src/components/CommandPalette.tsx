@@ -3,11 +3,11 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboa
 type JumpTarget = { id: string; title: string; eyebrow: string; description: string; keywords: string };
 
 const targets: JumpTarget[] = [
-  { id: 'home', title: 'The beginning', eyebrow: '00 / INTRODUCTION', description: 'Return to the porcelain dragon and opening story.', keywords: 'home hero ritually beginning dragon' },
-  { id: 'listen', title: 'The listening room', eyebrow: '01 / LISTEN', description: 'Slow down and pay attention to the ordinary.', keywords: 'listen sound attention wonder' },
-  { id: 'culture', title: 'Culture & makers', eyebrow: '02 / NOTEBOOK', description: 'Explore materials, rituals, places, and memory.', keywords: 'culture makers objects memory material ritual place' },
-  { id: 'learn', title: 'A slower kind of learning', eyebrow: '03 / LEARN', description: 'Three ways to look closer: material, ritual, attention.', keywords: 'learn study material ritual attention' },
-  { id: 'reserve', title: 'Reserve a moment', eyebrow: '04 / CONTACT', description: 'Prepare a note for a possible studio conversation.', keywords: 'reserve contact note collaboration message' },
+  { id: 'home', title: 'The beginning', eyebrow: '00 / INTRODUCTION', description: 'Return to the Kinetik training experience.', keywords: 'home hero training kinetik beginning' },
+  { id: 'listen', title: 'Training desk', eyebrow: '01 / LISTEN', description: 'Build a starting plan around your time and equipment.', keywords: 'training workout plan strength conditioning' },
+  { id: 'culture', title: 'Movement index', eyebrow: '02 / NOTEBOOK', description: 'Search exercises by focus, equipment, and movement type.', keywords: 'library exercises movement strength conditioning mobility' },
+  { id: 'learn', title: 'Gym planner', eyebrow: '03 / LEARN', description: 'Place equipment within a measured room sketch.', keywords: 'space room equipment floorplan planner' },
+  { id: 'reserve', title: 'First session', eyebrow: '04 / CONTACT', description: 'Prepare a local-only first-session enquiry.', keywords: 'start trial session enquiry' },
 ];
 
 export function CommandPalette() {
@@ -66,7 +66,7 @@ export function CommandPalette() {
         <div className="command-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
           <section className="command-dialog" role="dialog" aria-modal="true" aria-labelledby="command-title">
             <div className="command-topline">
-              <p id="command-title">THE KAIRO INDEX <span> / NAVIGATION</span></p>
+              <p id="command-title">THE KINETIK INDEX <span> / NAVIGATION</span></p>
               <button type="button" onClick={() => setOpen(false)} className="command-close">CLOSE <span aria-hidden="true">×</span></button>
             </div>
             <label className="command-search">

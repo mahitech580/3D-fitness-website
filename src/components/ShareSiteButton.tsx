@@ -5,8 +5,8 @@ export function ShareSiteButton() {
 
   async function shareSite() {
     const shareData = {
-      title: 'Ritually — Kairo Studio',
-      text: 'A living editorial study in porcelain, pigment, and contemporary culture.',
+      title: 'KINETIK — Train with intent',
+      text: 'Build a training week, explore movement, and sketch a gym space.',
       url: window.location.href,
     };
     try {
@@ -29,7 +29,7 @@ export function ShareSiteButton() {
 
   return (
     <span className="share-site-wrap">
-      <button type="button" className="share-site-button" onClick={shareSite}>SHARE THIS STUDY <span aria-hidden="true">↗</span></button>
+      <button type="button" className="share-site-button" onClick={shareSite}>SHARE KINETIK <span aria-hidden="true">↗</span></button>
       <span className="share-site-status" role="status" aria-live="polite">{status}</span>
     </span>
   );

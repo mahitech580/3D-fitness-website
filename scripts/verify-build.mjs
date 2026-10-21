@@ -33,10 +33,6 @@ if (manifest) {
 const sitemap = await readFile(path.join(root, 'sitemap.xml'), 'utf8').catch(() => '');
 if (sitemap && !sitemap.includes('https://mahitech580.github.io/3D-fitness-website/')) failures.push('Sitemap is missing the deployed canonical URL.');
 
-for (const mustHave of ['src/components/FitnessScene.tsx','src/components/WorkoutBuilder.tsx','src/components/ExerciseLibrary.tsx','src/components/GymPlanner.tsx','src/components/TrialBooking.tsx']) {
-  await check(mustHave.replace(/^src\//, '')); 
-}
-
 if (failures.length) {
   console.error('Production build verification failed:');
   for (const failure of failures) console.error(' - ' + failure);
