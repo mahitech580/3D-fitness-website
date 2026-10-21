@@ -300,6 +300,8 @@ export function GymPlanner() {
   const previewRef = useRef<HTMLDivElement>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const dragOriginRef = useRef<PlacedItem[] | null>(null);
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
   const nextId = useRef(Math.max(0, ...(stored?.items ?? DEFAULT_ITEMS).map((item) => item.id)) + 1);
   const selectedItem = items.find((item) => item.id === selectedId) ?? null;
   const selectedSize = selectedItem ? sizeOf(selectedItem) : null;
@@ -326,7 +328,7 @@ export function GymPlanner() {
   }
 
   function start3dDrag(id: number) {
-    dragOriginRef.current = items.map((item) => ({ ...item }));
+    dragOriginRef.current = itemsRef.current.map((item) => ({ ...item }));
     setSelectedId(id);
     setStatus('Dragging equipment in 3D. Release to place it; invalid or overlapping positions are blocked.');
   }
@@ -345,14 +347,15 @@ export function GymPlanner() {
   function finish3dDrag(id: number) {
     const before = dragOriginRef.current;
     dragOriginRef.current = null;
+    const latestItems = itemsRef.current;
     const changed = Boolean(before && before.some((prior) => {
-      const current = items.find((item) => item.id === prior.id);
+      const current = latestItems.find((item) => item.id === prior.id);
       return !current || current.x !== prior.x || current.y !== prior.y || current.rotated !== prior.rotated;
     }));
     if (changed && before) {
       setPast((current) => [...current, before].slice(-40));
       setFuture([]);
-      const item = items.find((entry) => entry.id === id);
+      const item = latestItems.find((entry) => entry.id === id);
       setStatus(item ? EQUIPMENT[item.type].label + ' repositioned in 3D. The 2D plan is synchronized.' : '3D layout updated. The 2D plan is synchronized.');
     } else {
       setStatus('Equipment selected. Drag it in the 3D room, or use the precise coordinate controls.');
