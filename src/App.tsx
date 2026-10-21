@@ -66,7 +66,7 @@ export function App() {
               <h1 id="hero-title">TRAIN WITH<br /><em>INTENT.</em></h1>
               <p className="hero-description">A smarter starting point for building strength, moving better, and making training fit the life you actually have.</p>
               <div className="hero-actions"><a className="button button-primary" href="#training">BUILD MY WEEK <span aria-hidden="true">↗</span></a><a className="button button-secondary" href="#space">PLAN YOUR SPACE <span aria-hidden="true">↓</span></a></div>
-              <div className="hero-note"><span className="note-index">01 / 04</span><p>START WHERE YOU ARE.<br />BUILD FROM THERE.</p></div>
+              <div className="hero-note"><span className="note-index">01 / 05</span><p>START WHERE YOU ARE.<br />BUILD FROM THERE.</p></div>
             </div>
             <div className="hero-art">
               <div className="art-orbit orbit-one" aria-hidden="true" /><div className="art-orbit orbit-two" aria-hidden="true" />
