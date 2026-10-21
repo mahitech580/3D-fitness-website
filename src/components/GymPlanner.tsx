@@ -159,21 +159,22 @@ function EquipmentModel({ item, roomWidth, roomLength, selected, onSelect, onDra
   );
 }
 
-function PlannerScene({ items, roomWidth, roomLength, roomHeight, selectedId, onSelect, onDragPreview, onDragEnd }: {
+function PlannerScene({ items, roomWidth, roomLength, roomHeight, selectedId, onSelect, onDragStart, onDragPreview, onDragEnd }: {
   items: PlacedItem[];
   roomWidth: number;
   roomLength: number;
   roomHeight: number;
   selectedId: number | null;
   onSelect: (id: number) => void;
+  onDragStart: (id: number) => void;
   onDragPreview: (id: number, x: number, y: number) => void;
   onDragEnd: (id: number) => void;
 }) {
   const { camera, gl } = useThree();
   const [dragging, setDragging] = useState(false);
   const dragIdRef = useRef<number | null>(null);
-  const dragContextRef = useRef({ items, roomWidth, roomLength, onDragPreview, onDragEnd });
-  dragContextRef.current = { items, roomWidth, roomLength, onDragPreview, onDragEnd };
+  const dragContextRef = useRef({ items, roomWidth, roomLength, onDragStart, onDragPreview, onDragEnd });
+  dragContextRef.current = { items, roomWidth, roomLength, onDragStart, onDragPreview, onDragEnd };
   const raycaster = useMemo(() => new Raycaster(), []);
   const pointer = useMemo(() => new Vector2(), []);
   const dragPlane = useMemo(() => new Plane(new Vector3(0, 1, 0), -0.03), []);
@@ -218,6 +219,7 @@ function PlannerScene({ items, roomWidth, roomLength, roomHeight, selectedId, on
   function beginDrag(id: number) {
     dragIdRef.current = id;
     setDragging(true);
+    dragContextRef.current.onDragStart(id);
   }
 
   return (
@@ -533,7 +535,7 @@ export function GymPlanner() {
                 <div className="planner-view-label"><span>02 / PERSPECTIVE VIEW</span><span>DRAG EQUIPMENT TO MOVE · DRAG FLOOR TO ORBIT · SCROLL TO ZOOM</span></div>
                 <div className="planner-3d-canvas" ref={previewRef}>
                   <Canvas shadows dpr={[1, 1.5]} camera={{ position: [roomWidth * 0.92, roomHeight * 1.5 + 3, roomLength * 1.05], fov: 38, near: 0.1, far: 120 }} gl={{ antialias: true, powerPreference: 'low-power', preserveDrawingBuffer: true }} fallback={<p>3D preview is not supported by this browser. Use the 2D floor plan.</p>}>
-                    <PlannerScene items={items} roomWidth={roomWidth} roomLength={roomLength} roomHeight={roomHeight} selectedId={selectedId} onSelect={(id) => { setSelectedId(id); const item = items.find((entry) => entry.id === id); if (item) setStatus(EQUIPMENT[item.type].label + ' selected in 3D. Drag to move it, or use the coordinate controls.'); }} onDragPreview={preview3dDrag} onDragEnd={finish3dDrag} />
+                    <PlannerScene items={items} roomWidth={roomWidth} roomLength={roomLength} roomHeight={roomHeight} selectedId={selectedId} onSelect={(id) => { setSelectedId(id); const item = items.find((entry) => entry.id === id); if (item) setStatus(EQUIPMENT[item.type].label + ' selected in 3D. Drag to move it, or use the coordinate controls.'); }} onDragStart={start3dDrag} onDragPreview={preview3dDrag} onDragEnd={finish3dDrag} />
                   </Canvas>
                 </div>
               </div>
