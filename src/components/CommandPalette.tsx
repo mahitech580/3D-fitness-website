@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 
 type JumpTarget = { id: string; title: string; eyebrow: string; description: string; keywords: string };
 
@@ -42,7 +42,7 @@ export function CommandPalette() {
     return targets.filter((target) => !normalized || (target.title + ' ' + target.eyebrow + ' ' + target.description + ' ' + target.keywords).toLowerCase().includes(normalized));
   }, [query]);
 
-  function handleSearchKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+  function handleSearchKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
     if (event.key === 'ArrowDown' && filteredTargets.length > 0) {
       event.preventDefault();
       resultRefs.current[0]?.focus();
