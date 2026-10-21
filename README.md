@@ -4,7 +4,7 @@ An original fitness experience combining a procedural 3D equipment centerpiece, 
 
 ## Features
 - **3D equipment hero:** procedural barbell and plates, pointer/touch rotation, graceful fallback, reduced-motion behavior.
-- **Workout builder:** choose goal, training level, available gear, session count and duration; generate an explainable browser-side weekly plan.
+- **Workout builder:** choose goal, training level, available gear, session count and duration; generate an explainable browser-side weekly plan and mark sessions complete with browser-local weekly tracking.
 - **Movement library:** search and filter authored starter entries by focus and equipment.
 - **Gym layout planner:** place, rotate, select, and remove equipment within a measured 12 m × 8 m grid.
 - **First-session enquiry:** a validated local-only prototype that does not claim to submit a real booking.

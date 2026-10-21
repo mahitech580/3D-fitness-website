@@ -3,6 +3,13 @@ import { EXERCISES, gearMatches, type Exercise, type GearOption, type TrainingGo
 
 type WorkoutDay = { label: string; theme: string; exercises: Exercise[]; minutes: number };
 
+function currentWeekKey(): string {
+  const date = new Date();
+  date.setHours(12, 0, 0, 0);
+  date.setDate(date.getDate() - ((date.getDay() + 6) % 7));
+  return String(date.getFullYear()) + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+}
+
 function buildPlan(goal: TrainingGoal, level: string, gear: GearOption, days: number, minutes: number): WorkoutDay[] {
   const eligible = EXERCISES.filter((exercise) => exercise.goals.includes(goal) && gearMatches(exercise, gear));
   const fallback = EXERCISES.filter((exercise) => gearMatches(exercise, gear));
@@ -43,8 +50,37 @@ export function WorkoutBuilder() {
   const [plan, setPlan] = useState<WorkoutDay[]>(() => buildPlan('Strength', 'Regular', 'Dumbbells', 3, 40));
   const [copyStatus, setCopyStatus] = useState('');
   const [showPlan, setShowPlan] = useState(false);
+  const [weekKey] = useState(currentWeekKey);
+  const [completedIds, setCompletedIds] = useState<string[]>(() => {
+    try {
+      const stored: unknown = JSON.parse(window.localStorage.getItem('kinetik-session-progress') ?? '[]');
+      return Array.isArray(stored) ? stored.filter((value): value is string => typeof value === 'string') : [];
+    } catch {
+      return [];
+    }
+  });
 
   const totalMoves = useMemo(() => plan.reduce((count, day) => count + day.exercises.length, 0), [plan]);
+  const sessionKeys = useMemo(() => plan.map((day) => [weekKey, goal, gear, day.label].join(':')), [plan, weekKey, goal, gear]);
+  const completedCount = sessionKeys.filter((key) => completedIds.includes(key)).length;
+
+  useMemo(() => completedCount / Math.max(1, plan.length) * 100, [completedCount, plan.length]);
+
+  useMemo(() => {
+    try { window.localStorage.setItem('kinetik-session-progress', JSON.stringify(completedIds)); }
+    catch { /* Progress remains available in memory when storage is disabled. */ }
+    return completedIds.length;
+  }, [completedIds]);
+
+  function toggleCompletion(key: string) {
+    setCompletedIds((current) => current.includes(key) ? current.filter((item) => item !== key) : [...current, key]);
+  }
+
+  function resetWeekProgress() {
+    const prefix = weekKey + ':';
+    setCompletedIds((current) => current.filter((key) => !key.startsWith(prefix)));
+    setCopyStatus('WEEKLY CHECKMARKS CLEARED FOR THIS BROWSER.');
+  }
 
   async function copyPlan() {
     const text = ['KINETIK / WEEK PLAN', 'Goal: ' + goal, 'Level: ' + level, 'Equipment: ' + gear, ''].concat(
@@ -82,13 +118,21 @@ export function WorkoutBuilder() {
           </div>
           <div className="builder-result" aria-live="polite">
             <div className="result-topline"><span>YOUR STARTER WEEK</span><span>{plan.length} SESSIONS / {totalMoves} MOVEMENT SLOTS</span></div>
+            <div className="progress-summary">
+              <div className="progress-summary-label"><strong>{completedCount} / {plan.length}</strong><span>SESSIONS COMPLETED THIS WEEK</span></div>
+              <div className="progress-track" role="progressbar" aria-label="Weekly sessions completed" aria-valuemin={0} aria-valuemax={plan.length} aria-valuenow={completedCount}><span style={{ width: (completedCount / Math.max(1, plan.length) * 100) + '%' }} /></div>
+              <button className="reset-progress" type="button" onClick={resetWeekProgress}>RESET WEEK</button>
+            </div>
             <div className="workout-days">
               {plan.map((day) => (
-                <article className="workout-day" key={day.label}>
+                <article className={completedIds.includes(sessionKeys[plan.indexOf(day)]) ? 'workout-day is-complete' : 'workout-day'} key={day.label}>
                   <div className="workout-day-head"><span>{day.label}</span><small>{day.theme}</small></div>
                   <h3>{goal === 'Conditioning' ? 'Conditioning set' : goal === 'Mobility' ? 'Mobility flow' : 'Strength session'}</h3>
                   <p className="day-duration">{day.minutes} MINUTES <span>·</span> {level.toUpperCase()}</p>
                   <ol>{day.exercises.map((exercise) => <li key={exercise.id}><span>{exercise.name}</span><small>{exercise.sets} × {exercise.reps}</small></li>)}</ol>
+                  <button className={completedIds.includes(sessionKeys[plan.indexOf(day)]) ? 'session-done-button is-done' : 'session-done-button'} type="button" aria-pressed={completedIds.includes(sessionKeys[plan.indexOf(day)])} onClick={() => toggleCompletion(sessionKeys[plan.indexOf(day)])}>
+                    {completedIds.includes(sessionKeys[plan.indexOf(day)]) ? 'SESSION COMPLETED' : 'MARK SESSION DONE'} <span aria-hidden="true">{completedIds.includes(sessionKeys[plan.indexOf(day)]) ? '✓' : '＋'}</span>
+                  </button>
                 </article>
               ))}
             </div>
