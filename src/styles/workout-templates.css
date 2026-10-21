@@ -1,0 +1,16 @@
+.workout-template-tools { margin: 20px 0 16px; padding: 16px; border: 1px solid var(--line); background: var(--panel); }
+.workout-template-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 13px; }
+.workout-template-heading h3 { margin: 0; color: var(--ink); font-size: clamp(17px, 2.5vw, 22px); letter-spacing: -.04em; }
+.workout-template-heading > span, .template-kicker { margin: 0 0 6px; color: var(--muted); font-size: 7px; font-weight: 850; letter-spacing: .1em; }
+.workout-template-controls { display: grid; grid-template-columns: minmax(160px, 1.3fr) auto minmax(160px, 1.1fr) auto auto; align-items: end; gap: 8px; }
+.workout-template-controls label { display: grid; gap: 6px; min-width: 0; }
+.workout-template-controls label > span { color: var(--muted); font-size: 7px; font-weight: 850; letter-spacing: .1em; }
+.workout-template-controls input, .workout-template-controls select { width: 100%; min-width: 0; min-height: 39px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 0; background: var(--surface); color: var(--ink); font: inherit; font-size: 11px; }
+.workout-template-controls button { min-height: 39px; white-space: nowrap; }
+.workout-template-controls button:disabled { opacity: .4; cursor: not-allowed; }
+.template-delete-button { padding: 0 10px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; font-size: 8px; font-weight: 800; letter-spacing: .08em; }
+.template-delete-button:not(:disabled):hover { border-color: #b65e52; color: #b65e52; }
+.workout-template-note { margin: 12px 0 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
+@media (max-width: 950px) { .workout-template-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } .workout-template-controls label:first-child, .workout-template-controls label:nth-of-type(2) { grid-column: span 1; } .workout-template-controls button { width: 100%; } }
+@media (max-width: 520px) { .workout-template-tools { padding: 12px; } .workout-template-heading { align-items: start; flex-direction: column; gap: 6px; } .workout-template-controls { grid-template-columns: minmax(0, 1fr); } }
+@media (forced-colors: active) { .workout-template-tools, .workout-template-controls input, .workout-template-controls select { border: 1px solid CanvasText; } }
