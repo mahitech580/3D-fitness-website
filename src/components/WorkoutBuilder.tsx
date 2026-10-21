@@ -75,7 +75,7 @@ export function WorkoutBuilder() {
   const [history, setHistory] = useState<CompletedWorkoutRecord[]>(() => {
     try {
       const stored: unknown = JSON.parse(window.localStorage.getItem('kinetik-workout-history') ?? '[]');
-      return Array.isArray(stored) ? stored.filter((entry: unknown): entry is CompletedWorkoutRecord => Boolean(entry) && typeof entry === 'object' && 'id' in entry && 'completedAt' in entry && 'dayLabel' in entry && 'goal' in entry).slice(0, 12) : [];
+      return Array.isArray(stored) ? stored.filter((entry: unknown): entry is CompletedWorkoutRecord => entry !== null && typeof entry === 'object' && 'id' in entry && 'completedAt' in entry && 'dayLabel' in entry && 'goal' in entry).slice(0, 12) : [];
     } catch { return []; }
   });
   const [showPlan, setShowPlan] = useState(false);
@@ -85,7 +85,7 @@ export function WorkoutBuilder() {
     try {
       const stored: unknown = JSON.parse(window.localStorage.getItem('kinetik-workout-templates') ?? '[]');
       if (!Array.isArray(stored)) return [];
-      return stored.filter((entry: unknown): entry is SavedWorkoutTemplate => Boolean(entry) && typeof entry === 'object'
+      return stored.filter((entry: unknown): entry is SavedWorkoutTemplate => entry !== null && typeof entry === 'object'
         && 'id' in entry && typeof entry.id === 'string' && 'name' in entry && typeof entry.name === 'string'
         && 'goal' in entry && 'level' in entry && 'gear' in entry && 'days' in entry && 'minutes' in entry
         && 'intensity' in entry && 'location' in entry && 'availableDays' in entry && 'avoidedIds' in entry).slice(0, 8);
