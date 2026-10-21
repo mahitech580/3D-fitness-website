@@ -1,12 +1,38 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
 
 function SectionEyebrow({ number, label }: { number: string; label: string }) {
   return <p className="section-eyebrow"><span>{number}</span><span>{label}</span></p>;
 }
+type JournalEntry = { id: string; title: string; detail: string; category: string; summary: string; body: string };
+const journalEntries: JournalEntry[] = [
+  { id: 'objects', title: 'The quiet language of objects', detail: 'MATERIAL / MEMORY', category: 'MATERIAL', summary: 'Why well-used things can hold a life inside their surfaces.', body: 'An object rarely begins and ends at the moment it is made. A cup carries the pressure of the hand that shaped it, the heat of the kiln, the marks of daily use, and the small ceremonies that gather around it. To look closely is to notice those layers without asking them to become something else.' },
+  { id: 'table', title: 'A table set for slowing down', detail: 'RITUAL / EVERYDAY', category: 'RITUAL', summary: 'How a repeated gesture can make a little space in the day.', body: 'A ritual does not need a grand occasion. It can be the pause before pouring tea, the arrangement of a plate, or setting aside a phone while people speak. Repetition gives these gestures a shape; attention gives them meaning. The table becomes less a surface and more an invitation to arrive.' },
+  { id: 'rain', title: 'Blue, borrowed from the rain', detail: 'COLOUR / PLACE', category: 'PLACE', summary: 'Following cobalt from mineral pigment into changing light.', body: 'Blue changes with its surroundings. On white porcelain it can feel precise and almost architectural; against a wet street it becomes soft and uncertain. The same pigment meets different light, material, and memory. The colour becomes a conversation between a thing and the place where it is seen.' },
+];
+
 
 export function StudioSections() {
   const [submitted, setSubmitted] = useState(false);
+  const [journalQuery, setJournalQuery] = useState('');
+  const [journalCategory, setJournalCategory] = useState('ALL');
+  const [selectedJournal, setSelectedJournal] = useState<JournalEntry | null>(null);
+
+  useEffect(() => {
+    if (!selectedJournal) return;
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') setSelectedJournal(null);
+    }
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [selectedJournal]);
+
+  const normalizedQuery = journalQuery.trim().toLowerCase();
+  const visibleJournalEntries = journalEntries.filter((entry) => {
+    const matchesCategory = journalCategory === 'ALL' || entry.category === journalCategory;
+    const haystack = (entry.title + ' ' + entry.detail + ' ' + entry.summary + ' ' + entry.body).toLowerCase();
+    return matchesCategory && (!normalizedQuery || haystack.includes(normalizedQuery));
+  });
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,12 +64,38 @@ export function StudioSections() {
             <h2 id="culture-title" className="section-heading">Made by hand.<br /><em>Held by memory.</em></h2>
             <p className="culture-intro">An ever-growing notebook of objects, gestures, makers, and places that remind us what care can look like.</p>
           </div>
-          <div className="journal-list">
-            <a className="journal-entry" href="#learn"><span className="journal-number">01</span><span className="journal-title">The quiet language of objects</span><span className="journal-detail">MATERIAL / MEMORY</span><span className="journal-arrow" aria-hidden="true">↗</span></a>
-            <a className="journal-entry" href="#learn"><span className="journal-number">02</span><span className="journal-title">A table set for slowing down</span><span className="journal-detail">RITUAL / EVERYDAY</span><span className="journal-arrow" aria-hidden="true">↗</span></a>
-            <a className="journal-entry" href="#learn"><span className="journal-number">03</span><span className="journal-title">Blue, borrowed from the rain</span><span className="journal-detail">COLOUR / PLACE</span><span className="journal-arrow" aria-hidden="true">↗</span></a>
+          <div className="journal-tools">
+            <label htmlFor="journal-search">FIND A NOTE</label>
+            <input id="journal-search" type="search" value={journalQuery} onChange={(event) => setJournalQuery(event.target.value)} placeholder="Search words, rituals, materials…" autoComplete="off" />
+            <div className="journal-filters" role="group" aria-label="Filter notebook by theme">
+              {['ALL', 'MATERIAL', 'RITUAL', 'PLACE'].map((category) => (
+                <button key={category} type="button" aria-pressed={journalCategory === category} className={journalCategory === category ? 'is-active' : undefined} onClick={() => setJournalCategory(category)}>{category}</button>
+              ))}
+            </div>
           </div>
-          <p className="journal-note">THREE OPEN PAGES — THE NOTEBOOK IS STILL BEING WRITTEN.</p>
+          <div className="journal-list">
+            {visibleJournalEntries.map((entry, index) => (
+              <button className="journal-entry journal-entry-button" type="button" key={entry.id} onClick={() => setSelectedJournal(entry)} aria-label={'Read: ' + entry.title}>
+                <span className="journal-number">{String(index + 1).padStart(2, '0')}</span>
+                <span className="journal-title-wrap"><span className="journal-title">{entry.title}</span><span className="journal-summary">{entry.summary}</span></span>
+                <span className="journal-detail">{entry.detail}</span><span className="journal-arrow" aria-hidden="true">↗</span>
+              </button>
+            ))}
+            {visibleJournalEntries.length === 0 && <p className="journal-empty" role="status">No notebook pages match that search. Try a different word or choose ALL.</p>}
+          </div>
+          <p className="journal-note">{visibleJournalEntries.length} OF {journalEntries.length} NOTEBOOK PAGES SHOWN — SELECT A PAGE TO READ.</p>
+          {selectedJournal && (
+            <div className="journal-dialog-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedJournal(null); }}>
+              <article className="journal-dialog" role="dialog" aria-modal="true" aria-labelledby="journal-dialog-title">
+                <div className="journal-dialog-top"><span>{selectedJournal.detail}</span><button type="button" autoFocus onClick={() => setSelectedJournal(null)}>CLOSE <span aria-hidden="true">×</span></button></div>
+                <p className="section-eyebrow"><span>NOTEBOOK</span><span>{selectedJournal.category}</span></p>
+                <h3 id="journal-dialog-title">{selectedJournal.title}</h3>
+                <p className="journal-dialog-summary">{selectedJournal.summary}</p>
+                <p className="journal-dialog-body">{selectedJournal.body}</p>
+                <button className="text-link journal-dialog-return" type="button" onClick={() => setSelectedJournal(null)}>RETURN TO THE NOTEBOOK <span aria-hidden="true">↗</span></button>
+              </article>
+            </div>
+          )}
         </div>
       </section>
 
