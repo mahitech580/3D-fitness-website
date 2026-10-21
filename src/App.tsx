@@ -6,6 +6,7 @@ import { HeroSection } from './components/HeroSection';
 import { StudioSections } from './components/StudioSections';
 import { ScrollProgress } from './components/ScrollProgress';
 import { CommandPalette } from './components/CommandPalette';
+import { ShareSiteButton } from './components/ShareSiteButton';
 
 export function App() {
   const [theme, setTheme] = useState<'light' | 'night'>(() => {
@@ -34,6 +35,7 @@ export function App() {
           <a className="footer-mark" href="#home" aria-label="Kairo Studio, back to top">K<span>·</span>S</a>
           <p>Made with patience, pigment, and a little wonder.</p>
           <span className="footer-copyright">© {new Date().getFullYear()} KAIRO STUDIO</span>
+          <ShareSiteButton />
           <a className="footer-top" href="#home">BACK TO THE BEGINNING ↑</a>
         </footer>
       </div>
