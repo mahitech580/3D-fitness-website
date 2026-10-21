@@ -10,7 +10,7 @@ const check = async (relativePath) => {
 
 const html = await readFile(path.join(root, 'index.html'), 'utf8').catch(() => '');
 if (!html) failures.push('Production index.html is missing or empty.');
-if (!/<title>Ritually — Kairo Studio<\/title>/.test(html)) failures.push('Production page title is missing.');
+if (!/<title>KINETIK — Train with intent<\/title>/.test(html)) failures.push('Production page title is missing or outdated.');
 if (!/<meta\s+name="description"/.test(html)) failures.push('Search description is missing.');
 if (!/name="theme-color"/.test(html)) failures.push('Browser theme color is missing.');
 if (!/id="root"/.test(html)) failures.push('React mount target is missing.');
@@ -20,18 +20,22 @@ const assetDir = path.join(root, 'assets');
 const assets = await readdir(assetDir).catch(() => []);
 if (!assets.some((name) => /\.js$/.test(name))) failures.push('No JavaScript asset was emitted.');
 if (!assets.some((name) => /\.css$/.test(name))) failures.push('No CSS asset was emitted.');
+for (const asset of ['favicon.svg', 'site.webmanifest', 'robots.txt', 'sitemap.xml', '404.html']) await check(asset);
 
-for (const asset of ['favicon.svg', 'site.webmanifest', 'robots.txt', 'sitemap.xml', 'porcelain-branch.svg', '404.html']) await check(asset);
 const manifest = await readFile(path.join(root, 'site.webmanifest'), 'utf8').catch(() => '');
 if (manifest) {
   try {
     const data = JSON.parse(manifest);
-    if (data.name !== 'Ritually — Kairo Studio') failures.push('Web manifest name does not match the site.');
+    if (data.name !== 'KINETIK — Train with intent') failures.push('Web manifest name does not match the site.');
     if (data.start_url !== './') failures.push('Web manifest start URL must stay relative for project Pages.');
   } catch { failures.push('Web manifest is not valid JSON.'); }
 }
 const sitemap = await readFile(path.join(root, 'sitemap.xml'), 'utf8').catch(() => '');
 if (sitemap && !sitemap.includes('https://mahitech580.github.io/3D-fitness-website/')) failures.push('Sitemap is missing the deployed canonical URL.');
+
+for (const mustHave of ['src/components/FitnessScene.tsx','src/components/WorkoutBuilder.tsx','src/components/ExerciseLibrary.tsx','src/components/GymPlanner.tsx','src/components/TrialBooking.tsx']) {
+  await check(mustHave.replace(/^src\//, '')); 
+}
 
 if (failures.length) {
   console.error('Production build verification failed:');

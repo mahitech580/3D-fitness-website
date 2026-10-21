@@ -1,12 +1,12 @@
 {
-  "name": "Ritually — Kairo Studio",
-  "short_name": "Ritually",
-  "description": "An editorial study in porcelain, pigment, and contemporary culture.",
+  "name": "KINETIK — Train with intent",
+  "short_name": "KINETIK",
+  "description": "A fitness discovery and planning experience.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f7f5ef",
-  "theme_color": "#f7f5ef",
+  "background_color": "#101411",
+  "theme_color": "#101411",
   "icons": [
     {
       "src": "./favicon.svg",
