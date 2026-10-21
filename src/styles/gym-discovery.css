@@ -37,3 +37,8 @@
 @media (max-width: 640px) { .gym-concept-grid, .gym-discovery-tools { grid-template-columns: minmax(0, 1fr); } .gym-discovery-tools { padding: 12px; } .gym-result-count { padding: 4px 0; } .gym-concept-content h3 { font-size: 22px; } }
 @media (prefers-reduced-motion: reduce) { .gym-enquire-link { transition: none; } }
 @media (forced-colors: active) { .gym-concept-card, .gym-discovery-tools { border: 1px solid CanvasText; } .gym-search-field input, .gym-filter-field select { border: 1px solid ButtonText; } }
+
+.selected-gym-interest { display: grid; gap: 7px; margin: 5px 0 16px; padding: 13px; border: 1px solid var(--line); background: var(--panel); }
+.selected-gym-interest > span { color: var(--muted); font-size: 7px; font-weight: 850; letter-spacing: .12em; }
+.selected-gym-interest strong { color: var(--ink); font-size: 11px; line-height: 1.5; }
+.selected-gym-interest p { margin: 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
