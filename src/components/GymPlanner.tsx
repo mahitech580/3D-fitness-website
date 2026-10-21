@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEv
 import '../styles/planner.css';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { Plane, Raycaster, Vector2, Vector3 } from 'three';
 
 const EQUIPMENT = {
@@ -23,8 +24,14 @@ const EQUIPMENT = {
 } as const;
 
 type EquipmentType = keyof typeof EQUIPMENT;
+type FloorFinish = 'rubber' | 'concrete' | 'wood';
+type WallFinish = 'chalk' | 'sage' | 'graphite';
+type CameraPreset = 'perspective' | 'top' | 'front' | 'side' | 'focus';
 type PlacedItem = { id: number; type: EquipmentType; x: number; y: number; rotated: boolean };
-type LayoutSnapshot = { version: 1; roomWidth: number; roomLength: number; roomHeight: number; items: PlacedItem[] };
+type LayoutSnapshot = { version: 1; roomWidth: number; roomLength: number; roomHeight: number; items: PlacedItem[]; floorFinish?: FloorFinish; wallFinish?: WallFinish };
+
+const FLOOR_COLORS: Record<FloorFinish, string> = { rubber: '#272d29', concrete: '#b8beb4', wood: '#9b7550' };
+const WALL_COLORS: Record<WallFinish, string> = { chalk: '#d9ddd4', sage: '#a8b9a4', graphite: '#525b55' };
 
 const TYPES = Object.keys(EQUIPMENT) as EquipmentType[];
 const DEFAULT_ITEMS: PlacedItem[] = [
@@ -42,6 +49,12 @@ function sizeOf(item: PlacedItem) {
 function isEquipmentType(value: unknown): value is EquipmentType {
   return typeof value === 'string' && TYPES.includes(value as EquipmentType);
 }
+function isFloorFinish(value: unknown): value is FloorFinish {
+  return value === 'rubber' || value === 'concrete' || value === 'wood';
+}
+function isWallFinish(value: unknown): value is WallFinish {
+  return value === 'chalk' || value === 'sage' || value === 'graphite';
+}
 
 function parseLayout(value: unknown): LayoutSnapshot {
   if (!value || typeof value !== 'object') throw new Error('The file does not contain a layout object.');
@@ -55,7 +68,7 @@ function parseLayout(value: unknown): LayoutSnapshot {
     ids.add(raw.id);
     return { id: raw.id, type: raw.type, x: raw.x, y: raw.y, rotated: raw.rotated };
   });
-  const snapshot = { version: 1 as const, roomWidth: data.roomWidth!, roomLength: data.roomLength!, roomHeight: data.roomHeight!, items };
+  const snapshot: LayoutSnapshot = { version: 1, roomWidth: data.roomWidth!, roomLength: data.roomLength!, roomHeight: data.roomHeight!, items, floorFinish: isFloorFinish(data.floorFinish) ? data.floorFinish : 'rubber', wallFinish: isWallFinish(data.wallFinish) ? data.wallFinish : 'sage' };
   for (const item of items) {
     if (!placementFits(item, items.filter((other) => other.id !== item.id), snapshot.roomWidth, snapshot.roomLength)) throw new Error('The layout contains equipment outside the room or overlapping another item.');
   }
@@ -159,12 +172,16 @@ function EquipmentModel({ item, roomWidth, roomLength, selected, onSelect, onDra
   );
 }
 
-function PlannerScene({ items, roomWidth, roomLength, roomHeight, selectedId, onSelect, onDragStart, onDragPreview, onDragEnd }: {
+function PlannerScene({ items, roomWidth, roomLength, roomHeight, selectedId, floorFinish, wallFinish, cameraPreset, cameraFocus, onSelect, onDragStart, onDragPreview, onDragEnd }: {
   items: PlacedItem[];
   roomWidth: number;
   roomLength: number;
   roomHeight: number;
   selectedId: number | null;
+  floorFinish: FloorFinish;
+  wallFinish: WallFinish;
+  cameraPreset: CameraPreset;
+  cameraFocus: { x: number; y: number; width: number; depth: number } | null;
   onSelect: (id: number) => void;
   onDragStart: (id: number) => void;
   onDragPreview: (id: number, x: number, y: number) => void;
@@ -174,11 +191,35 @@ function PlannerScene({ items, roomWidth, roomLength, roomHeight, selectedId, on
   const [dragging, setDragging] = useState(false);
   const dragIdRef = useRef<number | null>(null);
   const dragContextRef = useRef({ items, roomWidth, roomLength, onDragStart, onDragPreview, onDragEnd });
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
   dragContextRef.current = { items, roomWidth, roomLength, onDragStart, onDragPreview, onDragEnd };
   const raycaster = useMemo(() => new Raycaster(), []);
   const pointer = useMemo(() => new Vector2(), []);
   const dragPlane = useMemo(() => new Plane(new Vector3(0, 1, 0), -0.03), []);
   const worldPoint = useMemo(() => new Vector3(), []);
+
+  useEffect(() => {
+    const target = cameraPreset === 'focus' && cameraFocus
+      ? new Vector3(cameraFocus.x + cameraFocus.width / 2 - roomWidth / 2, 0, cameraFocus.y + cameraFocus.depth / 2 - roomLength / 2)
+      : new Vector3(0, 0, 0);
+    let position: Vector3;
+    if (cameraPreset === 'top') {
+      camera.up.set(0, 0, -1);
+      position = new Vector3(0, Math.max(roomWidth, roomLength) * 1.1, 0.001);
+    } else {
+      camera.up.set(0, 1, 0);
+      if (cameraPreset === 'front') position = new Vector3(0, roomHeight * 0.75 + 2, roomLength * 1.65);
+      else if (cameraPreset === 'side') position = new Vector3(roomWidth * 1.7, roomHeight * 0.75 + 2, 0);
+      else if (cameraPreset === 'focus' && cameraFocus) position = target.clone().add(new Vector3(4, 4, 5));
+      else position = new Vector3(roomWidth * 0.92, roomHeight * 1.5 + 3, roomLength * 1.05);
+    }
+    camera.position.copy(position);
+    camera.lookAt(target);
+    if (controlsRef.current) {
+      controlsRef.current.target.copy(target);
+      controlsRef.current.update();
+    }
+  }, [camera, cameraPreset, cameraFocus?.x, cameraFocus?.y, cameraFocus?.width, cameraFocus?.depth, roomWidth, roomLength, roomHeight]);
 
   useEffect(() => {
     function movePointer(event: PointerEvent) {
@@ -230,13 +271,13 @@ function PlannerScene({ items, roomWidth, roomLength, roomHeight, selectedId, on
       <pointLight position={[-roomWidth / 2, 4, -roomLength / 2]} intensity={0.4} color="#d7ff58" />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.08, 0]} receiveShadow>
         <planeGeometry args={[roomWidth, roomLength]} />
-        <meshStandardMaterial color="#b8beb4" roughness={0.86} />
+        <meshStandardMaterial color={FLOOR_COLORS[floorFinish]} roughness={floorFinish === 'rubber' ? 0.94 : 0.78} />
       </mesh>
       <gridHelper args={[Math.max(roomWidth, roomLength), Math.max(roomWidth, roomLength), '#626d60', '#919b8d']} position={[0, -0.045, 0]} />
-      <mesh position={[0, roomHeight / 2, -roomLength / 2]} receiveShadow><boxGeometry args={[roomWidth, roomHeight, 0.12]} /><meshStandardMaterial color="#d9ddd4" transparent opacity={0.35} roughness={0.92} /></mesh>
-      <mesh position={[-roomWidth / 2, roomHeight / 2, 0]} receiveShadow><boxGeometry args={[0.12, roomHeight, roomLength]} /><meshStandardMaterial color="#c5cec2" transparent opacity={0.24} roughness={0.92} /></mesh>
+      <mesh position={[0, roomHeight / 2, -roomLength / 2]} receiveShadow><boxGeometry args={[roomWidth, roomHeight, 0.12]} /><meshStandardMaterial color={WALL_COLORS[wallFinish]} transparent opacity={0.42} roughness={0.92} /></mesh>
+      <mesh position={[-roomWidth / 2, roomHeight / 2, 0]} receiveShadow><boxGeometry args={[0.12, roomHeight, roomLength]} /><meshStandardMaterial color={WALL_COLORS[wallFinish]} transparent opacity={0.32} roughness={0.92} /></mesh>
       {items.map((item) => <EquipmentModel key={item.id} item={item} roomWidth={roomWidth} roomLength={roomLength} selected={selectedId === item.id} onSelect={onSelect} onDragStart={beginDrag} />)}
-      <OrbitControls makeDefault enabled={!dragging} enableDamping dampingFactor={0.12} minPolarAngle={0.12} maxPolarAngle={1.47} minDistance={Math.max(4, roomWidth * 0.35)} maxDistance={Math.max(24, roomWidth * 2.8)} />
+      <OrbitControls ref={controlsRef} makeDefault enabled={!dragging} enableDamping dampingFactor={0.12} minPolarAngle={0.12} maxPolarAngle={1.57} minDistance={Math.max(4, roomWidth * 0.35)} maxDistance={Math.max(24, roomWidth * 2.8)} />
     </>
   );
 }
@@ -246,6 +287,10 @@ export function GymPlanner() {
   const [roomWidth, setRoomWidth] = useState(stored?.roomWidth ?? 12);
   const [roomLength, setRoomLength] = useState(stored?.roomLength ?? 8);
   const [roomHeight, setRoomHeight] = useState(stored?.roomHeight ?? 3);
+  const [floorFinish, setFloorFinish] = useState<FloorFinish>(stored?.floorFinish ?? 'rubber');
+  const [wallFinish, setWallFinish] = useState<WallFinish>(stored?.wallFinish ?? 'sage');
+  const [cameraPreset, setCameraPreset] = useState<CameraPreset>('perspective');
+  const [cameraFocus, setCameraFocus] = useState<{ x: number; y: number; width: number; depth: number } | null>(null);
   const [items, setItems] = useState<PlacedItem[]>(stored?.items ?? DEFAULT_ITEMS);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [tool, setTool] = useState<EquipmentType>('rack');
@@ -270,10 +315,10 @@ export function GymPlanner() {
   })) : Infinity;
 
   useEffect(() => {
-    const snapshot: LayoutSnapshot = { version: 1, roomWidth, roomLength, roomHeight, items };
+    const snapshot: LayoutSnapshot = { version: 1, roomWidth, roomLength, roomHeight, items, floorFinish, wallFinish };
     try { window.localStorage.setItem('kinetik-gym-plan-autosave', JSON.stringify(snapshot)); }
     catch { /* Keep editing possible if storage is unavailable. */ }
-  }, [roomWidth, roomLength, roomHeight, items]);
+  }, [roomWidth, roomLength, roomHeight, items, floorFinish, wallFinish]);
 
   function commitItems(next: PlacedItem[]) {
     setPast((current) => [...current, items.map((item) => ({ ...item }))].slice(-40));
@@ -315,8 +360,18 @@ export function GymPlanner() {
     }
   }
 
+  function focusSelectedIn3d() {
+    if (!selectedItem || !selectedSize) {
+      setStatus('Select an equipment item before focusing the 3D camera.');
+      return;
+    }
+    setCameraFocus({ x: selectedItem.x, y: selectedItem.y, width: selectedSize.width, depth: selectedSize.depth });
+    setCameraPreset('focus');
+    setStatus('Camera focused on ' + EQUIPMENT[selectedItem.type].label + '. Use orbit and zoom to inspect it.');
+  }
+
   function snapshot(): LayoutSnapshot {
-    return { version: 1, roomWidth, roomLength, roomHeight, items: items.map((item) => ({ ...item })) };
+    return { version: 1, roomWidth, roomLength, roomHeight, items: items.map((item) => ({ ...item })), floorFinish, wallFinish };
   }
 
   function placeAt(type: EquipmentType, x: number, y: number) {
@@ -421,7 +476,7 @@ export function GymPlanner() {
       const raw = window.localStorage.getItem('kinetik-gym-plan-saved');
       if (!raw) { setStatus('No saved layout exists in this browser yet. Use SAVE LAYOUT first.'); return; }
       const data = parseLayout(JSON.parse(raw));
-      setRoomWidth(data.roomWidth); setRoomLength(data.roomLength); setRoomHeight(data.roomHeight);
+      setRoomWidth(data.roomWidth); setRoomLength(data.roomLength); setRoomHeight(data.roomHeight); setFloorFinish(data.floorFinish ?? 'rubber'); setWallFinish(data.wallFinish ?? 'sage');
       setPast([]); setFuture([]); setItems(data.items); setSelectedId(null);
       nextId.current = Math.max(0, ...data.items.map((item) => item.id)) + 1;
       setStatus('Saved browser layout loaded.');
@@ -476,7 +531,7 @@ export function GymPlanner() {
     reader.onload = () => {
       try {
         const data = parseLayout(JSON.parse(String(reader.result)));
-        setRoomWidth(data.roomWidth); setRoomLength(data.roomLength); setRoomHeight(data.roomHeight);
+        setRoomWidth(data.roomWidth); setRoomLength(data.roomLength); setRoomHeight(data.roomHeight); setFloorFinish(data.floorFinish ?? 'rubber'); setWallFinish(data.wallFinish ?? 'sage');
         setItems(data.items); setPast([]); setFuture([]); setSelectedId(null);
         nextId.current = Math.max(0, ...data.items.map((item) => item.id)) + 1;
         setStatus('Imported a validated JSON layout. Review the room before using it.');
@@ -507,6 +562,10 @@ export function GymPlanner() {
                 <label>LENGTH<input aria-label="Room length in metres" type="number" min="4" max="18" step="1" value={roomLength} onChange={(event) => setRoomDimension('length', Number(event.target.value))} /></label>
                 <label>HEIGHT<input aria-label="Room height in metres" type="number" min="2" max="8" step="1" value={roomHeight} onChange={(event) => setRoomDimension('height', Number(event.target.value))} /></label>
               </div>
+              <div className="room-finish-controls">
+                <label>FLOOR FINISH<select aria-label="Floor finish" value={floorFinish} onChange={(event) => setFloorFinish(event.target.value as FloorFinish)}><option value="rubber">Rubber</option><option value="concrete">Concrete</option><option value="wood">Wood</option></select></label>
+                <label>WALL TONE<select aria-label="Wall appearance" value={wallFinish} onChange={(event) => setWallFinish(event.target.value as WallFinish)}><option value="chalk">Chalk</option><option value="sage">Sage</option><option value="graphite">Graphite</option></select></label>
+              </div>
               <div className="room-metric"><strong>{roomWidth} × {roomLength}</strong><span>METRES / {sizeSlots} m²</span></div>
               <p className="planner-note">Grid snap is 1 m. Room walls are a visual reference only; openings and regulatory clearances are not modeled.</p>
             </div>
@@ -523,7 +582,12 @@ export function GymPlanner() {
           </aside>
           <div className="planner-main">
             <div className="planner-toolbar"><div><span className="live-indicator" /> LIVE LAYOUT</div><div>{items.length} ITEMS / {occupiedArea} m² FOOTPRINT / {sizeSlots - occupiedArea} m² OPEN</div><div className="planner-view-controls" role="group" aria-label="Planner view">{(['split', 'plan', '3d'] as const).map((target) => <button key={target} type="button" className={view === target ? 'is-active' : ''} aria-pressed={view === target} onClick={() => setView(target)}>{target === 'split' ? 'SPLIT' : target === 'plan' ? '2D PLAN' : '3D ROOM'}</button>)}</div></div>
-            <div className={'planner-workspace' + (view === 'split' ? ' is-split' : '')}>
+            <div className="planner-camera-toolbar" role="group" aria-label="3D camera views">
+               <span>CAMERA VIEW</span>
+               {([{ key: 'perspective', label: 'RESET' }, { key: 'top', label: 'TOP' }, { key: 'front', label: 'FRONT' }, { key: 'side', label: 'SIDE' }] as const).map((preset) => <button key={preset.key} type="button" aria-pressed={cameraPreset === preset.key} className={cameraPreset === preset.key ? 'is-active' : ''} onClick={() => setCameraPreset(preset.key)}>{preset.label}</button>)}
+               <button type="button" disabled={!selectedItem} onClick={focusSelectedIn3d}>FOCUS SELECTED</button>
+             </div>
+             <div className={'planner-workspace' + (view === 'split' ? ' is-split' : '')}>
               <div className={'planner-view planner-plan-view' + activeViewClass('plan')}>
                 <div className="planner-view-label"><span>01 / TOP VIEW</span><span>SNAP · 1 M</span></div>
                 <div className="planner-grid-scroll"><div className="planner-grid" style={{ gridTemplateColumns: 'repeat(' + roomWidth + ', minmax(28px, 1fr))', gridTemplateRows: 'repeat(' + roomLength + ', 42px)' }}>
@@ -535,7 +599,7 @@ export function GymPlanner() {
                 <div className="planner-view-label"><span>02 / PERSPECTIVE VIEW</span><span>DRAG EQUIPMENT TO MOVE · DRAG FLOOR TO ORBIT · SCROLL TO ZOOM</span></div>
                 <div className="planner-3d-canvas" ref={previewRef}>
                   <Canvas shadows dpr={[1, 1.5]} camera={{ position: [roomWidth * 0.92, roomHeight * 1.5 + 3, roomLength * 1.05], fov: 38, near: 0.1, far: 120 }} gl={{ antialias: true, powerPreference: 'low-power', preserveDrawingBuffer: true }} fallback={<p>3D preview is not supported by this browser. Use the 2D floor plan.</p>}>
-                    <PlannerScene items={items} roomWidth={roomWidth} roomLength={roomLength} roomHeight={roomHeight} selectedId={selectedId} onSelect={(id) => { setSelectedId(id); const item = items.find((entry) => entry.id === id); if (item) setStatus(EQUIPMENT[item.type].label + ' selected in 3D. Drag to move it, or use the coordinate controls.'); }} onDragStart={start3dDrag} onDragPreview={preview3dDrag} onDragEnd={finish3dDrag} />
+                    <PlannerScene items={items} roomWidth={roomWidth} roomLength={roomLength} roomHeight={roomHeight} selectedId={selectedId} floorFinish={floorFinish} wallFinish={wallFinish} cameraPreset={cameraPreset} cameraFocus={cameraFocus} onSelect={(id) => { setSelectedId(id); const item = items.find((entry) => entry.id === id); if (item) setStatus(EQUIPMENT[item.type].label + ' selected in 3D. Drag to move it, or use the coordinate controls.'); }} onDragStart={start3dDrag} onDragPreview={preview3dDrag} onDragEnd={finish3dDrag} />
                   </Canvas>
                 </div>
               </div>
