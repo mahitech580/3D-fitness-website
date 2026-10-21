@@ -22,7 +22,7 @@ if (!assets.some((name) => /\.js$/.test(name))) failures.push('No JavaScript ass
 if (!assets.some((name) => /\.css$/.test(name))) failures.push('No CSS asset was emitted.');
 const scripts = await Promise.all(assets.filter((name) => /\.js$/.test(name)).map((name) => readFile(path.join(assetDir, name), 'utf8')));
 const bundleText = scripts.join('\n');
-for (const featureText of ['BUILD MY WEEK', 'MARK SESSION DONE', 'ROTATE 90°', 'PREPARE MY REQUEST', 'VIEW CONCEPT DETAILS', 'SAVE TEMPLATE', 'WEEKLY SESSION HISTORY', 'FOCUS SELECTED', 'FLOOR FINISH']) {
+for (const featureText of ['BUILD MY WEEK', 'MARK SESSION DONE', 'ROTATE 90°', 'PREPARE MY REQUEST', 'VIEW CONCEPT DETAILS', 'SAVE TEMPLATE', 'WEEKLY SESSION HISTORY', 'FOCUS SELECTED', 'FLOOR FINISH', 'COMMON MISTAKES', 'RELATED MOVEMENTS', 'GYM CONCEPTS']) {
   if (!bundleText.includes(featureText)) failures.push('Expected interactive feature text was not found in the production JS: ' + featureText);
 }
 for (const asset of ['favicon.svg', 'site.webmanifest', 'robots.txt', 'sitemap.xml', '404.html']) await check(asset);
