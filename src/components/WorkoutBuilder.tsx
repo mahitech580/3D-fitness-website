@@ -3,6 +3,7 @@ import { EXERCISES, gearMatches, type Exercise, type GearOption, type TrainingGo
 import { WorkoutSession, type PlannedWorkoutDay, type CompletedWorkoutRecord } from './WorkoutSession';
 import { ProgressDashboard } from './ProgressDashboard';
 import '../styles/workout-session.css';
+import '../styles/workout-templates.css';
 
 type WorkoutDay = PlannedWorkoutDay;
 type WorkoutSettings = {
