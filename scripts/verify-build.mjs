@@ -45,10 +45,10 @@ const sourceContents = await Promise.all(sourcePaths.map((relativePath) =>
 ));
 const sectionIds = new Set();
 for (const source of sourceContents.slice(0, -1)) {
-  for (const match of source.matchAll(/<section\\b[^>]*\\bid=["']([^"']+)["']/gs)) sectionIds.add(match[1]);
+  for (const match of source.matchAll(/<section\b[^>]*\bid=["']([^"']+)["']/gs)) sectionIds.add(match[1]);
 }
 const paletteSource = sourceContents[sourceContents.length - 1];
-const commandTargetIds = [...paletteSource.matchAll(/\\{\\s*id:\\s*'([^']+)'/g)].map((match) => match[1]);
+const commandTargetIds = [...paletteSource.matchAll(/\{\s*id:\s*'([^']+)'/g)].map((match) => match[1]);
 for (const targetId of commandTargetIds) {
   if (!sectionIds.has(targetId)) failures.push('Command palette target does not match a section anchor: #' + targetId);
 }
