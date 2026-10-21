@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { EXERCISES, EXERCISE_DETAILS, type GearOption, type ExerciseDifficulty, type MovementType } from '../data/exercises';
+import { EXERCISES, EXERCISE_DETAILS, type GearOption } from '../data/exercises';
 
 const categories = ['All', 'Strength', 'Conditioning', 'Mobility'] as const;
 const difficulties = ['All levels', 'Beginner', 'Intermediate', 'Advanced'] as const;
@@ -68,8 +68,8 @@ export function ExerciseLibrary() {
               <div className="exercise-meta"><span>{exercise.sets} SETS</span><span>{exercise.reps} REPS / TIME</span><span>{details?.difficulty ?? 'General'} / {details?.movementType ?? exercise.category}</span><span>PRIMARY · {(details?.primaryMuscles ?? [exercise.focus]).join(' / ')}</span></div>
               <button className="exercise-details-toggle" type="button" aria-expanded={expanded === exercise.id} onClick={() => setExpanded((current) => current === exercise.id ? null : exercise.id)}>{expanded === exercise.id ? 'CLOSE CUE' : 'FORM CUE'} <span aria-hidden="true">{expanded === exercise.id ? '−' : '+'}</span></button>
               {expanded === exercise.id && <div className="exercise-cue"><p>{exercise.cue}</p><span>REST GUIDE · {exercise.rest}</span><span>GEAR · {exercise.gear.join(' / ')}</span><span>SECONDARY · {(details?.secondaryMuscles ?? []).join(' / ') || 'Not specified'}</span><div className="exercise-detail-group"><strong>TECHNIQUE</strong><ol>{(details?.instructions ?? [exercise.cue]).map((instruction) => <li key={instruction}>{instruction}</li>)}</ol></div><div className="exercise-detail-group"><strong>COMMON MISTAKES</strong><ul>{(details?.commonMistakes ?? ['Move with control and stay within a comfortable range.']).map((mistake) => <li key={mistake}>{mistake}</li>)}</ul></div><div className="exercise-detail-group"><strong>RELATED MOVEMENTS</strong><p>{(details?.alternatives ?? []).map((id) => EXERCISES.find((item) => item.id === id)?.name ?? id).join(' · ') || 'No alternatives listed yet.'}</p></div></div>}
-            </article>
-          );})}
+            </article>;
+          })}
           {filtered.length === 0 && <div className="empty-library"><h3>No movements found.</h3><p>Try a broader search or reset the equipment and category filters.</p><button type="button" className="button button-quiet" onClick={() => { setQuery(''); setCategory('All'); setGear('All gear'); setMuscle('All muscles'); setDifficulty('All levels'); setMovement('All patterns'); setSort('Recommended'); }}>RESET FILTERS</button></div>}
         </div>
         <p className="section-footnote">Training suggestions are general information. Choose appropriate loads, use stable equipment, and stop if a movement causes pain.</p>
