@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEvent, type ComponentRef } from 'react';
 import '../styles/planner.css';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { Plane, Raycaster, Vector2, Vector3 } from 'three';
 
 const EQUIPMENT = {
@@ -191,7 +190,7 @@ function PlannerScene({ items, roomWidth, roomLength, roomHeight, selectedId, fl
   const [dragging, setDragging] = useState(false);
   const dragIdRef = useRef<number | null>(null);
   const dragContextRef = useRef({ items, roomWidth, roomLength, onDragStart, onDragPreview, onDragEnd });
-  const controlsRef = useRef<OrbitControlsImpl | null>(null);
+  const controlsRef = useRef<ComponentRef<typeof OrbitControls> | null>(null);
   dragContextRef.current = { items, roomWidth, roomLength, onDragStart, onDragPreview, onDragEnd };
   const raycaster = useMemo(() => new Raycaster(), []);
   const pointer = useMemo(() => new Vector2(), []);
