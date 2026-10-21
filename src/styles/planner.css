@@ -91,3 +91,23 @@
   .library-toolbar { grid-template-columns: minmax(0, 1fr); }
   .library-toolbar .search-control { grid-column: auto; }
 }
+
+.room-finish-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+.room-finish-controls label { display: grid; gap: 6px; min-width: 0; color: var(--muted); font-size: 7px; font-weight: 800; letter-spacing: .09em; }
+.room-finish-controls select { width: 100%; min-width: 0; min-height: 36px; padding: 7px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 11px; letter-spacing: 0; }
+.planner-camera-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; padding: 9px 12px; border: 1px solid var(--line); border-bottom: 0; background: var(--surface); }
+.planner-camera-toolbar > span { margin-right: auto; color: var(--muted); font-size: 7px; font-weight: 850; letter-spacing: .12em; }
+.planner-camera-toolbar button { min-height: 32px; padding: 7px 10px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); cursor: pointer; font-size: 7px; font-weight: 850; letter-spacing: .08em; }
+.planner-camera-toolbar button.is-active, .planner-camera-toolbar button:not(:disabled):hover { border-color: var(--accent); color: var(--accent); }
+.planner-camera-toolbar button:disabled { opacity: .4; cursor: not-allowed; }
+.planner-3d-canvas canvas { touch-action: pan-y; }
+@media (max-width: 760px) {
+  .room-finish-controls { gap: 6px; }
+  .planner-camera-toolbar { align-items: stretch; }
+  .planner-camera-toolbar > span { flex: 1 0 100%; margin-bottom: 3px; }
+  .planner-camera-toolbar button { flex: 1 1 auto; }
+}
+@media (forced-colors: active) {
+  .room-finish-controls select, .planner-camera-toolbar button { border: 1px solid ButtonText; }
+  .planner-camera-toolbar button.is-active { outline: 2px solid Highlight; }
+}
