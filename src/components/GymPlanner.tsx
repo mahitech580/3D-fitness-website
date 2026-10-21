@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEvent } from 'react';
+import '../styles/planner.css';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 
@@ -188,7 +189,6 @@ export function GymPlanner() {
   const [status, setStatus] = useState('Add an item, select it in either view, then use the property controls to position it precisely.');
   const [past, setPast] = useState<PlacedItem[][]>([]);
   const [future, setFuture] = useState<PlacedItem[][]>([]);
-  const [importOpen, setImportOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const nextId = useRef(Math.max(0, ...(stored?.items ?? DEFAULT_ITEMS).map((item) => item.id)) + 1);
@@ -445,7 +445,7 @@ export function GymPlanner() {
             <div className="planner-footer"><div><span>ROOM / APPROXIMATE</span><strong>{roomWidth} × {roomLength} × {roomHeight} m</strong></div><div><span>AREA OCCUPIED</span><strong>{occupiedArea} m² / {fillPercent}%</strong></div><div><span>GEOMETRY CHECK</span><strong>{overlaps ? overlaps + ' WARNINGS' : 'NO OVERLAPS'}</strong></div></div>
             <div className="planner-actions">
               <div className="planner-history-actions"><button type="button" disabled={!past.length} onClick={undo}>↶ UNDO</button><button type="button" disabled={!future.length} onClick={redo}>↷ REDO</button><button type="button" onClick={resetLayout}>CLEAR ROOM</button></div>
-              <div className="planner-export-actions"><button type="button" onClick={saveLayout}>SAVE LAYOUT</button><button type="button" onClick={loadLayout}>LOAD SAVED</button><button type="button" onClick={exportJson}>EXPORT JSON</button><button type="button" onClick={() => { setImportOpen((open) => !open); importRef.current?.click(); }}>IMPORT JSON</button><button type="button" onClick={exportPlanPng}>EXPORT 2D PNG</button><button type="button" onClick={export3dPng}>EXPORT 3D PNG</button><input ref={importRef} className="planner-file-input" type="file" accept="application/json,.json" aria-label="Import a Kinetik JSON layout" onChange={importLayout} /></div>
+              <div className="planner-export-actions"><button type="button" onClick={saveLayout}>SAVE LAYOUT</button><button type="button" onClick={loadLayout}>LOAD SAVED</button><button type="button" onClick={exportJson}>EXPORT JSON</button><button type="button" onClick={() => importRef.current?.click()}>IMPORT JSON</button><button type="button" onClick={exportPlanPng}>EXPORT 2D PNG</button><button type="button" onClick={export3dPng}>EXPORT 3D PNG</button><input ref={importRef} className="planner-file-input" type="file" accept="application/json,.json" aria-label="Import a Kinetik JSON layout" onChange={importLayout} /></div>
             </div>
             <p className="planner-status" role="status" aria-live="polite">{status}</p>
             <p className="planner-note planner-disclaimer">Changes autosave locally in this browser. Explicit save/load also stays on this device; there is no account or cloud sync. Footprints and spacing are approximate concepts, not architectural, accessibility, fire-safety, or manufacturer-clearance approval.</p>
