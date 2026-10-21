@@ -35,7 +35,7 @@ URL: https://www.fitness.com/en
 
 **Useful pattern:** A fitness destination should remain useful after the hero: people need to browse exercises and find information, not only click a large CTA.
 
-**Implementation decision:** Add an indexed set of sample movements, search, category filters, and short cues. This is authored starter content, not a claim that a complete exercise video database exists.
+**Implementation decision:** Keep a typed movement catalogue and detailed guidance records connected by exercise ID. Search covers exercise names and guidance, and filters include category, primary muscle, equipment, difficulty and movement pattern; users can sort results and expand step-by-step technique, common mistakes, secondary muscles and alternatives. This is authored starter content, not a claim that a complete exercise/video database exists.
 
 **Do not copy:** Article text, media assets, exercise database data, or claims of an operational AI assistant.
 
@@ -46,7 +46,7 @@ URL: https://builder.thor.fitness/
 
 **Useful pattern:** Let visitors manipulate a space and see simple metrics change immediately.
 
-**Implementation decision:** Add a lightweight 2D gym-planning grid with a room measurement, equipment placement, selection, rotation, removal, and occupancy summary. Label it explicitly as a concept planner; it does not provide a true CAD drawing, code-compliant fit-out, or exported 3D model.
+**Implementation decision:** Build a shared room-layout model displayed in a 1 m-grid 2D editor and an interactive procedural 3D room. The user can select, drag, rotate, duplicate, numerically position and remove fifteen equipment types; collision/bounds validation, room measurements and finishes, camera presets, undo/redo, local save/load, JSON import/export and 2D/3D PNG export use that layout state. This remains a concept planner, not a professional CAD model or code-compliant fit-out.
 
 **Do not copy:** Thor branding, equipment product images, proprietary model assets, or an implication that the local grid equals Thor's full 3D tool.
 
@@ -95,6 +95,45 @@ URL: https://www.wildinteractive.co.nz/creative-technology
 **Implementation decision:** Keep pointer response subtle and optional, use the equipment scene to support the story, and make motion respectful of reduced-motion settings.
 
 **Do not copy:** Its exact illustrations, effects, proprietary source code, or visual identity.
+
+### 9. Active Theory — Creative Digital Experiences
+URL: https://activetheory.net/
+
+**Observed:** The requested domain returned a page titled “Active Theory · Creative Digital Experiences” but the readable browser response only displayed “Please enable JavaScript.” The interactive portfolio and individual case studies could not be inspected from the available browser output.
+
+**Useful pattern:** No specific interaction pattern is claimed from this inaccessible session.
+
+**Implementation decision:** Continue with a restrained, product-oriented 3D scene and functional fitness tools; do not attribute any unverified interaction to this reference. Revisit this site when a full browser session is available.
+
+**Do not copy:** No proprietary layout, art, animation, or code was inspected or adopted.
+
+### 10. Awwwards — 3D websites and WebGL websites
+URLs: https://www.awwwards.com/websites/3d/ and https://www.awwwards.com/websites/webgl/
+
+**Observed:** Both category pages timed out during this research pass. Their individual example sites and interactions were therefore not inspected.
+
+**Useful pattern:** None is credited to a specific Awwwards entry because the category pages were inaccessible in this session.
+
+**Implementation decision:** Do not fabricate a list of examples or imply that individual awarded experiences were audited. Keep the existing original procedural equipment art, section-based navigation, and interactive 2D/3D gym editor as the concrete implementation.
+
+**Do not copy:** No specific award-winning site or asset was identified or copied from these category pages.
+
+## Official technical documentation
+
+### Three.js — WebGLRenderer
+URL: https://threejs.org/docs/pages/WebGLRenderer
+
+The documentation describes the WebGL renderer and provides an explicit `.dispose()` method for freeing renderer GPU resources once the renderer is no longer used. The application uses React Three Fiber's managed Canvas lifecycle and does not add a competing manual render loop. This documentation is a reminder not to dispose of renderer-owned objects while they remain in use.
+
+### React Three Fiber — Performance pitfalls
+URL: https://r3f.docs.pmnd.rs/advanced/pitfalls
+
+The guidance recommends reusing geometries/materials where practical and avoiding React state updates in a per-frame animation loop or for every high-frequency pointer movement. The planner snaps equipment to a 1 m grid and updates its shared layout only when the snapped position changes, rather than writing state for every pixel moved.
+
+### React Three Fiber — Scaling performance
+URL: https://r3f.docs.pmnd.rs/advanced/scaling-performance
+
+The guide explains demand-driven rendering for scenes that can become idle, and notes that imperative camera/control updates must still request renders when using that mode. The KINETIK hero has intentional movement and the planner has interactive camera controls, so any future move to on-demand rendering needs to preserve those control updates. No FPS or performance-score claim is made without measurement.
 
 ## Synthesis
 
