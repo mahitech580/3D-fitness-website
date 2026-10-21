@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { EXERCISES, type ExerciseCategory, type GearOption } from '../data/exercises';
+import { EXERCISES, type GearOption } from '../data/exercises';
 
 const categories = ['All', 'Strength', 'Conditioning', 'Mobility'] as const;
 type CategoryFilter = typeof categories[number];
