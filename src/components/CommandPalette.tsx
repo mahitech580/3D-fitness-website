@@ -14,6 +14,7 @@ export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const resultRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   useEffect(() => {
     function handleShortcut(event: KeyboardEvent) {
@@ -41,6 +42,13 @@ export function CommandPalette() {
     return targets.filter((target) => !normalized || (target.title + ' ' + target.eyebrow + ' ' + target.description + ' ' + target.keywords).toLowerCase().includes(normalized));
   }, [query]);
 
+  function handleSearchKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'ArrowDown' && filteredTargets.length > 0) {
+      event.preventDefault();
+      resultRefs.current[0]?.focus();
+    }
+  }
+
   function jumpTo(id: string) {
     setOpen(false);
     window.location.hash = id;
@@ -64,12 +72,15 @@ export function CommandPalette() {
             <label className="command-search">
               <span className="visually-hidden">Search page sections</span>
               <span aria-hidden="true">⌕</span>
-              <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search a section, idea, or word…" autoComplete="off" />
+              <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={handleSearchKeyDown} placeholder="Search a section, idea, or word…" autoComplete="off" />
               <kbd>ESC</kbd>
             </label>
             <div className="command-results" role="listbox" aria-label="Page destinations">
-              {filteredTargets.map((target) => (
-                <button className="command-result" type="button" role="option" aria-selected="false" key={target.id} onClick={() => jumpTo(target.id)}>
+              {filteredTargets.map((target, index) => (
+                <button className="command-result" type="button" role="option" aria-selected="false" key={target.id} ref={(node) => { resultRefs.current[index] = node; }} onKeyDown={(event) => {
+                  if (event.key === 'ArrowDown') { event.preventDefault(); resultRefs.current[(index + 1) % filteredTargets.length]?.focus(); }
+                  if (event.key === 'ArrowUp') { event.preventDefault(); if (index === 0) inputRef.current?.focus(); else resultRefs.current[index - 1]?.focus(); }
+                }} onClick={() => jumpTo(target.id)}>
                   <span className="command-result-index">{target.eyebrow}</span>
                   <span className="command-result-copy"><strong>{target.title}</strong><small>{target.description}</small></span>
                   <span className="command-result-arrow" aria-hidden="true">↗</span>
@@ -77,7 +88,7 @@ export function CommandPalette() {
               ))}
               {filteredTargets.length === 0 && <p className="command-empty" role="status">No section matches. Try “ritual”, “learn”, or “contact”.</p>}
             </div>
-            <p className="command-hint">MOVE THROUGH THE STUDIO <span>·</span> CTRL / ⌘ + K TO TOGGLE</p>
+            <p className="command-hint">↑ / ↓ TO NAVIGATE <span>·</span> CTRL / ⌘ + K TO TOGGLE</p>
           </section>
         </div>
       )}
