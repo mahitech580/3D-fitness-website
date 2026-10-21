@@ -14,6 +14,8 @@ const journalEntries: JournalEntry[] = [
 
 export function StudioSections() {
   const [submitted, setSubmitted] = useState(false);
+  const [preparedNote, setPreparedNote] = useState('');
+  const [copyMessage, setCopyMessage] = useState('');
   const [journalQuery, setJournalQuery] = useState('');
   const [journalCategory, setJournalCategory] = useState('ALL');
   const [selectedJournal, setSelectedJournal] = useState<JournalEntry | null>(null);
@@ -36,7 +38,29 @@ export function StudioSections() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formValues = new FormData(event.currentTarget);
+    const intention = (formValues.get('intention') ?? '').toString().replace(/-/g, ' ');
+    setPreparedNote([
+      'KAIRO STUDIO — ENQUIRY NOTE',
+      '',
+      'Name: ' + (formValues.get('name') ?? ''),
+      'Email: ' + (formValues.get('email') ?? ''),
+      'Intention: ' + intention,
+      '',
+      'Note:',
+      (formValues.get('note') ?? '').toString().trim() || '(No extra note provided.)',
+    ].join('\n'));
+    setCopyMessage('');
     setSubmitted(true);
+  }
+
+  async function copyPreparedNote() {
+    try {
+      await navigator.clipboard.writeText(preparedNote);
+      setCopyMessage('Note copied. Paste it into your preferred email or notes app; nothing was sent.');
+    } catch {
+      setCopyMessage('Clipboard access was blocked. The note has not been sent; copy your details manually.');
+    }
   }
 
   return (
@@ -137,7 +161,13 @@ export function StudioSections() {
               <label htmlFor="enquiry-note">A FEW WORDS (OPTIONAL)</label>
               <textarea id="enquiry-note" name="note" rows={3} placeholder="A small beginning is enough." onChange={() => setSubmitted(false)} />
               <button className="form-submit" type="submit">PREPARE NOTE <span aria-hidden="true">↗</span></button>
-              {submitted && <p className="form-status" role="status">Your note is ready in this prototype, but has not been sent. Connect a delivery endpoint to receive enquiries.</p>}
+              {submitted && (
+                <div className="prepared-note">
+                  <p className="form-status" role="status">Your enquiry note is prepared locally. It has not been sent or stored.</p>
+                  <button className="copy-note-button" type="button" onClick={copyPreparedNote}>COPY PREPARED NOTE <span aria-hidden="true">↗</span></button>
+                  {copyMessage && <p className="copy-note-status" role="status">{copyMessage}</p>}
+                </div>
+              )}
             </form>
           </div>
         </div>
