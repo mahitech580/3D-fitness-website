@@ -4,6 +4,7 @@ import { WatercolorBackground } from './components/WatercolorBackground';
 import { HeroSection } from './components/HeroSection';
 import { StudioSections } from './components/StudioSections';
 import { ScrollProgress } from './components/ScrollProgress';
+import { CommandPalette } from './components/CommandPalette';
 
 export function App() {
   return (
@@ -13,6 +14,7 @@ export function App() {
         <WatercolorBackground />
         <ScrollProgress />
         <SiteHeader />
+        <CommandPalette />
         <main id="main-content" tabIndex={-1}>
           <HeroSection />
           <StudioSections />
