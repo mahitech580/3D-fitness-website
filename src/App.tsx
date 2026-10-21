@@ -8,10 +8,12 @@ import { GymPlanner } from './components/GymPlanner';
 import { TrialBooking } from './components/TrialBooking';
 import { CommandPalette } from './components/CommandPalette';
 import { ShareSiteButton } from './components/ShareSiteButton';
+import { GymDiscovery } from './components/GymDiscovery';
 
 const navigation = [
   { href: '#training', label: 'TRAINING' },
   { href: '#library', label: 'MOVEMENT INDEX' },
+  { href: '#gyms', label: 'GYM CONCEPTS' },
   { href: '#space', label: 'GYM PLANNER' },
   { href: '#start', label: 'FIRST SESSION' },
 ];
@@ -23,6 +25,7 @@ export function App() {
   });
   const [menuOpen, setMenuOpen] = useState(false);
   const [scenePaused, setScenePaused] = useState(false);
+  const [selectedGym, setSelectedGym] = useState('');
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -77,8 +80,9 @@ export function App() {
           <div className="ticker" aria-label="Training approaches"><div className="ticker-track"><span>STRENGTH</span><i>✳</i><span>CONDITIONING</span><i>✳</i><span>MOBILITY</span><i>✳</i><span>CONSISTENCY</span><i>✳</i><span>STRENGTH</span><i>✳</i><span>CONDITIONING</span><i>✳</i><span>MOBILITY</span><i>✳</i><span>CONSISTENCY</span><i>✳</i></div></div>
           <WorkoutBuilder />
           <ExerciseLibrary />
+          <GymDiscovery onEnquire={(gymName) => setSelectedGym(gymName)} />
           <GymPlanner />
-          <TrialBooking />
+          <TrialBooking selectedGym={selectedGym} />
         </main>
         <footer className="site-footer">
           <a className="footer-brand" href="#home"><span className="brand-mark" aria-hidden="true">K</span>KINETIK</a>
