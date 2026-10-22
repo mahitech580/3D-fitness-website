@@ -227,6 +227,9 @@ export function WorkoutArena() {
   const [totalReps, setTotalReps] = useState(0);
   const [setsCompleted, setSetsCompleted] = useState(0);
   const [elapsed, setElapsed] = useState(0);
+  const [restDuration, setRestDuration] = useState(60);
+  const [restRemaining, setRestRemaining] = useState(0);
+  const [resting, setResting] = useState(false);
   const [trackingMode, setTrackingMode] = useState<TrackingMode>('manual');
   const [sessionSaved, setSessionSaved] = useState(false);
   const [history, setHistory] = useState<WorkoutHistoryEntry[]>(readArenaHistory);
@@ -242,6 +245,16 @@ export function WorkoutArena() {
     const timer = window.setInterval(() => setElapsed((value) => value + 1), 1000);
     return () => window.clearInterval(timer);
   }, [running]);
+
+  useEffect(() => {
+    if (!resting) return;
+    const timer = window.setInterval(() => setRestRemaining((value) => Math.max(0, value - 1)), 1000);
+    return () => window.clearInterval(timer);
+  }, [resting]);
+
+  useEffect(() => {
+    if (resting && restRemaining === 0) setResting(false);
+  }, [resting, restRemaining]);
 
   useEffect(() => {
     try { window.localStorage.setItem('kinetik-arena-history', JSON.stringify(history)); }
@@ -301,6 +314,8 @@ export function WorkoutArena() {
     setSetsCompleted(0);
     setRunning(false);
     setElapsed(0);
+    setResting(false);
+    setRestRemaining(0);
     setSessionSaved(false);
   }
 
@@ -311,6 +326,8 @@ export function WorkoutArena() {
     setTotalReps(0);
     setSetsCompleted(0);
     setElapsed(0);
+    setResting(false);
+    setRestRemaining(0);
     setSessionSaved(false);
   }
 
@@ -318,7 +335,20 @@ export function WorkoutArena() {
     if (setsCompleted >= 3) return;
     currentRepRef.current = 0;
     setReps(0);
+    setResting(false);
+    setRestRemaining(0);
     setRunning(true);
+  }
+
+  function startRest() {
+    setRunning(false);
+    setRestRemaining(restDuration);
+    setResting(restDuration > 0);
+  }
+
+  function skipRest() {
+    setResting(false);
+    setRestRemaining(0);
   }
 
   const clock = String(Math.floor(elapsed / 60)).padStart(2, '0') + ':' + String(elapsed % 60).padStart(2, '0');
@@ -369,7 +399,7 @@ export function WorkoutArena() {
             <button className="arena-primary-control" type="button" disabled={!running && setsCompleted >= 3} onClick={() => {
               if (running) setRunning(false);
               else if (reps >= current.targetReps) startNextSet();
-              else setRunning(true);
+              else { skipRest(); setRunning(true); }
             }}>{setsCompleted >= 3 ? 'TARGET COMPLETE' : running ? 'PAUSE SESSION' : reps >= current.targetReps ? 'START NEXT SET ' + (setsCompleted + 1) : elapsed > 0 ? 'RESUME SESSION' : 'START SESSION'} <span aria-hidden="true">{running ? 'Ⅱ' : setsCompleted >= 3 ? '✓' : reps >= current.targetReps ? '↗' : '▶'}</span></button>
             <button className="arena-secondary-control" type="button" onClick={resetSession}>RESET <span aria-hidden="true">↺</span></button>
           </div>
@@ -377,7 +407,13 @@ export function WorkoutArena() {
             {trackingMode === 'manual' ? reps >= current.targetReps ? 'SET TARGET REACHED' : 'LOG ONE COMPLETED REP' : 'AUTO-COUNTING AVATAR CYCLES'}
             <span aria-hidden="true">{trackingMode === 'manual' ? '+1' : '↻'}</span>
           </button>
-          <p className="arena-session-state" role="status">{reducedMotion && running ? 'Reduced motion is enabled. The scene stays still, but you can continue the timer and log each rep manually.' : setsCompleted >= 3 ? (sessionSaved ? 'THREE SET TARGET COMPLETE. SESSION SAVED IN THIS BROWSER.' : 'THREE SET TARGET COMPLETE. FINISHING YOUR LOCAL SESSION RECORD…') : reps >= current.targetReps ? 'SET COMPLETE. Recover as needed, then start the next set.' : running && trackingMode === 'manual' ? 'Training timer is running. Tap LOG ONE COMPLETED REP after you perform each rep yourself.' : running ? 'Follow-along is running. Each complete avatar cycle counts as a demo cycle, not a body-tracked rep.' : totalReps > 0 ? totalReps + ' TOTAL ' + (trackingMode === 'manual' ? 'REPS LOGGED' : 'DEMO CYCLES') + '. Resume this set when ready.' : 'Paused. Choose your tracking mode, then start the session.'}</p>
+          <div className="arena-rest-panel">
+            <div className="arena-rest-readout"><span>REST TIMER</span><strong>{String(Math.floor(restRemaining / 60)).padStart(2, '0') + ':' + String(restRemaining % 60).padStart(2, '0')}</strong></div>
+            <label htmlFor="arena-rest-duration">REST LENGTH<select id="arena-rest-duration" value={restDuration} onChange={(event) => setRestDuration(Number(event.target.value))}><option value={30}>30 SEC</option><option value={45}>45 SEC</option><option value={60}>60 SEC</option><option value={90}>90 SEC</option></select></label>
+            <button type="button" onClick={startRest} disabled={resting || setsCompleted >= 3}>START REST</button>
+            {resting && <button type="button" onClick={skipRest}>SKIP REST</button>}
+          </div>
+          <p className="arena-session-state" role="status">{resting ? 'Rest timer is running. Your active-work timer and demonstration are paused.' : reducedMotion && running ? 'Reduced motion is enabled. The scene stays still, but you can continue the timer and log each rep manually.' : setsCompleted >= 3 ? (sessionSaved ? 'THREE SET TARGET COMPLETE. SESSION SAVED IN THIS BROWSER.' : 'THREE SET TARGET COMPLETE. FINISHING YOUR LOCAL SESSION RECORD…') : reps >= current.targetReps ? 'SET COMPLETE. Recover as needed, then start the next set or run a timed rest.' : running && trackingMode === 'manual' ? 'Training timer is running. Tap LOG ONE COMPLETED REP after you perform each rep yourself.' : running ? 'Follow-along is running. Each complete avatar cycle counts as a demo cycle, not a body-tracked rep.' : totalReps > 0 ? totalReps + ' TOTAL ' + (trackingMode === 'manual' ? 'REPS LOGGED' : 'DEMO CYCLES') + '. Resume this set when ready.' : 'Paused. Choose your tracking mode, then start the session.'}</p>
           <div className={showCue ? 'arena-form-card is-visible' : 'arena-form-card'} aria-live="polite">
             <div><span>FORM GUIDE</span><span>{current.prescription}</span></div>
             <h4>{current.tempo}</h4>
