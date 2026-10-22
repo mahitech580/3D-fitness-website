@@ -48,7 +48,7 @@ export function App() {
         <ScrollProgress />
         <CommandPalette />
         <header className="site-header">
-          <a className="brand-lockup" href="#home" aria-label="Kinetik home"><span className="brand-mark" aria-hidden="true">K</span><span>KINETIK<span className="brand-sub">TRAINING, BUILT AROUND YOU</span></span></a>
+          <a className="brand-lockup" href="#arena" aria-label="Kinetik home"><span className="brand-mark" aria-hidden="true">K</span><span>KINETIK<span className="brand-sub">TRAINING, BUILT AROUND YOU</span></span></a>
           <nav id="site-navigation" className={menuOpen ? 'site-nav is-open' : 'site-nav'} aria-label="Main navigation">
             {navigation.map((item) => <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}</a>)}
           </nav>
@@ -67,7 +67,7 @@ export function App() {
           <TrialBooking selectedGym={selectedGym} />
         </main>
         <footer className="site-footer">
-          <a className="footer-brand" href="#home"><span className="brand-mark" aria-hidden="true">K</span>KINETIK</a>
+          <a className="footer-brand" href="#arena"><span className="brand-mark" aria-hidden="true">K</span>KINETIK</a>
           <p>Train with intent. Keep showing up.</p>
           <div className="footer-links">{navigation.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}</div>
           <ShareSiteButton />
