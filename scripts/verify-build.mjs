@@ -45,7 +45,7 @@ const sourceContents = await Promise.all(sourcePaths.map((relativePath) =>
   }),
 ));
 const appSource = sourceContents[0];
-const arenaIndex = appSource.indexOf('<WorkoutArena />');
+const arenaIndex = appSource.indexOf('<WorkoutArena');
 const plannerIndex = appSource.indexOf('<WorkoutBuilder />');
 if (arenaIndex < 0) failures.push('The primary 3D WorkoutArena is not mounted in the application.');
 if (plannerIndex >= 0 && arenaIndex > plannerIndex) failures.push('The 3D WorkoutArena must render before the workout-plan builder.');
