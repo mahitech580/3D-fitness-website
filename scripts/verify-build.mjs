@@ -49,7 +49,7 @@ const arenaIndex = appSource.indexOf('<WorkoutArena />');
 const plannerIndex = appSource.indexOf('<WorkoutBuilder />');
 if (arenaIndex < 0) failures.push('The primary 3D WorkoutArena is not mounted in the application.');
 if (plannerIndex >= 0 && arenaIndex > plannerIndex) failures.push('The 3D WorkoutArena must render before the workout-plan builder.');
-if (/import\\s+\\{\\s*FitnessScene\\s*\\}/.test(appSource) || /<section\\b[^>]*className=["']hero-section/.test(appSource)) {
+if (appSource.includes('FitnessScene') || appSource.includes('className="hero-section"')) {
   failures.push('The old marketing hero should not replace the primary 3D workout experience.');
 }
 const sectionIds = new Set();
