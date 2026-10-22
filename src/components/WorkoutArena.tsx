@@ -60,6 +60,36 @@ const MOVES: MoveDefinition[] = [
   { id: 'hinge', name: 'Hip hinge / RDL', focus: 'HAMSTRINGS / GLUTES', target: 'POSTERIOR CHAIN', cue: 'Push the hips back with soft knees, keep the spine long, and bring the weight close to the legs.', prescription: '3 × 8–10', tempo: 'HIPS BACK', targetReps: 10 },
 ];
 
+function Dumbbell({
+  position = [0, 0, 0] as [number, number, number],
+  loadKg = 6,
+}: {
+  position?: [number, number, number];
+  loadKg?: number;
+}) {
+  const plateScale = 0.75 + Math.min(14, Math.max(2, loadKg)) / 32;
+  return (
+    <group position={position}>
+      <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.035, 0.035, 0.25, 16]} />
+        <meshStandardMaterial color="#b7c0ba" metalness={0.88} roughness={0.24} />
+      </mesh>
+      {[-0.13, 0.13].map((x) => (
+        <group key={x} position={[x, 0, 0]}>
+          <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.105 * plateScale, 0.105 * plateScale, 0.075 * plateScale, 24]} />
+            <meshPhysicalMaterial color="#202724" metalness={0.62} roughness={0.25} clearcoat={0.45} />
+          </mesh>
+          <mesh rotation={[0, 0, Math.PI / 2]} position={[x > 0 ? 0.04 : -0.04, 0, 0]}>
+            <torusGeometry args={[0.075 * plateScale, 0.008 * plateScale, 8, 24]} />
+            <meshStandardMaterial color="#d6ff3d" metalness={0.36} roughness={0.3} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 function Barbell({ loadKg }: { loadKg: number }) {
   const plateRadius = 0.29 + Math.min(14, Math.max(2, loadKg)) / 105;
   const plateThickness = 0.12 + Math.min(14, Math.max(2, loadKg)) / 110;
