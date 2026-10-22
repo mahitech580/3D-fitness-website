@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MotionConfig } from 'framer-motion';
 import { ScrollProgress } from './components/ScrollProgress';
-import { WorkoutArena } from './components/WorkoutArena';
+import { WorkoutArena, type MoveId } from './components/WorkoutArena';
 import { WorkoutBuilder } from './components/WorkoutBuilder';
 import { ExerciseLibrary } from './components/ExerciseLibrary';
 import { GymPlanner } from './components/GymPlanner';
@@ -26,6 +26,7 @@ export function App() {
   });
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedGym, setSelectedGym] = useState('');
+  const [studioLaunch, setStudioLaunch] = useState<{ moveId: MoveId; requestId: number } | null>(null);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -39,6 +40,17 @@ export function App() {
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, []);
+
+  function startInStudio(moveId: MoveId) {
+    setStudioLaunch((current) => ({ moveId, requestId: (current?.requestId ?? 0) + 1 }));
+    window.location.hash = 'arena';
+    window.requestAnimationFrame(() => {
+      document.getElementById('arena')?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    });
+  }
 
   return (
     <MotionConfig reducedMotion="user">
@@ -59,8 +71,8 @@ export function App() {
           </div>
         </header>
         <main id="main-content" tabIndex={-1}>
-          <WorkoutArena />
-          <WorkoutBuilder />
+          <WorkoutArena launchRequest={studioLaunch} />
+          <WorkoutBuilder onStartIn3D={startInStudio} />
           <ExerciseLibrary />
           <GymDiscovery onEnquire={(gymName) => setSelectedGym(gymName)} />
           <GymPlanner />
