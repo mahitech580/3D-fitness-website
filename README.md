@@ -1,13 +1,12 @@
 # KINETIK — Interactive 3D workout and fitness lab
 
-An original fitness-planning prototype that combines a procedural 3D equipment hero, explainable workout programming, guided sessions, movement education, illustrative gym concepts, and a synchronized 2D/3D gym layout planner.
+An original 3D-first workout experience. Open directly into a Three.js training floor with an articulated athlete, six selectable animated movement patterns, manual rep logging or clearly labeled follow-along demo cycles, target-driven sets, and local session history. Workout programming, movement education, gym concepts and the 2D/3D gym designer support that main experience.
 
 ## Features
 
 - **3D motion lab (primary experience):** an articulated procedural athlete animates six movement patterns in a Three.js / React Three Fiber gym. Orbit the camera or switch views, select movements, change tempo, and follow technique cues.
 - **Real rep logging:** manual training mode counts reps only when you log a rep you physically completed. Optional follow-along mode counts avatar animation cycles separately; it never claims to track your body or camera.
 - **Set completion and saved sessions:** complete three sets to store a record in this browser. The history labels manual reps versus demo cycles and stores session duration.
-- **3D object hero:** a procedural barbell and weight-plate study with a pause control, reduced-motion support, and a rendering fallback.
 - **Workout builder:** configure goal, level, equipment, location, preferred intensity, session duration, available weekdays, and movements to avoid. The browser-side rule engine builds a repeatable week; it is not a hosted AI coach.
 - **Reusable workout templates:** save, reload, and remove up to eight named preference templates in this browser. Templates regenerate sessions from the current movement catalog.
 - **Guided session execution:** start, pause/resume, previous/next movement, change to an alternative movement, start/skip a rest timer, and finish a session.
