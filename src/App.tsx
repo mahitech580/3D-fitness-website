@@ -74,7 +74,7 @@ export function App() {
               <div className="art-orbit orbit-one" aria-hidden="true" /><div className="art-orbit orbit-two" aria-hidden="true" />
               <div className="art-kicker"><span>FORM / FUNCTION</span><span>01 — TRAINING EQUIPMENT</span></div>
               <FitnessScene paused={scenePaused} />
-              <button className="scene-toggle" type="button" aria-pressed={scenePaused} onClick={() => setScenePaused((paused) => !paused)}>{scenePaused ? 'RESUME ROTATION' : 'PAUSE ROTATION'} <span aria-hidden="true">{scenePaused ? '▶' : 'Ⅱ'}</span></button>
+              <button className="scene-toggle" type="button" aria-label={scenePaused ? 'Resume 3D athlete demonstration' : 'Pause 3D athlete demonstration'} aria-pressed={scenePaused} onClick={() => setScenePaused((paused) => !paused)}>{scenePaused ? 'RESUME DEMO' : 'PAUSE DEMO'} <span aria-hidden="true">{scenePaused ? '▶' : 'Ⅱ'}</span></button>
               <p className="art-caption">BUILT FOR THE REPETITION THAT BUILDS YOU.</p>
             </div>
             <div className="hero-bottomline"><span>STRENGTH / CONDITIONING / MOBILITY</span><a href="#arena">ENTER THE MOTION LAB <span aria-hidden="true">↓</span></a><span>CONTROLLED EFFORT. REAL PROGRESS.</span></div>
