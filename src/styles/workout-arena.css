@@ -104,3 +104,21 @@
   .arena-tracking-options button, .arena-log-rep { border: 1px solid ButtonText; }
   .arena-tracking-options button.is-active { outline: 2px solid Highlight; }
 }
+
+.arena-rest-panel { display: grid; grid-template-columns: minmax(105px,.85fr) minmax(95px,.8fr) auto auto; align-items: end; gap: 7px; margin-top: 9px; padding: 11px; border: 1px solid #ffffff22; background: #ffffff05; }
+.arena-rest-readout { display: grid; gap: 6px; }
+.arena-rest-readout span, .arena-rest-panel label { color: #8d9c90; font-size: 7px; font-weight: 850; letter-spacing: .1em; }
+.arena-rest-readout strong { color: #d7ff58; font: 800 21px/.95 var(--serif); font-variant-numeric: tabular-nums; }
+.arena-rest-panel label { display: grid; gap: 6px; min-width: 0; }
+.arena-rest-panel select { width: 100%; min-width: 0; min-height: 35px; padding: 7px; border: 1px solid #ffffff24; border-radius: 0; background: #111714; color: #edf3e9; font: inherit; font-size: 9px; letter-spacing: .01em; }
+.arena-rest-panel button { min-height: 35px; padding: 7px 9px; border: 1px solid #ffffff24; background: transparent; color: #c7d1c6; cursor: pointer; font-size: 7px; font-weight: 850; letter-spacing: .06em; white-space: nowrap; }
+.arena-rest-panel button:hover:not(:disabled) { border-color: #d7ff58; color: #d7ff58; }
+.arena-rest-panel button:disabled { opacity: .42; cursor: not-allowed; }
+@media (max-width: 620px) {
+  .arena-rest-panel { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .arena-rest-readout { align-self: center; }
+  .arena-rest-panel button { width: 100%; }
+}
+@media (forced-colors: active) {
+  .arena-rest-panel, .arena-rest-panel select, .arena-rest-panel button { border: 1px solid ButtonText; }
+}
