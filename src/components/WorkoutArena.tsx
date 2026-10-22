@@ -5,7 +5,7 @@ import { useReducedMotion } from 'framer-motion';
 import type { Group } from 'three';
 import '../styles/workout-arena.css';
 
-export export type MoveId = 'squat' | 'curl' | 'press' | 'jacks' | 'lunge' | 'hinge';
+export type MoveId = 'squat' | 'curl' | 'press' | 'jacks' | 'lunge' | 'hinge';
 type StudioLaunchRequest = { moveId: MoveId; requestId: number };
 type CameraMode = 'front' | 'side' | 'three-quarter';
 type TrackingMode = 'manual' | 'follow-along';
