@@ -72,15 +72,15 @@ export function App() {
             </div>
             <div className="hero-art">
               <div className="art-orbit orbit-one" aria-hidden="true" /><div className="art-orbit orbit-two" aria-hidden="true" />
-              <div className="art-kicker"><span>FORM / FUNCTION</span><span>01 — EQUIPMENT STUDY</span></div>
+              <div className="art-kicker"><span>FORM / FUNCTION</span><span>01 — TRAINING EQUIPMENT</span></div>
               <FitnessScene paused={scenePaused} />
               <button className="scene-toggle" type="button" aria-pressed={scenePaused} onClick={() => setScenePaused((paused) => !paused)}>{scenePaused ? 'RESUME ROTATION' : 'PAUSE ROTATION'} <span aria-hidden="true">{scenePaused ? '▶' : 'Ⅱ'}</span></button>
               <p className="art-caption">BUILT FOR THE REPETITION THAT BUILDS YOU.</p>
             </div>
-            <div className="hero-bottomline"><span>STRENGTH / CONDITIONING / MOBILITY</span><a href="#training">SCROLL TO EXPLORE <span aria-hidden="true">↓</span></a><span>CONTROLLED EFFORT. REAL PROGRESS.</span></div>
+            <div className="hero-bottomline"><span>STRENGTH / CONDITIONING / MOBILITY</span><a href="#arena">ENTER THE MOTION LAB <span aria-hidden="true">↓</span></a><span>CONTROLLED EFFORT. REAL PROGRESS.</span></div>
           </section>
-          <div className="ticker" aria-label="Training approaches"><div className="ticker-track"><span>STRENGTH</span><i>✳</i><span>CONDITIONING</span><i>✳</i><span>MOBILITY</span><i>✳</i><span>CONSISTENCY</span><i>✳</i><span>STRENGTH</span><i>✳</i><span>CONDITIONING</span><i>✳</i><span>MOBILITY</span><i>✳</i><span>CONSISTENCY</span><i>✳</i></div></div>
           <WorkoutArena />
+          <div className="ticker" aria-label="Training approaches"><div className="ticker-track"><span>STRENGTH</span><i>✳</i><span>CONDITIONING</span><i>✳</i><span>MOBILITY</span><i>✳</i><span>CONSISTENCY</span><i>✳</i><span>STRENGTH</span><i>✳</i><span>CONDITIONING</span><i>✳</i><span>MOBILITY</span><i>✳</i><span>CONSISTENCY</span><i>✳</i></div></div>
           <WorkoutBuilder />
           <ExerciseLibrary />
           <GymDiscovery onEnquire={(gymName) => setSelectedGym(gymName)} />
