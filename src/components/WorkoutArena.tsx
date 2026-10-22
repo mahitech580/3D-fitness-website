@@ -18,6 +18,7 @@ type WorkoutHistoryEntry = {
   totalReps: number;
   durationSeconds: number;
   tempo: number;
+  loadKg: number;
 };
 
 function readArenaHistory(): WorkoutHistoryEntry[] {
@@ -31,7 +32,8 @@ function readArenaHistory(): WorkoutHistoryEntry[] {
         && typeof item.moveId === 'string' && typeof item.moveName === 'string'
         && (item.trackingMode === 'manual' || item.trackingMode === 'follow-along')
         && typeof item.setsCompleted === 'number' && typeof item.totalReps === 'number'
-        && typeof item.durationSeconds === 'number' && typeof item.tempo === 'number';
+        && typeof item.durationSeconds === 'number' && typeof item.tempo === 'number'
+        && typeof item.loadKg === 'number';
     }).slice(0, 5);
   } catch { return []; }
 }
@@ -60,16 +62,17 @@ function Joint({ position, color = '#c7a18b', radius = 0.085 }: { position: [num
   return <mesh position={position} castShadow><sphereGeometry args={[radius, 20, 16]} /><meshStandardMaterial color={color} roughness={0.43} metalness={0.02} /></mesh>;
 }
 
-function Dumbbell({ position = [0, 0, 0] as [number, number, number] }: { position?: [number, number, number] }) {
+function Dumbbell({ position = [0, 0, 0] as [number, number, number], loadKg = 6 }: { position?: [number, number, number]; loadKg?: number }) {
+  const plateScale = 0.75 + Math.min(14, Math.max(2, loadKg)) / 32;
   return (
     <group position={position}>
       <mesh rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.035, 0.035, 0.25, 16]} /><meshStandardMaterial color="#b7c0ba" metalness={0.88} roughness={0.24} /></mesh>
-      {[-0.13, 0.13].map((x) => <group key={x} position={[x, 0, 0]}><mesh rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.105, 0.105, 0.075, 24]} /><meshPhysicalMaterial color="#202724" metalness={0.62} roughness={0.25} clearcoat={0.45} /></mesh><mesh rotation={[0, 0, Math.PI / 2]} position={[x > 0 ? 0.04 : -0.04, 0, 0]}><torusGeometry args={[0.075, 0.008, 8, 24]} /><meshStandardMaterial color="#d7ff58" metalness={0.36} roughness={0.3} /></mesh></group>)}
+      {[-0.13, 0.13].map((x) => <group key={x} position={[x, 0, 0]}><mesh rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.105 * plateScale, 0.105 * plateScale, 0.075 * plateScale, 24]} /><meshPhysicalMaterial color="#202724" metalness={0.62} roughness={0.25} clearcoat={0.45} /></mesh><mesh rotation={[0, 0, Math.PI / 2]} position={[x > 0 ? 0.04 : -0.04, 0, 0]}><torusGeometry args={[0.075 * plateScale, 0.008 * plateScale, 8, 24]} /><meshStandardMaterial color="#d7ff58" metalness={0.36} roughness={0.3} /></mesh></group>)}
     </group>
   );
 }
 
-export function Athlete({ move, running, tempo, onRep }: { move: MoveId; running: boolean; tempo: number; onRep: () => void }) {
+export function Athlete({ move, running, tempo, loadKg, onRep }: { move: MoveId; running: boolean; tempo: number; loadKg: number; onRep: () => void }) {
   const root = useRef<Group>(null);
   const torso = useRef<Group>(null);
   const leftShoulder = useRef<Group>(null);
@@ -173,7 +176,7 @@ export function Athlete({ move, running, tempo, onRep }: { move: MoveId; running
               <mesh position={[0, -0.19, 0]} castShadow><capsuleGeometry args={[0.065, 0.28, 5, 12]} /><meshStandardMaterial color="#c7a18b" roughness={0.5} /></mesh>
               <Joint position={[0, -0.37, 0]} radius={0.065} />
               <mesh position={[0, -0.43, 0.015]} castShadow><sphereGeometry args={[0.082, 16, 12]} /><meshStandardMaterial color="#c7a18b" roughness={0.56} /></mesh>
-              {(move === 'curl' || move === 'press' || move === 'hinge' || move === 'lunge') && <Dumbbell position={[0, -0.49, 0.015]} />}
+              {(['curl', 'press', 'hinge'] as MoveId[]).includes(move) && <Dumbbell position={[0, -0.49, 0.015]} loadKg={loadKg} />}
             </group>
           </group>
         ))}
@@ -200,7 +203,7 @@ function TrainingRoom({ move }: { move: MoveId }) {
       <mesh position={[0, 2.45, -1.7]}><boxGeometry args={[3.3, 0.09, 0.09]} /><meshStandardMaterial color="#8e9b90" metalness={0.8} roughness={0.3} /></mesh>
       <mesh position={[0, 1.46, -1.7]}><boxGeometry args={[3.15, 0.055, 0.055]} /><meshStandardMaterial color="#8e9b90" metalness={0.8} roughness={0.3} /></mesh>
       {[-1.18, -0.94, 0.94, 1.18].map((x, index) => <mesh key={x} position={[x, 1.48, -1.7]} rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[index % 2 ? 0.29 : 0.35, index % 2 ? 0.29 : 0.35, 0.11, 32]} /><meshStandardMaterial color={index % 2 ? '#323a34' : '#242b26'} metalness={0.45} roughness={0.3} /></mesh>)}
-      {move === 'curl' || move === 'press' ? <group position={[2.05, 0.07, -0.45]}><mesh position={[0, 0.12, 0]}><boxGeometry args={[0.36, 0.18, 0.34]} /><meshStandardMaterial color="#252e29" roughness={0.7} /></mesh>{[-0.2, 0.2].map((x) => <mesh key={x} position={[x, 0.2, 0]}><cylinderGeometry args={[0.06, 0.06, 0.12, 16]} /><meshStandardMaterial color="#d7ff58" metalness={0.4} /></mesh>)}</group> : null}
+      {move === 'curl' || move === 'press' || move === 'hinge' ? <group position={[2.05, 0.07, -0.45]}><mesh position={[0, 0.12, 0]}><boxGeometry args={[0.36, 0.18, 0.34]} /><meshStandardMaterial color="#252e29" roughness={0.7} /></mesh>{[-0.2, 0.2].map((x) => <mesh key={x} position={[x, 0.2, 0]}><cylinderGeometry args={[0.06, 0.06, 0.12, 16]} /><meshStandardMaterial color="#d7ff58" metalness={0.4} /></mesh>)}</group> : null}
       <ContactShadows position={[0, -0.095, 0]} opacity={0.4} scale={9} blur={2.7} far={3.5} resolution={256} />
     </>
   );
@@ -223,6 +226,7 @@ export function WorkoutArena() {
   const [moveId, setMoveId] = useState<MoveId>('squat');
   const [running, setRunning] = useState(false);
   const [tempo, setTempo] = useState(48);
+  const [loadKg, setLoadKg] = useState(6);
   const [reps, setReps] = useState(0);
   const [totalReps, setTotalReps] = useState(0);
   const [setsCompleted, setSetsCompleted] = useState(0);
@@ -273,10 +277,11 @@ export function WorkoutArena() {
       totalReps,
       durationSeconds: elapsed,
       tempo,
+      loadKg: ['curl', 'press', 'hinge'].includes(moveId) ? loadKg : 0,
     };
     setHistory((records) => [record, ...records.filter((item) => item.id !== record.id)].slice(0, 5));
     setSessionSaved(true);
-  }, [setsCompleted, sessionSaved, moveId, current.name, trackingMode, totalReps, elapsed, tempo]);
+  }, [setsCompleted, sessionSaved, moveId, current.name, trackingMode, totalReps, elapsed, tempo, loadKg]);
 
   const currentRepRef = useRef(0);
   const registerRep = useCallback((source: TrackingMode) => {
@@ -365,7 +370,7 @@ export function WorkoutArena() {
           <div className="arena-canvas">
             <Canvas shadows dpr={[1, 1.4]} camera={{ position: [3.2, 2.85, 5.7], fov: 38, near: 0.1, far: 60 }} gl={{ antialias: true, powerPreference: 'low-power' }} onCreated={() => setSceneReady(true)} fallback={<div className="arena-webgl-fallback">3D graphics are unavailable here. The movement instructions and session controls remain available below.</div>}>
               <TrainingRoom move={moveId} />
-              <Athlete key={moveId} move={moveId} running={running && !reducedMotion} tempo={tempo} onRep={countRep} />
+              <Athlete key={moveId} move={moveId} running={running && !reducedMotion} tempo={tempo} loadKg={loadKg} onRep={countRep} />
               <CameraDirector mode={cameraMode} />
             </Canvas>
           </div>
@@ -387,6 +392,13 @@ export function WorkoutArena() {
           </div>
           <div className="arena-rep-progress" role="progressbar" aria-label="Repetitions completed in current set" aria-valuemin={0} aria-valuemax={current.targetReps} aria-valuenow={reps}><span style={{ width: (reps / current.targetReps * 100) + '%' }} /></div>
           <div className="arena-tempo-control"><label htmlFor="arena-tempo">MOVEMENT TEMPO</label><input id="arena-tempo" type="range" min={24} max={72} step={4} value={tempo} onChange={(event) => setTempo(Number(event.target.value))} /><div><span>SLOW / CONTROLLED</span><strong>{tempo} REPS / MIN TARGET</strong></div></div>
+          <div className="arena-load-control">
+            <label htmlFor="arena-dumbbell-load">DUMBBELL LOAD / HAND</label>
+            <select id="arena-dumbbell-load" value={loadKg} disabled={!(['curl', 'press', 'hinge'] as MoveId[]).includes(moveId)} onChange={(event) => setLoadKg(Number(event.target.value))}>
+              {[2, 4, 6, 8, 10, 12, 14].map((value) => <option key={value} value={value}>{value} KG</option>)}
+            </select>
+            <span>{(['curl', 'press', 'hinge'] as MoveId[]).includes(moveId) ? 'Changes the procedural dumbbell plate size and is recorded with the session.' : 'This movement is demonstrated as bodyweight; load control is disabled.'}</span>
+          </div>
           <div className="arena-tracking-mode">
             <div className="arena-tracking-heading"><span>REP TRACKING MODE</span><span>{trackingMode === 'manual' ? 'YOU CONTROL THE COUNT' : '3D DEMO AUTO-COUNT'}</span></div>
             <div className="arena-tracking-options" role="group" aria-label="Repetition tracking mode">
@@ -424,7 +436,7 @@ export function WorkoutArena() {
       </div>
       <div className="arena-history">
         <div className="arena-history-head"><div><p className="arena-kicker"><span>LOG</span> LOCAL TRAINING HISTORY</p><h3>Work completed.</h3></div><span>{history.length} / 5 SAVED SESSIONS</span></div>
-        {history.length ? <div className="arena-history-list">{history.map((record) => <article key={record.id}><div><strong>{record.moveName}</strong><small>{new Date(record.completedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })} · {record.trackingMode === 'manual' ? 'Manual rep log' : '3D demo cycles'} · {record.setsCompleted} sets · {record.totalReps} counts</small></div><span>{String(Math.floor(record.durationSeconds / 60)).padStart(2, '0') + ':' + String(record.durationSeconds % 60).padStart(2, '0')}</span></article>)}</div> : <p className="arena-history-empty">Complete all three sets to save your first session. Records stay in this browser; demo cycles and manually logged reps are labeled separately.</p>}
+        {history.length ? <div className="arena-history-list">{history.map((record) => <article key={record.id}><div><strong>{record.moveName}</strong><small>{new Date(record.completedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })} · {record.trackingMode === 'manual' ? 'Manual rep log' : '3D demo cycles'} · {record.setsCompleted} sets · {record.totalReps} counts{record.loadKg ? ' · ' + record.loadKg + ' kg / hand' : ' · bodyweight'}</small></div><span>{String(Math.floor(record.durationSeconds / 60)).padStart(2, '0') + ':' + String(record.durationSeconds % 60).padStart(2, '0')}</span></article>)}</div> : <p className="arena-history-empty">Complete all three sets to save your first session. Records stay in this browser; demo cycles and manually logged reps are labeled separately.</p>}
       </div>
     </section>
   );
