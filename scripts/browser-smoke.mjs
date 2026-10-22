@@ -29,7 +29,8 @@ try {
   assert.equal(await page.locator('#experience canvas').count(), 1, 'The 3D scene should load as it approaches the viewport.');
 
   await page.locator('#start').scrollIntoViewIfNeeded();
-  await page.getByRole('radio', { name: /build my engine/i }).check();
+  await page.locator('.program-card').nth(1).getByRole('link', { name: /make this my focus/i }).click();
+  assert.equal(await page.getByRole('radio', { name: /build my engine/i }).isChecked(), true, 'The conditioning card should preselect conditioning in the plan builder.');
   await page.getByRole('button', { name: /build my starter plan/i }).click();
   await page.locator('#generated-plan').waitFor();
   assert.match(await page.locator('#generated-plan').innerText(), /Conditioning base/i);

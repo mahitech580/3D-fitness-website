@@ -22,6 +22,7 @@ const programs = [
   {
     number: '01',
     title: 'Strength / Build',
+    goal: 'strength',
     text: 'Progressive, purposeful sessions built around the basics: move well, add load slowly, and get stronger over time.',
     image: photos.strength,
     alt: 'Strength training equipment in a focused gym environment',
@@ -31,6 +32,7 @@ const programs = [
   {
     number: '02',
     title: 'Conditioning / Engine',
+    goal: 'conditioning',
     text: 'Intervals, carries, and smart effort that help build work capacity without turning every session into a race.',
     image: photos.conditioning,
     alt: 'Athlete training outdoors during a conditioning session',
@@ -40,6 +42,7 @@ const programs = [
   {
     number: '03',
     title: 'Mobility / Restore',
+    goal: 'mobility',
     text: 'Controlled movement and recovery work to keep your routine sustainable on the days between hard sessions.',
     image: photos.mobility,
     alt: 'Person moving through a controlled stretching routine',
@@ -303,7 +306,7 @@ function Programs() {
                 <div className="program-content">
                   <div className="program-title-row"><h3>{program.title}</h3><span>{program.duration}</span></div>
                   <p>{program.text}</p>
-                  <a className="program-link" href="#start">MAKE THIS MY FOCUS <Arrow /></a>
+                  <a className="program-link" href="#start" onClick={() => window.dispatchEvent(new CustomEvent('kinetik-focus', { detail: program.goal }))}>MAKE THIS MY FOCUS <Arrow /></a>
                 </div>
               </article>
             </Reveal>
@@ -467,6 +470,16 @@ function PlanBuilder() {
       return null;
     }
   });
+
+
+  useEffect(() => {
+    function handleFocusChange(event: Event) {
+      const selectedGoal = (event as CustomEvent<string>).detail;
+      if (Object.prototype.hasOwnProperty.call(planTemplates, selectedGoal)) setGoal(selectedGoal);
+    }
+    window.addEventListener('kinetik-focus', handleFocusChange);
+    return () => window.removeEventListener('kinetik-focus', handleFocusChange);
+  }, []);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
