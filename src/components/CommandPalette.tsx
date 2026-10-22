@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboa
 type JumpTarget = { id: string; title: string; eyebrow: string; description: string; keywords: string };
 
 const targets: JumpTarget[] = [
-  { id: 'home', title: 'The beginning', eyebrow: '00 / INTRODUCTION', description: 'Return to the Kinetik fitness experience.', keywords: 'home hero training kinetik beginning' },
   { id: 'arena', title: '3D motion lab', eyebrow: '01 / LIVE TRAINING', description: 'Choose a movement and control an animated 3D athlete, camera, tempo and reps.', keywords: '3d workout arena trainer athlete squat curl press jumping jack lunge hinge reps animation interactive' },
   { id: 'training', title: 'Training plan', eyebrow: '02 / PROGRAMMING', description: 'Build and save a starter week around your time, gear and training preferences.', keywords: 'workout plan strength muscle conditioning mobility rest timer template' },
   { id: 'library', title: 'Movement index', eyebrow: '03 / MOVEMENT', description: 'Search movements by muscle group, equipment, level and movement pattern.', keywords: 'library exercises technique common mistakes alternatives sort filter' },
