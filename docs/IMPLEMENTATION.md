@@ -7,7 +7,9 @@ KINETIK is an original, local-first fitness experience built with React, TypeScr
 ## Main application
 
 - **Application shell:** responsive section navigation, light/dark theme preference, a Ctrl/Command+K command palette wired to valid section IDs, share action, keyboard skip link, reduced-motion configuration and a semantic document structure.
-- **3D motion lab (primary training experience):** a custom procedural articulated athlete is assembled from Three.js meshes and animated in six movement cycles (squat, curl, overhead press, jumping jack, reverse lunge and hip hinge/RDL). The scene has studio lighting, a gym rack, floor grid, contact shadows, orbit controls and front/side/three-quarter views. DOM controls select a movement, tune tempo, start/pause, track reps and elapsed time, automatically pause at rep targets, and progress through a three-set target. Instructions and controls remain in HTML, separate from the scene.
+- **3D motion lab (primary training experience):** a custom procedural articulated athlete is assembled from Three.js meshes and animated in six movement cycles (squat, curl, overhead press, jumping jack, reverse lunge and hip hinge/RDL). The gym scene has studio lighting, a rack, floor grid, contact shadows, orbit controls and front/side/three-quarter views. The user can pick movements, adjust tempo, start/pause the timer, and follow form guidance in HTML.
+- **Rep tracking modes:** manual training mode accepts explicit rep logging from the user and pauses at the selected movement's rep target; follow-along mode instead counts completed animation cycles. The interface labels these separately because the site does not use a camera or motion tracking to observe a user's body.
+- **Session history:** completing the third set saves the exercise, tracking mode, counted reps/cycles, elapsed time, and tempo to browser-local storage. Only the five most recent session records are retained and displayed.
 - **3D hero:** the original procedural barbell/equipment study remains as the visual intro; the interactive trainer immediately follows the hero.
 - **Workout planner:** transparent, browser-side rule-based programming using goal, level, equipment, location, intensity, time, days available and avoided-movement preferences.
 - **Workout templates:** up to eight named preference sets can be saved, loaded and deleted in browser-local storage. A loaded template regenerates its sessions from the current exercise catalogue and rules; it does not store a custom reordered routine.
@@ -20,7 +22,7 @@ KINETIK is an original, local-first fitness experience built with React, TypeScr
 
 ## Data and privacy behavior
 
-Training templates, plan completion markers, recent workout history, theme preference and gym layouts use browser-local storage. They are not synchronized across devices or users. The enquiry request only exists in page state until the user copies it. There is no configured account system, server database, booking API, map provider, hosted AI model, or gym inventory integration.
+Training templates, plan completion markers, 3D session history, theme preference and gym layouts use browser-local storage. They are not synchronized across devices or users. The enquiry request only exists in page state until the user copies it. There is no configured account system, server database, booking API, map provider, hosted AI model, or gym inventory integration.
 
 ## Asset policy
 
