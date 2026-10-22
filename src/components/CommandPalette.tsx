@@ -4,11 +4,12 @@ type JumpTarget = { id: string; title: string; eyebrow: string; description: str
 
 const targets: JumpTarget[] = [
   { id: 'home', title: 'The beginning', eyebrow: '00 / INTRODUCTION', description: 'Return to the Kinetik fitness experience.', keywords: 'home hero training kinetik beginning' },
-  { id: 'training', title: 'Training desk', eyebrow: '01 / TRAINING', description: 'Build a starter week around your time, gear and training preferences.', keywords: 'workout plan strength muscle conditioning mobility rest timer' },
-  { id: 'library', title: 'Movement index', eyebrow: '02 / MOVEMENT', description: 'Search movements by muscle group, equipment, level and movement pattern.', keywords: 'library exercises technique common mistakes alternatives sort filter' },
-  { id: 'gyms', title: 'Gym concepts', eyebrow: '03 / DISCOVERY', description: 'Explore searchable sample gym concepts and training focus.', keywords: 'gym venue city location concept sample facilities enquire Hyderabad Bengaluru Chennai' },
-  { id: 'space', title: 'Gym planner', eyebrow: '04 / SPACE DESIGN', description: 'Edit the shared 2D and 3D layout, arrange equipment and export the concept.', keywords: 'room equipment floorplan planner three js 3d rotate drag camera finish save load export' },
-  { id: 'start', title: 'First session', eyebrow: '05 / FIRST STEP', description: 'Prepare a local-only first-session enquiry.', keywords: 'trial session enquiry contact gym concept' },
+  { id: 'arena', title: '3D motion lab', eyebrow: '01 / LIVE TRAINING', description: 'Choose a movement and control an animated 3D athlete, camera, tempo and reps.', keywords: '3d workout arena trainer athlete squat curl press jumping jack lunge hinge reps animation interactive' },
+  { id: 'training', title: 'Training plan', eyebrow: '02 / PROGRAMMING', description: 'Build and save a starter week around your time, gear and training preferences.', keywords: 'workout plan strength muscle conditioning mobility rest timer template' },
+  { id: 'library', title: 'Movement index', eyebrow: '03 / MOVEMENT', description: 'Search movements by muscle group, equipment, level and movement pattern.', keywords: 'library exercises technique common mistakes alternatives sort filter' },
+  { id: 'gyms', title: 'Gym concepts', eyebrow: '04 / DISCOVERY', description: 'Explore searchable sample gym concepts and training focus.', keywords: 'gym venue city location concept sample facilities enquire Hyderabad Bengaluru Chennai' },
+  { id: 'space', title: 'Gym planner', eyebrow: '05 / SPACE DESIGN', description: 'Edit the shared 2D and 3D layout, arrange equipment and export the concept.', keywords: 'room equipment floorplan planner three js 3d rotate drag camera finish save load export' },
+  { id: 'start', title: 'First session', eyebrow: '06 / FIRST STEP', description: 'Prepare a local-only first-session enquiry.', keywords: 'trial session enquiry contact gym concept' },
 ];
 
 export function CommandPalette() {
@@ -87,7 +88,7 @@ export function CommandPalette() {
                   <span className="command-result-arrow" aria-hidden="true">↗</span>
                 </button>
               ))}
-              {filteredTargets.length === 0 && <p className="command-empty" role="status">No section matches. Try “training”, “gym”, or “space”.</p>}
+              {filteredTargets.length === 0 && <p className="command-empty" role="status">No section matches. Try “3D”, “movement”, or “gym”.</p>}
             </div>
             <p className="command-hint">↑ / ↓ TO NAVIGATE <span>·</span> CTRL / ⌘ + K TO TOGGLE</p>
           </section>
