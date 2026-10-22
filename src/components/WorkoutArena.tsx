@@ -51,7 +51,7 @@ const MOVES: MoveDefinition[] = [
   { id: 'squat', name: 'Bodyweight squat', focus: 'QUADS / GLUTES', target: 'LOWER BODY', cue: 'Keep the whole foot planted. Send the hips back, then stand tall without rushing.', prescription: '3 × 10–12', tempo: 'CONTROLLED DESCENT', targetReps: 10 },
   { id: 'curl', name: 'Dumbbell curl', focus: 'BICEPS / FOREARMS', target: 'ARMS', cue: 'Keep the elbows close to the ribs. Curl without swinging the torso.', prescription: '3 × 8–12', tempo: 'NO BODY SWING', targetReps: 10 },
   { id: 'press', name: 'Overhead press', focus: 'SHOULDERS / TRICEPS', target: 'UPPER BODY', cue: 'Brace the trunk and press overhead in a comfortable range. Do not force the lower back into an arch.', prescription: '3 × 8–10', tempo: 'RIBS STACKED', targetReps: 8 },
-  { id: 'jacks', name: 'Jumping jack', focus: 'FULL BODY / CARDIO', target: 'CONDITIONING', cue: 'Move smoothly and land softly. Use a step-out version whenever that feels better.', prescription: '3 × 30 SEC', tempo: 'SOFT LANDING', targetReps: 20 },
+  { id: 'jacks', name: 'Jumping jack', focus: 'FULL BODY / CARDIO', target: 'CONDITIONING', cue: 'Move smoothly and land softly. Use a step-out version whenever that feels better.', prescription: '3 × 20 REPS', tempo: 'SOFT LANDING', targetReps: 20 },
   { id: 'lunge', name: 'Reverse lunge', focus: 'LEGS / BALANCE', target: 'LOWER BODY', cue: 'Step back to a stable stance and keep the front foot grounded. Use a range you can control.', prescription: '3 × 8 / SIDE', tempo: 'STABLE FOOTING', targetReps: 8 },
   { id: 'hinge', name: 'Hip hinge / RDL', focus: 'HAMSTRINGS / GLUTES', target: 'POSTERIOR CHAIN', cue: 'Push the hips back with soft knees, keep the spine long, and bring the weight close to the legs.', prescription: '3 × 8–10', tempo: 'HIPS BACK', targetReps: 10 },
 ];
@@ -396,7 +396,7 @@ export function WorkoutArena() {
             <p>{trackingMode === 'manual' ? 'Train in the real world and tap LOG REP after each rep you complete. This app does not track your body.' : 'Each complete avatar cycle counts as a demo cycle, not a physical repetition. Switch to manual mode to record your own reps.'}</p>
           </div>
           <div className="arena-session-buttons">
-            <button className="arena-primary-control" type="button" disabled={!running && setsCompleted >= 3} onClick={() => {
+            <button className="arena-primary-control" type="button" disabled={(!running && setsCompleted >= 3) || resting} onClick={() => {
               if (running) setRunning(false);
               else if (reps >= current.targetReps) startNextSet();
               else { skipRest(); setRunning(true); }
