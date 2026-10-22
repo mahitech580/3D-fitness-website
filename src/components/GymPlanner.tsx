@@ -552,7 +552,7 @@ export function GymPlanner() {
     <section className="section planner-section" id="space" aria-labelledby="space-title">
       <div className="section-shell">
         <div className="section-heading-row">
-          <div><p className="eyebrow"><span>04</span> SPACE / PLANNING LAB</p><h2 id="space-title">Make room<br /><em>to move.</em></h2></div>
+          <div><p className="eyebrow"><span>05</span> SPACE / PLANNING LAB</p><h2 id="space-title">Make room<br /><em>to move.</em></h2></div>
           <p className="section-intro">Build a training room, place equipment, and inspect the same layout in 2D and 3D. This is a concept planner—not a CAD tool or a safety-certified fit-out.</p>
         </div>
         <div className="planner-layout">
