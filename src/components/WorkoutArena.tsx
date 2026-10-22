@@ -16,15 +16,16 @@ type MoveDefinition = {
   cue: string;
   prescription: string;
   tempo: string;
+  targetReps: number;
 };
 
 const MOVES: MoveDefinition[] = [
-  { id: 'squat', name: 'Bodyweight squat', focus: 'QUADS / GLUTES', target: 'LOWER BODY', cue: 'Keep the whole foot planted. Send the hips back, then stand tall without rushing.', prescription: '3 × 10–12', tempo: 'CONTROLLED DESCENT' },
-  { id: 'curl', name: 'Dumbbell curl', focus: 'BICEPS / FOREARMS', target: 'ARMS', cue: 'Keep the elbows close to the ribs. Curl without swinging the torso.', prescription: '3 × 8–12', tempo: 'NO BODY SWING' },
-  { id: 'press', name: 'Overhead press', focus: 'SHOULDERS / TRICEPS', target: 'UPPER BODY', cue: 'Brace the trunk and press overhead in a comfortable range. Do not force the lower back into an arch.', prescription: '3 × 8–10', tempo: 'RIBS STACKED' },
-  { id: 'jacks', name: 'Jumping jack', focus: 'FULL BODY / CARDIO', target: 'CONDITIONING', cue: 'Move smoothly and land softly. Use a step-out version whenever that feels better.', prescription: '3 × 30 SEC', tempo: 'SOFT LANDING' },
-  { id: 'lunge', name: 'Reverse lunge', focus: 'LEGS / BALANCE', target: 'LOWER BODY', cue: 'Step back to a stable stance and keep the front foot grounded. Use a range you can control.', prescription: '3 × 8 / SIDE', tempo: 'STABLE FOOTING' },
-  { id: 'hinge', name: 'Hip hinge / RDL', focus: 'HAMSTRINGS / GLUTES', target: 'POSTERIOR CHAIN', cue: 'Push the hips back with soft knees, keep the spine long, and bring the weight close to the legs.', prescription: '3 × 8–10', tempo: 'HIPS BACK' },
+  { id: 'squat', name: 'Bodyweight squat', focus: 'QUADS / GLUTES', target: 'LOWER BODY', cue: 'Keep the whole foot planted. Send the hips back, then stand tall without rushing.', prescription: '3 × 10–12', tempo: 'CONTROLLED DESCENT', targetReps: 10 },
+  { id: 'curl', name: 'Dumbbell curl', focus: 'BICEPS / FOREARMS', target: 'ARMS', cue: 'Keep the elbows close to the ribs. Curl without swinging the torso.', prescription: '3 × 8–12', tempo: 'NO BODY SWING', targetReps: 10 },
+  { id: 'press', name: 'Overhead press', focus: 'SHOULDERS / TRICEPS', target: 'UPPER BODY', cue: 'Brace the trunk and press overhead in a comfortable range. Do not force the lower back into an arch.', prescription: '3 × 8–10', tempo: 'RIBS STACKED', targetReps: 8 },
+  { id: 'jacks', name: 'Jumping jack', focus: 'FULL BODY / CARDIO', target: 'CONDITIONING', cue: 'Move smoothly and land softly. Use a step-out version whenever that feels better.', prescription: '3 × 30 SEC', tempo: 'SOFT LANDING', targetReps: 20 },
+  { id: 'lunge', name: 'Reverse lunge', focus: 'LEGS / BALANCE', target: 'LOWER BODY', cue: 'Step back to a stable stance and keep the front foot grounded. Use a range you can control.', prescription: '3 × 8 / SIDE', tempo: 'STABLE FOOTING', targetReps: 8 },
+  { id: 'hinge', name: 'Hip hinge / RDL', focus: 'HAMSTRINGS / GLUTES', target: 'POSTERIOR CHAIN', cue: 'Push the hips back with soft knees, keep the spine long, and bring the weight close to the legs.', prescription: '3 × 8–10', tempo: 'HIPS BACK', targetReps: 10 },
 ];
 
 function Joint({ position, color = '#c7a18b', radius = 0.085 }: { position: [number, number, number]; color?: string; radius?: number }) {
@@ -191,11 +192,15 @@ export function WorkoutArena() {
   const [running, setRunning] = useState(false);
   const [tempo, setTempo] = useState(48);
   const [reps, setReps] = useState(0);
+  const [totalReps, setTotalReps] = useState(0);
+  const [setsCompleted, setSetsCompleted] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   const [cameraMode, setCameraMode] = useState<CameraMode>('three-quarter');
   const [showCue, setShowCue] = useState(true);
   const [sceneReady, setSceneReady] = useState(false);
   const current = MOVES.find((move) => move.id === moveId) ?? MOVES[0];
+  const targetRepsRef = useRef(current.targetReps);
+  targetRepsRef.current = current.targetReps;
 
   useEffect(() => {
     if (!running) return;
@@ -203,11 +208,24 @@ export function WorkoutArena() {
     return () => window.clearInterval(timer);
   }, [running]);
 
-  const countRep = useCallback(() => setReps((value) => value + 1), []);
+  const countRep = useCallback(() => {
+    setTotalReps((value) => value + 1);
+    setReps((value) => {
+      const next = value + 1;
+      if (next >= targetRepsRef.current) {
+        setRunning(false);
+        setSetsCompleted((completed) => Math.min(3, completed + 1));
+        return targetRepsRef.current;
+      }
+      return next;
+    });
+  }, []);
 
   function selectMove(id: MoveId) {
     setMoveId(id);
     setReps(0);
+    setTotalReps(0);
+    setSetsCompleted(0);
     setRunning(false);
     setElapsed(0);
   }
@@ -215,7 +233,15 @@ export function WorkoutArena() {
   function resetSession() {
     setRunning(false);
     setReps(0);
+    setTotalReps(0);
+    setSetsCompleted(0);
     setElapsed(0);
+  }
+
+  function startNextSet() {
+    if (setsCompleted >= 3) return;
+    setReps(0);
+    setRunning(true);
   }
 
   const clock = String(Math.floor(elapsed / 60)).padStart(2, '0') + ':' + String(elapsed % 60).padStart(2, '0');
@@ -248,17 +274,21 @@ export function WorkoutArena() {
           <h3>{current.name}</h3>
           <p className="arena-muscle-line">{current.focus}</p>
           <div className="arena-stats">
-            <div><span>REPS</span><strong>{String(reps).padStart(2, '0')}</strong></div>
+            <div><span>REPS / SET</span><strong>{String(reps).padStart(2, '0')}<small>/{current.targetReps}</small></strong></div>
+            <div><span>SETS</span><strong>{setsCompleted}<small>/3</small></strong></div>
             <div><span>ELAPSED</span><strong>{clock}</strong></div>
-            <div><span>TEMPO</span><strong>{tempo}<small>RPM</small></strong></div>
           </div>
-          <div className="arena-rep-progress" role="progressbar" aria-label="Progress to next 10-rep block" aria-valuemin={0} aria-valuemax={10} aria-valuenow={reps % 10}><span style={{ width: ((reps % 10) * 10) + '%' }} /></div>
+          <div className="arena-rep-progress" role="progressbar" aria-label="Repetitions completed in current set" aria-valuemin={0} aria-valuemax={current.targetReps} aria-valuenow={reps}><span style={{ width: (reps / current.targetReps * 100) + '%' }} /></div>
           <div className="arena-tempo-control"><label htmlFor="arena-tempo">MOVEMENT TEMPO</label><input id="arena-tempo" type="range" min={24} max={72} step={4} value={tempo} onChange={(event) => setTempo(Number(event.target.value))} /><div><span>SLOW / CONTROLLED</span><strong>{tempo} REPS / MIN TARGET</strong></div></div>
           <div className="arena-session-buttons">
-            <button className="arena-primary-control" type="button" onClick={() => setRunning((value) => !value)}>{running ? 'PAUSE SESSION' : 'START SESSION'} <span aria-hidden="true">{running ? 'Ⅱ' : '▶'}</span></button>
+            <button className="arena-primary-control" type="button" disabled={!running && setsCompleted >= 3} onClick={() => {
+              if (running) setRunning(false);
+              else if (reps >= current.targetReps) startNextSet();
+              else setRunning(true);
+            }}>{setsCompleted >= 3 ? 'TARGET COMPLETE' : running ? 'PAUSE SESSION' : reps >= current.targetReps ? 'START NEXT SET ' + (setsCompleted + 1) : elapsed > 0 ? 'RESUME SESSION' : 'START SESSION'} <span aria-hidden="true">{running ? 'Ⅱ' : setsCompleted >= 3 ? '✓' : reps >= current.targetReps ? '↗' : '▶'}</span></button>
             <button className="arena-secondary-control" type="button" onClick={resetSession}>RESET <span aria-hidden="true">↺</span></button>
           </div>
-          <p className="arena-session-state" role="status">{reducedMotion && running ? 'Reduced-motion preference detected. The session timer runs; start motion manually by turning off reduced motion in system settings.' : running ? 'Cycle running. One complete movement cycle increments the rep counter.' : 'Paused. Start the session when you are ready.'}</p>
+          <p className="arena-session-state" role="status">{reducedMotion && running ? 'Reduced-motion preference detected. The timer runs without animated repetition cycles. Change your system motion preference to use the moving model.' : setsCompleted >= 3 ? 'THREE SET TARGET COMPLETE. Reset to run the movement again.' : reps >= current.targetReps ? 'SET COMPLETE. Recover as needed, then start the next set.' : running ? 'The procedural movement cycle is running. Each full cycle records one rep and pauses at the set target.' : totalReps > 0 ? totalReps + ' TOTAL REPS RECORDED. Resume the current set when ready.' : 'Paused. Start the session when you are ready.'}</p>
           <div className={showCue ? 'arena-form-card is-visible' : 'arena-form-card'} aria-live="polite">
             <div><span>FORM GUIDE</span><span>{current.prescription}</span></div>
             <h4>{current.tempo}</h4>
