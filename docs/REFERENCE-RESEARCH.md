@@ -59,7 +59,7 @@ URL: https://lusion.co/
 
 **Useful pattern:** A central 3D object should have a clear art direction and a reason to exist, rather than function as background decoration alone.
 
-**Implementation decision:** Make the 3D athlete and a controllable training floor the core experience, not just a decorative model. The separate gym designer also uses original procedural equipment geometry.
+**Implementation decision:** Keep the equipment-only 3D motion lab and the separately controllable gym designer as different tools. The motion stage uses procedural weights and abstract geometry rather than a human model.
 
 **Do not copy:** Lusion's projects, branding, scene layouts, or creative assets.
 
@@ -118,6 +118,45 @@ URLs: https://www.awwwards.com/websites/3d/ and https://www.awwwards.com/website
 
 **Do not copy:** No specific award-winning site or asset was identified or copied from these category pages.
 
+## User-supplied reference audit
+
+The following repository sources and live pages were inspected for layout structure, section sequencing and animation technique. They are design references only; the implementation uses its own text, layout and geometry.
+
+### 11. Deri Kurniawan — 3D Portfolio
+URLs: https://3d-portfolio.derikn.com/ and https://github.com/Deri-Kurniawan/3d-portfolio
+
+**Observed in source:** the hero layers several isolated decorative illustrations and animates their entrance with Framer Motion. The page then continues through a stack, projects, a connection section and a quote instead of stopping after the hero.
+
+**Applied:** decorative motion, layered composition and a clear multi-section rhythm. The portfolio's artwork and identity are not reused.
+
+### 12. PR Fitness
+URLs: https://prfitnessmundur.vercel.app/ and https://github.com/GYM-3D-WEBSITES/prfitness
+
+**Observed in source:** the experience combines an atmospheric background, a 3D scene, procedural dumbbell and treadmill models, scroll progress, and separate About, Programs, Trainers, Gallery, Products and Contact sections.
+
+**Applied:** an equipment-only Three.js scene, image-led sections, and a page structure with training paths, gallery and clear CTAs. The source code, brand and photo assets are not copied.
+
+### 13. Gym@freaks
+URLs: https://pawar-pratik.github.io/3D-Gym-Website/ and https://github.com/Pawar-Pratik/3D-Gym-Website
+
+**Observed in source:** the hero uses repeated scrolling typography and a Canvas; its source describes a Blender-built 3D sequence controlled by scroll progress. The README explicitly warns that the original page is not responsive and several controls do not work.
+
+**Applied:** a reduced-motion-aware motion-led visual language and animated objects, while keeping the layout responsive and the existing controls functional. No human model or original frame sequence is reused.
+
+### 14. Fitlife and Futras
+URLs: https://codewithsadee.github.io/fitlife/ and https://github.com/codewithsadee/fitlife; https://codewithsadee.github.io/futras/ and https://github.com/codewithsadee/futras
+
+**Observed in source:** Fitlife uses a hero image, split About layout, video-banner panel, image-based class cards, service cards, a blog feed and footer. Futras uses a similarly section-based fitness/nutrition landing page with image-forward content blocks.
+
+**Applied:** photographic backgrounds, training-path cards, editorial imagery and a clearer section sequence. Template text, logos and the repositories' photo assets are not copied.
+
+### 15. Gym Trainer
+URL: https://isax5.github.io/gym-trainer/
+
+**Observed:** the page explains an exercise app with a clear feature-card grid, in-app screenshots, guided sessions, progress records, theme/unit controls and local-first privacy positioning.
+
+**Applied:** concise feature explanations and honest wording about browser-local data; no unsupported member counts, trainers, venue availability, or real booking claims are added.
+
 ## Official technical documentation
 
 ### Three.js — WebGLRenderer
@@ -137,8 +176,8 @@ The guide explains demand-driven rendering for scenes that can become idle, and 
 
 ## Synthesis
 
-- Open directly into the interactive 3D motion lab with an articulated athlete, movement selection, manual rep logging, explicit follow-along demo cycles and local training history.
-- Keep secondary tools connected to the core training task: build a week, study a movement, design a gym space, or prepare a local-only enquiry.
+- Lead with a photographic, multi-section fitness brand experience, followed by an equipment-only 3D motion lab, movement selection, manual rep logging, explicit follow-along demo cycles and local training history.
+- Keep secondary tools connected to the core training task: choose a focus, build a week, study a movement, design a gym space, or prepare a local-only enquiry.
 - Treat workout generation as an explainable local algorithm until a real coaching service is built.
 - Treat the planner as a small interactive concept tool, not a construction-grade 3D system.
 - Keep a non-WebGL route, reduced motion, keyboard navigation, and truthful product language.

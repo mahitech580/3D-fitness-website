@@ -9,16 +9,17 @@ import { TrialBooking } from './components/TrialBooking';
 import { CommandPalette } from './components/CommandPalette';
 import { ShareSiteButton } from './components/ShareSiteButton';
 import { GymDiscovery } from './components/GymDiscovery';
+import { BrandMarquee, ProgramShowcase, StudioCulture, FitnessGallery, ClosingCTA } from './components/BrandSections';
 import { LandingHero } from './components/LandingHero';
 import './styles/kinetik-refresh.css';
 
 const navigation = [
-  { href: '#arena', label: '3D WORKOUT' },
+  { href: '#programs', label: 'PROGRAMS' },
+  { href: '#arena', label: '3D STUDIO' },
   { href: '#training', label: 'TRAINING PLAN' },
-  { href: '#library', label: 'MOVEMENT INDEX' },
-  { href: '#gyms', label: 'GYM CONCEPTS' },
-  { href: '#space', label: 'GYM PLANNER' },
-  { href: '#start', label: 'FIRST SESSION' },
+  { href: '#library', label: 'MOVEMENTS' },
+  { href: '#space', label: 'GYM DESIGN' },
+  { href: '#start', label: 'GET STARTED' },
 ];
 
 export function App() {
@@ -74,11 +75,16 @@ export function App() {
         </header>
         <main id="main-content" tabIndex={-1}>
           <LandingHero />
+          <BrandMarquee />
+          <ProgramShowcase />
+          <StudioCulture />
           <WorkoutArena launchRequest={studioLaunch} />
           <WorkoutBuilder onStartIn3D={startInStudio} />
+          <FitnessGallery />
           <ExerciseLibrary />
           <GymDiscovery onEnquire={(gymName) => setSelectedGym(gymName)} />
           <GymPlanner />
+          <ClosingCTA />
           <TrialBooking selectedGym={selectedGym} />
         </main>
         <footer className="site-footer">

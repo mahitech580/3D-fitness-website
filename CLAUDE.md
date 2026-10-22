@@ -1,7 +1,13 @@
 # Kinetik — Fitness Experience Engineering Rules
 
 ## Product direction
-This repository is an original fitness and training experience inspired by four public reference products: WTF Gyms, Freeletics, Fitness.com, and Thor Fitness Builder. Use these sources for patterns, not branding or copied assets. The active direction is high-energy athletic editorial: charcoal, chalk, acid-lime accents, oversized typography, intentional 3D equipment, and clean functional training tools. Do not let the previous porcelain-dragon / Kairo Studio direction leak into the main experience.
+This repository is an original fitness brand experience and training workspace. Design references reviewed include Deri Kurniawan's 3D portfolio, PR Fitness, Gym@freaks, Fitlife, Futras, Gym Trainer, WTF Gyms, Freeletics, Fitness.com, and Thor Fitness Builder. Use these for patterns, not branding, text, or copied assets. The active direction is image-led athletic editorial: charcoal, chalk, acid-lime accents, oversized typography, full-bleed gym photography, richer multi-section storytelling, and functional training tools. Use equipment-only 3D animation—barbells, dumbbells, plates and abstract geometry—with no 3D human/avatar model.
+
+## Visual direction
+- Put strong, licensed gym photography into hero and section backgrounds; use overlays and contrast for legible text.
+- Build distinct programs, editorial/gallery, studio, and closing CTA sections; do not stop after a single hero or pile every control above the fold.
+- 3D models are equipment and decorative geometry only. Never add a 3D human/athlete/avatar.
+- Scroll can subtly affect equipment motion, but obey reduced-motion settings and keep mobile layouts responsive.
 
 ## Interaction requirements
 - Make each UI control do the action it advertises.

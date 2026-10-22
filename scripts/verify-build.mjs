@@ -22,7 +22,7 @@ if (!assets.some((name) => /\.js$/.test(name))) failures.push('No JavaScript ass
 if (!assets.some((name) => /\.css$/.test(name))) failures.push('No CSS asset was emitted.');
 const scripts = await Promise.all(assets.filter((name) => /\.js$/.test(name)).map((name) => readFile(path.join(assetDir, name), 'utf8')));
 const bundleText = scripts.join('\n');
-for (const featureText of ['BUILD MY WEEK', 'MARK SESSION DONE', 'ROTATE 90°', 'PREPARE MY REQUEST', 'VIEW CONCEPT DETAILS', 'SAVE TEMPLATE', 'WEEKLY SESSION HISTORY', 'FOCUS SELECTED', 'FLOOR FINISH', 'COMMON MISTAKES', 'RELATED MOVEMENTS', 'GYM CONCEPTS', 'KINETIK / MOTION LAB', 'START SESSION', 'START NEXT SET', 'CHOOSE MOVEMENT', 'SET TARGET COMPLETE', 'REPS / SET', 'REP TRACKING MODE', 'LOG ONE COMPLETED REP', 'LOCAL TRAINING HISTORY', 'FOLLOW ALONG / AUTO', 'SESSION SAVED IN THIS BROWSER', 'REST LENGTH', 'START REST', 'TRAIN / LOG MY REPS', 'SETS PER MOVEMENT', 'DUMBBELL LOAD / HAND', 'OPEN IN 3D STUDIO']) {
+for (const featureText of ['BUILD MY WEEK', 'MARK SESSION DONE', 'ROTATE 90°', 'PREPARE MY REQUEST', 'VIEW CONCEPT DETAILS', 'SAVE TEMPLATE', 'WEEKLY SESSION HISTORY', 'FOCUS SELECTED', 'FLOOR FINISH', 'COMMON MISTAKES', 'RELATED MOVEMENTS', 'GYM CONCEPTS', 'PROGRAMS FOR', 'LESS NOISE.', 'Equipment.', 'KINETIK / MOTION LAB', 'START SESSION', 'START NEXT SET', 'CHOOSE MOVEMENT', 'SET TARGET COMPLETE', 'REPS / SET', 'REP TRACKING MODE', 'LOG ONE COMPLETED REP', 'LOCAL TRAINING HISTORY', 'FOLLOW ALONG / AUTO', 'SESSION SAVED IN THIS BROWSER', 'REST LENGTH', 'START REST', 'TRAIN / LOG MY REPS', 'SETS PER MOVEMENT', 'DUMBBELL LOAD / HAND', 'OPEN IN 3D STUDIO']) {
   if (!bundleText.includes(featureText)) failures.push('Expected interactive feature text was not found in the production JS: ' + featureText);
 }
 for (const asset of ['favicon.svg', 'site.webmanifest', 'robots.txt', 'sitemap.xml', '404.html']) await check(asset);
@@ -30,6 +30,8 @@ for (const asset of ['favicon.svg', 'site.webmanifest', 'robots.txt', 'sitemap.x
 // Guard the app's keyboard-accessible command palette against stale section anchors.
 const sourcePaths = [
   'src/App.tsx',
+  'src/components/LandingHero.tsx',
+  'src/components/BrandSections.tsx',
   'src/components/WorkoutArena.tsx',
   'src/components/WorkoutBuilder.tsx',
   'src/components/ExerciseLibrary.tsx',
@@ -46,9 +48,15 @@ const sourceContents = await Promise.all(sourcePaths.map((relativePath) =>
 ));
 const appSource = sourceContents[0];
 const arenaIndex = appSource.indexOf('<WorkoutArena');
-const plannerIndex = appSource.indexOf('<WorkoutBuilder />');
+const plannerIndex = appSource.indexOf('<WorkoutBuilder');
 if (arenaIndex < 0) failures.push('The primary 3D WorkoutArena is not mounted in the application.');
-if (plannerIndex >= 0 && arenaIndex > plannerIndex) failures.push('The 3D WorkoutArena must render before the workout-plan builder.');
+if (plannerIndex >= 0 && arenaIndex > plannerIndex) failures.push('The equipment motion lab must render before the workout-plan builder.');
+for (const section of ['<LandingHero', '<BrandMarquee', '<ProgramShowcase', '<StudioCulture', '<FitnessGallery', '<ClosingCTA']) {
+  if (!appSource.includes(section)) failures.push('The multi-section fitness experience is missing: ' + section);
+}
+const arenaSource = sourceContents[3];
+if (/function Athlete\s*\(|<Athlete\b|articulated athlete|3D athlete/.test(arenaSource)) failures.push('The 3D character model must be removed; the motion stage should use equipment only.');
+if (!arenaSource.includes('function EquipmentMotion(') || !arenaSource.includes('function Barbell(')) failures.push('The equipment-only 3D motion scene is not mounted in source.');
 if (appSource.includes('FitnessScene') || appSource.includes('className="hero-section"')) {
   failures.push('The old marketing hero should not replace the primary 3D workout experience.');
 }

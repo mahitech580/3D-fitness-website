@@ -29,8 +29,8 @@ export function LandingHero() {
               <div className="home-photo-frame">
                 <img
                   className="home-hero-photo"
-                  src="https://images.unsplash.com/photo-1745329532588-1394a50671f0?auto=format&fit=crop&fm=jpg&ixid=NHwxMjA3fDA%3D&ixlib=rb-4.1.0&q=60&w=3000"
-                  alt="Athlete preparing for a strength exercise inside a low-lit gym"
+                  src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1800&q=85"
+                  alt="Dark, equipment-filled strength gym interior"
                   fetchPriority="high"
                 />
                 <div className="home-photo-shade" aria-hidden="true" />
@@ -68,8 +68,7 @@ export function LandingHero() {
             <div className="home-stat-note"><span className="home-live-dot" /> YOUR NEXT REP STARTS HERE</div>
           </div>
           <p className="home-photo-credit">
-            Photo by <a href="https://unsplash.com/@jakubklucky?utm_source=kinetik&utm_medium=referral" target="_blank" rel="noreferrer">Jakub Klucký</a> on{" "}
-            <a href="https://unsplash.com/photos/man-is-working-out-at-the-gym-O3UrNIU1FVQ?utm_source=kinetik&utm_medium=referral" target="_blank" rel="noreferrer">Unsplash</a>
+            Background photography from <a href="https://unsplash.com/license" target="_blank" rel="noreferrer">Unsplash</a>
           </p>
         </div>
       </section>

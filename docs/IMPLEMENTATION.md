@@ -7,7 +7,8 @@ KINETIK is an original, local-first fitness experience built with React, TypeScr
 ## Main application
 
 - **Application shell:** responsive section navigation, light/dark theme preference, a Ctrl/Command+K command palette wired to valid section IDs, share action, keyboard skip link, reduced-motion configuration and a semantic document structure.
-- **3D motion lab (primary training experience):** a custom procedural articulated athlete is assembled from Three.js meshes and animated in six movement cycles (squat, curl, overhead press, jumping jack, reverse lunge and hip hinge/RDL). The gym scene has studio lighting, a rack, floor grid, contact shadows, orbit controls and front/side/three-quarter views. The user can pick movements, adjust tempo, set the procedural dumbbell load for curl/press/hinge, start/pause the timer, and follow form guidance in HTML. The model only shows the selected load as different procedural plate sizing; it is not a physical load estimate.
+- **Image-led landing experience:** a photographic hero, four photo-backed training-path cards, a cinematic studio interlude, feature cards, a gallery and a closing CTA establish the visual story before the detailed tools. Unsplash images are referenced remotely rather than copied into the repository; the site links to the Unsplash license information.
+- **3D motion lab:** an equipment-only procedural Three.js scene uses a barbell, adjustable dumbbells, plate geometry and orbit rings. It has studio lighting, a rack, floor grid, contact shadows, orbit controls and front/side/three-quarter views. Users can pick a movement focus, adjust animation tempo and displayed load, start/pause the session timer, and follow movement guidance in HTML. It contains no 3D human or avatar model, and its plate sizing is illustrative—not a physical load estimate.
 - **Rep tracking modes:** manual training mode accepts explicit rep logging from the user and pauses at the selected movement's rep target; follow-along mode instead counts completed animation cycles. The interface labels these separately because the site does not use a camera or motion tracking to observe a user's body. Session history records the selected dumbbell load for weighted exercises and marks bodyweight movements separately.
 - **Session history:** completing the selected set target saves the exercise, tracking mode, counted reps/cycles, elapsed time, and tempo to browser-local storage. Users can choose two to five sets per movement; the prescription and save threshold follow that setting. Only the five most recent session records are retained and displayed.
 - **Workout planner:** transparent, browser-side rule-based programming using goal, level, equipment, location, intensity, time, days available and avoided-movement preferences. Compatible planned movements provide an explicit handoff into the primary 3D arena; the arena resets its session state and loads the selected pose.
@@ -25,7 +26,7 @@ Training templates, plan completion markers, 3D session history, theme preferenc
 
 ## Asset policy
 
-The articulated trainer, room, rack, dumbbells, and gym-planner equipment are generated from project-authored geometry and materials; no third-party GLB/GLTF model or captured character animation is bundled. See [ASSET-CREDITS.md](./ASSET-CREDITS.md) for the asset policy and attributions.
+The 3D stage, room, rack, barbells, dumbbells, plates, orbit geometry and gym-planner equipment are generated from project-authored geometry and materials; no third-party GLB/GLTF model or captured human animation is bundled. See [ASSET-CREDITS.md](./ASSET-CREDITS.md) for imagery sources and licensing.
 
 ## Local development
 
@@ -42,7 +43,7 @@ The GitHub Actions workflow on `main` runs the build/smoke-check workflow and pu
 
 - All venue entries are sample concepts and must not be interpreted as real gyms.
 - Training recommendations are deterministic rules, not an AI coach or individualized medical advice.
-- The 3D athlete is procedural animation designed for illustrative demonstration; it is not a motion-capture model, exercise biomechanics simulator, medical tool, or automated form-tracking system. In manual mode, rep counts are entered by the user and are not independently verified. In follow-along mode, the counter measures completed avatar animation cycles only; it does not observe a person's physical repetitions.
+- The 3D stage animates equipment and geometry only; it does not show or analyze a human body. It is not an exercise biomechanics simulator, medical tool, or automated form-tracking system. In manual mode, rep counts are entered by the user and are not independently verified. In follow-along mode, the counter measures equipment animation cycles only; it does not observe physical repetitions.
 - Exercise coverage is curated starter content; there are no licensed demonstration videos, clinical claims, meal logging, or nutrition database.
 - Gym dimensions and equipment footprints are visual planning estimates, not architectural, building-code, accessibility, fire-safety, manufacturer-clearance or professional fit-out certification.
 - Saved layouts (including room finish settings), templates and session history live in the current browser only.

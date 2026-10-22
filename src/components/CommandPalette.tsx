@@ -3,12 +3,13 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboa
 type JumpTarget = { id: string; title: string; eyebrow: string; description: string; keywords: string };
 
 const targets: JumpTarget[] = [
-  { id: 'arena', title: '3D motion lab', eyebrow: '01 / LIVE TRAINING', description: 'Choose a movement and control an animated 3D athlete, camera, tempo and reps.', keywords: '3d workout arena trainer athlete squat curl press jumping jack lunge hinge reps animation interactive' },
-  { id: 'training', title: 'Training plan', eyebrow: '02 / PROGRAMMING', description: 'Build and save a starter week around your time, gear and training preferences.', keywords: 'workout plan strength muscle conditioning mobility rest timer template' },
-  { id: 'library', title: 'Movement index', eyebrow: '03 / MOVEMENT', description: 'Search movements by muscle group, equipment, level and movement pattern.', keywords: 'library exercises technique common mistakes alternatives sort filter' },
-  { id: 'gyms', title: 'Gym concepts', eyebrow: '04 / DISCOVERY', description: 'Explore searchable sample gym concepts and training focus.', keywords: 'gym venue city location concept sample facilities enquire Hyderabad Bengaluru Chennai' },
-  { id: 'space', title: 'Gym planner', eyebrow: '05 / SPACE DESIGN', description: 'Edit the shared 2D and 3D layout, arrange equipment and export the concept.', keywords: 'room equipment floorplan planner three js 3d rotate drag camera finish save load export' },
-  { id: 'start', title: 'First session', eyebrow: '06 / FIRST STEP', description: 'Prepare a local-only first-session enquiry.', keywords: 'trial session enquiry contact gym concept' },
+  { id: 'programs', title: 'Training paths', eyebrow: '01 / CHOOSE YOUR FOCUS', description: 'Explore image-led strength, conditioning, mobility and hybrid training paths.', keywords: 'programs strength conditioning mobility hybrid classes photos training' },
+  { id: 'arena', title: 'Equipment motion lab', eyebrow: '02 / 3D OBJECTS', description: 'Orbit an animated equipment-only scene, adjust tempo, and log real reps separately.', keywords: '3d workout equipment dumbbell barbell weight plates animation orbit no character squat curl press jumping jack lunge hinge reps interactive' },
+  { id: 'training', title: 'Training plan', eyebrow: '03 / PROGRAMMING', description: 'Build and save a starter week around your time, gear and training preferences.', keywords: 'workout plan strength muscle conditioning mobility rest timer template' },
+  { id: 'library', title: 'Movement index', eyebrow: '04 / MOVEMENT', description: 'Search movements by muscle group, equipment, level and movement pattern.', keywords: 'library exercises technique common mistakes alternatives sort filter' },
+  { id: 'gyms', title: 'Gym concepts', eyebrow: '05 / DISCOVERY', description: 'Explore searchable sample gym concepts and training focus.', keywords: 'gym venue city location concept sample facilities enquire Hyderabad Bengaluru Chennai' },
+  { id: 'space', title: 'Gym planner', eyebrow: '06 / SPACE DESIGN', description: 'Edit the shared 2D and 3D layout, arrange equipment and export the concept.', keywords: 'room equipment floorplan planner three js 3d rotate drag camera finish save load export' },
+  { id: 'start', title: 'First session', eyebrow: '07 / FIRST STEP', description: 'Prepare a local-only first-session enquiry.', keywords: 'trial session enquiry contact gym concept' },
 ];
 
 export function CommandPalette() {

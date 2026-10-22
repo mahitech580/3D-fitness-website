@@ -60,129 +60,148 @@ const MOVES: MoveDefinition[] = [
   { id: 'hinge', name: 'Hip hinge / RDL', focus: 'HAMSTRINGS / GLUTES', target: 'POSTERIOR CHAIN', cue: 'Push the hips back with soft knees, keep the spine long, and bring the weight close to the legs.', prescription: '3 × 8–10', tempo: 'HIPS BACK', targetReps: 10 },
 ];
 
-function Joint({ position, color = '#c7a18b', radius = 0.085 }: { position: [number, number, number]; color?: string; radius?: number }) {
-  return <mesh position={position} castShadow><sphereGeometry args={[radius, 20, 16]} /><meshStandardMaterial color={color} roughness={0.43} metalness={0.02} /></mesh>;
-}
-
-function Dumbbell({ position = [0, 0, 0] as [number, number, number], loadKg = 6 }: { position?: [number, number, number]; loadKg?: number }) {
-  const plateScale = 0.75 + Math.min(14, Math.max(2, loadKg)) / 32;
+function Barbell({ loadKg }: { loadKg: number }) {
+  const plateRadius = 0.29 + Math.min(14, Math.max(2, loadKg)) / 105;
+  const plateThickness = 0.12 + Math.min(14, Math.max(2, loadKg)) / 110;
   return (
-    <group position={position}>
-      <mesh rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.035, 0.035, 0.25, 16]} /><meshStandardMaterial color="#b7c0ba" metalness={0.88} roughness={0.24} /></mesh>
-      {[-0.13, 0.13].map((x) => <group key={x} position={[x, 0, 0]}><mesh rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.105 * plateScale, 0.105 * plateScale, 0.075 * plateScale, 24]} /><meshPhysicalMaterial color="#202724" metalness={0.62} roughness={0.25} clearcoat={0.45} /></mesh><mesh rotation={[0, 0, Math.PI / 2]} position={[x > 0 ? 0.04 : -0.04, 0, 0]}><torusGeometry args={[0.075 * plateScale, 0.008 * plateScale, 8, 24]} /><meshStandardMaterial color="#d7ff58" metalness={0.36} roughness={0.3} /></mesh></group>)}
+    <group>
+      <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.045, 0.045, 3.5, 24]} />
+        <meshStandardMaterial color="#b9c4c0" metalness={0.92} roughness={0.18} />
+      </mesh>
+      {([-1.32, -1.12, 1.12, 1.32] as const).map((x, index) => (
+        <group key={x} position={[x, 0, 0]}>
+          <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[plateRadius * (index % 2 ? 0.88 : 1), plateRadius * (index % 2 ? 0.88 : 1), plateThickness, 36]} />
+            <meshPhysicalMaterial color={index % 2 ? "#22282a" : "#171b1d"} metalness={0.72} roughness={0.22} clearcoat={0.5} />
+          </mesh>
+          <mesh rotation={[0, 0, Math.PI / 2]} position={[x < 0 ? -plateThickness * 0.52 : plateThickness * 0.52, 0, 0]}>
+            <torusGeometry args={[plateRadius * 0.82, 0.012, 8, 36]} />
+            <meshStandardMaterial color="#d6ff3d" metalness={0.46} roughness={0.25} emissive="#26320b" emissiveIntensity={0.35} />
+          </mesh>
+        </group>
+      ))}
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[-1.53, 0, 0]}>
+        <cylinderGeometry args={[0.11, 0.11, 0.08, 20]} />
+        <meshStandardMaterial color="#d6ff3d" metalness={0.42} roughness={0.28} />
+      </mesh>
+      <mesh rotation={[0, 0, Math.PI / 2]} position={[1.53, 0, 0]}>
+        <cylinderGeometry args={[0.11, 0.11, 0.08, 20]} />
+        <meshStandardMaterial color="#d6ff3d" metalness={0.42} roughness={0.28} />
+      </mesh>
     </group>
   );
 }
 
-export function Athlete({ move, running, tempo, loadKg, onRep }: { move: MoveId; running: boolean; tempo: number; loadKg: number; onRep: () => void }) {
+/** The 3D stage uses equipment and abstract geometry only—no character/avatar model. */
+function EquipmentMotion({
+  move,
+  running,
+  tempo,
+  loadKg,
+  onRep,
+  reducedMotion,
+}: {
+  move: MoveId;
+  running: boolean;
+  tempo: number;
+  loadKg: number;
+  onRep: () => void;
+  reducedMotion: boolean;
+}) {
   const root = useRef<Group>(null);
-  const torso = useRef<Group>(null);
-  const leftShoulder = useRef<Group>(null);
-  const rightShoulder = useRef<Group>(null);
-  const leftElbow = useRef<Group>(null);
-  const rightElbow = useRef<Group>(null);
-  const leftHip = useRef<Group>(null);
-  const rightHip = useRef<Group>(null);
-  const leftKnee = useRef<Group>(null);
-  const rightKnee = useRef<Group>(null);
+  const barbell = useRef<Group>(null);
+  const dumbbellLeft = useRef<Group>(null);
+  const dumbbellRight = useRef<Group>(null);
+  const orbitRing = useRef<Group>(null);
   const cycle = useRef(0);
   const lastRep = useRef(onRep);
   lastRep.current = onRep;
 
   useFrame((state, delta) => {
-    const safeDelta = Math.min(delta, 0.05);
-    if (running) {
-      cycle.current += safeDelta * (tempo / 60);
+    const dt = Math.min(delta, 0.05);
+    const time = state.clock.elapsedTime;
+
+    if (running && !reducedMotion) {
+      cycle.current += dt * (tempo / 60);
       while (cycle.current >= 1) {
         cycle.current -= 1;
         lastRep.current();
       }
     }
-    const phase = cycle.current;
-    const effort = (1 - Math.cos(phase * Math.PI * 2)) / 2;
-    const breath = Math.sin(state.clock.elapsedTime * 2.1) * 0.014;
-    const lungeSide = Math.sin(phase * Math.PI * 2);
-    const squat = move === 'squat' ? effort : 0;
-    const curl = move === 'curl' ? effort : 0;
-    const press = move === 'press' ? effort : 0;
-    const jacks = move === 'jacks' ? effort : 0;
-    const lunge = move === 'lunge' ? effort : 0;
-    const hinge = move === 'hinge' ? effort : 0;
 
-    if (root.current) root.current.position.y = Math.sin(state.clock.elapsedTime * 1.1) * (running ? 0.01 : 0.006) + (jacks ? Math.max(0, Math.sin(phase * Math.PI * 2)) * 0.11 : 0);
-    if (torso.current) {
-      torso.current.rotation.x = hinge * 0.66 + squat * 0.16 + Math.sin(state.clock.elapsedTime * 1.5) * 0.012;
-      torso.current.position.y = breath - squat * 0.06 - lunge * 0.05 - hinge * 0.035;
-      torso.current.rotation.z = lunge * lungeSide * 0.035;
+    const phase = cycle.current * Math.PI * 2;
+    const motion = reducedMotion ? 0 : Math.sin(phase);
+    const pageProgress = typeof window === 'undefined'
+      ? 0
+      : Math.max(0, Math.min(1, window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight)));
+    if (root.current) {
+      root.current.rotation.y = reducedMotion ? -0.16 : -0.16 + time * 0.13 + pageProgress * 0.48;
+      root.current.position.x = reducedMotion ? 0 : Math.sin(pageProgress * Math.PI) * 0.18;
+      root.current.position.y = 1.05 + (reducedMotion ? 0 : Math.sin(time * 0.78) * 0.045);
     }
-
-    const leftLeg = leftHip.current; const rightLeg = rightHip.current;
-    if (leftLeg) { leftLeg.rotation.x = -squat * 0.35 - hinge * 0.12 - lunge * (0.2 + Math.max(0, lungeSide) * 0.34); leftLeg.rotation.z = -jacks * 0.34 - lunge * 0.08; }
-    if (rightLeg) { rightLeg.rotation.x = -squat * 0.35 - hinge * 0.12 - lunge * (0.2 + Math.max(0, -lungeSide) * 0.34); rightLeg.rotation.z = jacks * 0.34 + lunge * 0.08; }
-    if (leftKnee.current) leftKnee.current.rotation.x = squat * 1.08 + hinge * 0.22 + lunge * (0.68 + Math.max(0, lungeSide) * 0.26) - jacks * 0.12;
-    if (rightKnee.current) rightKnee.current.rotation.x = squat * 1.08 + hinge * 0.22 + lunge * (0.68 + Math.max(0, -lungeSide) * 0.26) - jacks * 0.12;
-
-    const leftArm = leftShoulder.current; const rightArm = rightShoulder.current;
-    if (leftArm) {
-      leftArm.rotation.z = -0.12 - jacks * 2.45 - press * 2.25 + hinge * 0.18;
-      leftArm.rotation.x = hinge * -0.25;
+    if (barbell.current) {
+      const pressing = move === 'press' ? motion * 0.11 : 0;
+      barbell.current.position.y = 0.02 + pressing + (reducedMotion ? 0 : Math.sin(time * 0.8) * 0.025);
+      barbell.current.rotation.z = reducedMotion ? 0 : motion * (move === 'hinge' ? 0.045 : 0.075);
+      barbell.current.rotation.x = reducedMotion ? 0 : Math.cos(time * 0.42) * 0.035;
     }
-    if (rightArm) {
-      rightArm.rotation.z = 0.12 + jacks * 2.45 + press * 2.25 - hinge * 0.18;
-      rightArm.rotation.x = hinge * -0.25;
+    if (dumbbellLeft.current) {
+      dumbbellLeft.current.position.y = 0.58 + (reducedMotion ? 0 : Math.sin(time * 0.92 + 0.5) * 0.07 + (move === 'curl' ? motion * 0.12 : 0));
+      dumbbellLeft.current.rotation.z = reducedMotion ? -0.06 : -0.06 + Math.sin(time * 0.58) * 0.08 + (move === 'curl' ? motion * 0.13 : 0);
+      dumbbellLeft.current.rotation.x = reducedMotion ? 0.32 : 0.32 + time * 0.18;
     }
-    if (leftElbow.current) leftElbow.current.rotation.x = -curl * 1.9 - press * 0.08 + jacks * 0.08;
-    if (rightElbow.current) rightElbow.current.rotation.x = -curl * 1.9 - press * 0.08 + jacks * 0.08;
+    if (dumbbellRight.current) {
+      dumbbellRight.current.position.y = 0.58 + (reducedMotion ? 0 : Math.sin(time * 0.92 + 2.2) * 0.07 + (move === 'curl' ? -motion * 0.12 : 0));
+      dumbbellRight.current.rotation.z = reducedMotion ? 0.06 : 0.06 + Math.sin(time * 0.58 + 1.6) * 0.08 - (move === 'curl' ? motion * 0.13 : 0);
+      dumbbellRight.current.rotation.x = reducedMotion ? -0.32 : -0.32 - time * 0.18;
+    }
+    if (orbitRing.current && !reducedMotion) {
+      orbitRing.current.rotation.z = time * 0.13 + pageProgress * 0.22;
+      orbitRing.current.rotation.x = 0.32 + Math.sin(time * 0.22) * 0.05;
+    }
   });
 
   return (
-    <group ref={root} position={[0, 0, 0]}>
-      {/* Feet, articulated legs and hips */}
-      <mesh position={[0, 1.01, 0]} castShadow><capsuleGeometry args={[0.19, 0.21, 5, 16]} /><meshStandardMaterial color="#252d29" roughness={0.78} /></mesh>
-      {([-1, 1] as const).map((side) => (
-        <group key={side} ref={side < 0 ? leftHip : rightHip} position={[side * 0.14, 0.98, 0]}>
-          <mesh position={[0, -0.25, 0]} castShadow><capsuleGeometry args={[0.105, 0.39, 5, 12]} /><meshStandardMaterial color="#27322c" roughness={0.62} /></mesh>
-          <mesh position={[0, -0.51, 0]} castShadow><sphereGeometry args={[0.09, 18, 14]} /><meshStandardMaterial color="#303b33" roughness={0.67} /></mesh>
-          <group ref={side < 0 ? leftKnee : rightKnee} position={[0, -0.51, 0]}>
-            <mesh position={[0, -0.245, 0]} castShadow><capsuleGeometry args={[0.078, 0.37, 5, 12]} /><meshStandardMaterial color="#27322c" roughness={0.62} /></mesh>
-            <mesh position={[0, -0.49, 0]}><sphereGeometry args={[0.065, 16, 12]} /><meshStandardMaterial color="#343e36" roughness={0.65} /></mesh>
-            <mesh position={[0, -0.515, 0.09]} castShadow><boxGeometry args={[0.17, 0.105, 0.29]} /><meshStandardMaterial color="#121715" roughness={0.47} /></mesh>
-            <mesh position={[0, -0.462, 0.16]}><boxGeometry args={[0.105, 0.012, 0.04]} /><meshStandardMaterial color="#d7ff58" emissive="#35430d" emissiveIntensity={0.12} /></mesh>
-          </group>
+    <group ref={root} position={[0, 1.05, 0.15]}>
+      <group ref={barbell} position={[0, 0.02, -0.35]}>
+        <Barbell loadKg={loadKg} />
+      </group>
+
+      <group ref={dumbbellLeft} position={[-1.25, 0.58, 0.52]}>
+        <Dumbbell loadKg={loadKg} />
+      </group>
+      <group ref={dumbbellRight} position={[1.25, 0.58, 0.52]} rotation={[0, Math.PI, 0]}>
+        <Dumbbell loadKg={loadKg} />
+      </group>
+
+      <group ref={orbitRing} position={[0, 0.12, -0.7]}>
+        <mesh>
+          <torusGeometry args={[2.0, 0.012, 8, 128]} />
+          <meshStandardMaterial color="#d6ff3d" emissive="#4b5c16" emissiveIntensity={0.55} metalness={0.3} roughness={0.28} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]} scale={[0.79, 0.79, 0.79]}>
+          <torusGeometry args={[1.6, 0.009, 8, 128]} />
+          <meshStandardMaterial color="#7c8e80" metalness={0.62} roughness={0.3} transparent opacity={0.65} />
+        </mesh>
+      </group>
+
+      <mesh position={[0, -0.98, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.45, 1.48, 96]} />
+        <meshBasicMaterial color="#d6ff3d" transparent opacity={0.64} />
+      </mesh>
+      {[-1, 1].map((side) => (
+        <group key={side} position={[side * 2.05, -0.48, -0.35]}>
+          <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.27, 0.27, 0.16, 32]} />
+            <meshPhysicalMaterial color="#202628" metalness={0.76} roughness={0.2} clearcoat={0.4} />
+          </mesh>
+          <mesh rotation={[0, 0, Math.PI / 2]} position={[side * 0.09, 0, 0]}>
+            <torusGeometry args={[0.2, 0.012, 8, 32]} />
+            <meshStandardMaterial color="#d6ff3d" metalness={0.35} roughness={0.27} emissive="#24300c" emissiveIntensity={0.3} />
+          </mesh>
         </group>
       ))}
-
-      {/* Torso has a pivot so hinges and braced movement read clearly */}
-      <group ref={torso} position={[0, 1.12, 0]}>
-        <mesh position={[0, 0.28, 0]} rotation={[0, 0, 0]} castShadow><capsuleGeometry args={[0.255, 0.44, 8, 20]} /><meshPhysicalMaterial color="#333f38" roughness={0.5} metalness={0.06} clearcoat={0.18} /></mesh>
-        <mesh position={[0, 0.46, 0.018]} castShadow><boxGeometry args={[0.28, 0.11, 0.14]} /><meshStandardMaterial color="#d7ff58" roughness={0.55} /></mesh>
-        <mesh position={[0, 0.31, 0.16]} scale={[0.76, 0.42, 0.22]}><sphereGeometry args={[0.21, 24, 18]} /><meshStandardMaterial color="#435147" roughness={0.58} /></mesh>
-        {[-1, 1].map((side) => <mesh key={side} position={[side * 0.12, 0.02, 0.242]} rotation={[0, 0, side * -0.08]}><boxGeometry args={[0.014, 0.12, 0.008]} /><meshStandardMaterial color="#111714" roughness={0.8} /></mesh>)}
-        <mesh position={[0, 0.08, 0.02]}><torusGeometry args={[0.23, 0.014, 8, 32]} /><meshStandardMaterial color="#65776b" metalness={0.55} roughness={0.34} /></mesh>
-        <mesh position={[0, 0.65, 0]} castShadow><cylinderGeometry args={[0.075, 0.095, 0.16, 20]} /><meshStandardMaterial color="#c7a18b" roughness={0.68} /></mesh>
-        <group position={[0, 0.83, 0.012]}>
-          <mesh castShadow><sphereGeometry args={[0.165, 28, 22]} /><meshStandardMaterial color="#c7a18b" roughness={0.58} /></mesh>
-          <mesh position={[0, 0.105, -0.018]}><sphereGeometry args={[0.155, 24, 16]} /><meshStandardMaterial color="#171b19" roughness={0.8} /></mesh>
-          {[-1, 1].map((side) => <mesh key={'ear-' + side} position={[side * 0.16, 0, 0]}><sphereGeometry args={[0.035, 14, 12]} /><meshStandardMaterial color="#b98e78" roughness={0.56} /></mesh>)}
-          <mesh position={[0, -0.015, 0.151]}><boxGeometry args={[0.13, 0.07, 0.045]} /><meshStandardMaterial color="#9c7261" roughness={0.58} /></mesh>
-          {[-1, 1].map((side) => <group key={'eye-' + side} position={[side * 0.062, 0.034, 0.151]}><mesh><sphereGeometry args={[0.025, 12, 10]} /><meshStandardMaterial color="#f0e7d8" roughness={0.42} /></mesh><mesh position={[0, 0, 0.021]}><sphereGeometry args={[0.012, 10, 8]} /><meshStandardMaterial color="#17201a" roughness={0.25} /></mesh><mesh position={[0, 0.03, -0.002]} rotation={[0, 0, side * -0.12]}><boxGeometry args={[0.055, 0.012, 0.012]} /><meshStandardMaterial color="#30241f" roughness={0.8} /></mesh></group>)}
-        </group>
-
-        {([-1, 1] as const).map((side) => (
-          <group key={side} ref={side < 0 ? leftShoulder : rightShoulder} position={[side * 0.285, 0.52, 0]}>
-            <Joint position={[0, 0, 0]} radius={0.105} color="#c7a18b" />
-            <mesh position={[side * 0.045, -0.13, 0]} scale={[0.98, 1.02, 0.92]}><sphereGeometry args={[0.105, 18, 14]} /><meshStandardMaterial color="#c7a18b" roughness={0.52} /></mesh>
-            <mesh position={[side * 0.015, -0.2, 0]} castShadow><capsuleGeometry args={[0.082, 0.27, 5, 12]} /><meshStandardMaterial color="#c7a18b" roughness={0.5} /></mesh>
-            <group ref={side < 0 ? leftElbow : rightElbow} position={[side * 0.015, -0.37, 0]}>
-              <Joint position={[0, 0, 0]} radius={0.072} />
-              <mesh position={[0, -0.19, 0]} castShadow><capsuleGeometry args={[0.065, 0.28, 5, 12]} /><meshStandardMaterial color="#c7a18b" roughness={0.5} /></mesh>
-              <Joint position={[0, -0.37, 0]} radius={0.065} />
-              <mesh position={[0, -0.43, 0.015]} castShadow><sphereGeometry args={[0.082, 16, 12]} /><meshStandardMaterial color="#c7a18b" roughness={0.56} /></mesh>
-              {(['curl', 'press', 'hinge'] as MoveId[]).includes(move) && <Dumbbell position={[0, -0.49, 0.015]} loadKg={loadKg} />}
-            </group>
-          </group>
-        ))}
-      </group>
     </group>
   );
 }
@@ -381,20 +400,20 @@ export function WorkoutArena({ launchRequest = null }: { launchRequest?: StudioL
   return (
     <section id="arena" className="workout-arena-section" aria-labelledby="arena-title">
       <div className="arena-section-head">
-        <div><p className="arena-kicker"><span>01</span> KINETIK / MOTION LAB</p><h2 id="arena-title">Your form.<br /><em>In three dimensions.</em></h2></div>
-        <p>Step onto the training floor. Choose a movement, orbit the articulated athlete, log the reps you actually perform or use the separate follow-along demo, and manage sets and rest. The scene is procedural 3D—not motion capture or an automated form assessment.</p>
+        <div><p className="arena-kicker"><span>01</span> KINETIK / MOTION LAB</p><h2 id="arena-title">Equipment.<br /><em>In motion.</em></h2></div>
+        <p>Explore a cinematic equipment-only 3D scene, change camera angles, choose a movement tempo, and manage your sets and rest. The motion study uses procedurally modelled weights and geometry—no 3D people, camera tracking, or automated form assessment.</p>
       </div>
       <div className="arena-workspace">
         <div className="arena-stage">
-          <div className="arena-stage-top"><span><i className={running ? 'arena-live-dot is-running' : 'arena-live-dot'} />{running ? 'MOTION RUNNING' : 'READY TO MOVE'}</span><span>INTERACTIVE 3D / ORBIT VIEW</span></div>
+          <div className="arena-stage-top"><span><i className={running ? 'arena-live-dot is-running' : 'arena-live-dot'} />{running ? 'MOTION RUNNING' : 'READY TO MOVE'}</span><span>3D EQUIPMENT / ORBIT VIEW</span></div>
           <div className="arena-canvas">
             <Canvas shadows dpr={[1, 1.4]} camera={{ position: [3.2, 2.85, 5.7], fov: 38, near: 0.1, far: 60 }} gl={{ antialias: true, powerPreference: 'low-power' }} onCreated={() => setSceneReady(true)} fallback={<div className="arena-webgl-fallback">3D graphics are unavailable here. The movement instructions and session controls remain available below.</div>}>
               <TrainingRoom move={moveId} />
-              <Athlete key={moveId} move={moveId} running={running && !reducedMotion} tempo={tempo} loadKg={loadKg} onRep={countRep} />
+              <EquipmentMotion key={moveId} move={moveId} running={running && !reducedMotion} tempo={tempo} loadKg={loadKg} onRep={countRep} reducedMotion={reducedMotion} />
               <CameraDirector mode={cameraMode} />
             </Canvas>
           </div>
-          <div className="arena-stage-bottom"><span>{sceneReady ? 'SCENE READY' : 'LOADING SCENE'}</span><span>DRAG TO ORBIT · SCROLL TO ZOOM</span><span>FORM / {String(MOVES.findIndex((move) => move.id === moveId) + 1).padStart(2, '0')}</span></div>
+          <div className="arena-stage-bottom"><span>{sceneReady ? 'SCENE READY' : 'LOADING SCENE'}</span><span>DRAG TO ORBIT · SCROLL TO ZOOM</span><span>OBJECT / {String(MOVES.findIndex((move) => move.id === moveId) + 1).padStart(2, '0')}</span></div>
           <div className="arena-camera-controls" role="group" aria-label="3D camera position">
             <span>CAMERA</span>
             {([{ id: 'front', label: 'FRONT' }, { id: 'three-quarter', label: '3/4 VIEW' }, { id: 'side', label: 'SIDE' }] as const).map((camera) => <button type="button" key={camera.id} className={cameraMode === camera.id ? 'is-active' : ''} aria-pressed={cameraMode === camera.id} onClick={() => setCameraMode(camera.id)}>{camera.label}</button>)}
@@ -426,7 +445,7 @@ export function WorkoutArena({ launchRequest = null }: { launchRequest?: StudioL
               <button type="button" className={trackingMode === 'manual' ? 'is-active' : ''} aria-pressed={trackingMode === 'manual'} onClick={() => changeTrackingMode('manual')}>TRAIN / LOG MY REPS</button>
               <button type="button" className={trackingMode === 'follow-along' ? 'is-active' : ''} aria-pressed={trackingMode === 'follow-along'} disabled={reducedMotion} onClick={() => changeTrackingMode('follow-along')}>FOLLOW ALONG / AUTO</button>
             </div>
-            <p>{trackingMode === 'manual' ? 'Train in the real world and tap LOG REP after each rep you complete. This app does not track your body.' : 'Each complete avatar cycle counts as a demo cycle, not a physical repetition. Switch to manual mode to record your own reps.'}</p>
+            <p>{trackingMode === 'manual' ? 'Train in the real world and tap LOG REP after each rep you complete. This app does not track your body.' : 'Each complete equipment animation cycle counts as a demo cycle, not a physical repetition. Switch to manual mode to record your own reps.'}</p>
           </div>
           <div className="arena-session-buttons">
             <button className="arena-primary-control" type="button" disabled={(!running && setsCompleted >= setCount) || resting} onClick={() => {
@@ -437,7 +456,7 @@ export function WorkoutArena({ launchRequest = null }: { launchRequest?: StudioL
             <button className="arena-secondary-control" type="button" onClick={resetSession}>RESET <span aria-hidden="true">↺</span></button>
           </div>
           <button className="arena-log-rep" type="button" disabled={trackingMode !== 'manual' || !running || reps >= current.targetReps} onClick={logCompletedRep}>
-            {trackingMode === 'manual' ? reps >= current.targetReps ? 'SET TARGET REACHED' : 'LOG ONE COMPLETED REP' : 'AUTO-COUNTING AVATAR CYCLES'}
+            {trackingMode === 'manual' ? reps >= current.targetReps ? 'SET TARGET REACHED' : 'LOG ONE COMPLETED REP' : 'AUTO-COUNTING OBJECT CYCLES'}
             <span aria-hidden="true">{trackingMode === 'manual' ? '+1' : '↻'}</span>
           </button>
           <div className="arena-rest-panel">
@@ -446,9 +465,9 @@ export function WorkoutArena({ launchRequest = null }: { launchRequest?: StudioL
             <button type="button" onClick={startRest} disabled={resting || setsCompleted >= setCount}>START REST</button>
             {resting && <button type="button" onClick={skipRest}>SKIP REST</button>}
           </div>
-          <p className="arena-session-state" role="status">{resting ? 'Rest timer is running. Your active-work timer and demonstration are paused.' : reducedMotion && running ? 'Reduced motion is enabled. The scene stays still, but you can continue the timer and log each rep manually.' : setsCompleted >= setCount ? (sessionSaved ? 'SET TARGET COMPLETE. SESSION SAVED IN THIS BROWSER.' : 'SET TARGET COMPLETE. FINISHING YOUR LOCAL SESSION RECORD…') : reps >= current.targetReps ? 'SET COMPLETE. Recover as needed, then start the next set or run a timed rest.' : running && trackingMode === 'manual' ? 'Training timer is running. Tap LOG ONE COMPLETED REP after you perform each rep yourself.' : running ? 'Follow-along is running. Each complete avatar cycle counts as a demo cycle, not a body-tracked rep.' : totalReps > 0 ? totalReps + ' TOTAL ' + (trackingMode === 'manual' ? 'REPS LOGGED' : 'DEMO CYCLES') + '. Resume this set when ready.' : 'Paused. Choose your tracking mode, then start the session.'}</p>
+          <p className="arena-session-state" role="status">{resting ? 'Rest timer is running. Your active-work timer and demonstration are paused.' : reducedMotion && running ? 'Reduced motion is enabled. The scene stays still, but you can continue the timer and log each rep manually.' : setsCompleted >= setCount ? (sessionSaved ? 'SET TARGET COMPLETE. SESSION SAVED IN THIS BROWSER.' : 'SET TARGET COMPLETE. FINISHING YOUR LOCAL SESSION RECORD…') : reps >= current.targetReps ? 'SET COMPLETE. Recover as needed, then start the next set or run a timed rest.' : running && trackingMode === 'manual' ? 'Training timer is running. Tap LOG ONE COMPLETED REP after you perform each rep yourself.' : running ? 'Follow-along is running. Each complete equipment animation cycle counts as a demo cycle, not a body-tracked rep.' : totalReps > 0 ? totalReps + ' TOTAL ' + (trackingMode === 'manual' ? 'REPS LOGGED' : 'DEMO CYCLES') + '. Resume this set when ready.' : 'Paused. Choose your tracking mode, then start the session.'}</p>
           <div className={showCue ? 'arena-form-card is-visible' : 'arena-form-card'} aria-live="polite">
-            <div><span>FORM GUIDE</span><span>{current.prescription.replace(/^3 ×/, String(setCount) + ' ×')}</span></div>
+            <div><span>MOVEMENT GUIDE</span><span>{current.prescription.replace(/^3 ×/, String(setCount) + ' ×')}</span></div>
             <h4>{current.tempo}</h4>
             <p>{current.cue}</p>
           </div>
