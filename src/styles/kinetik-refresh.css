@@ -279,7 +279,7 @@
 .home-capability-link { display: flex; align-items: center; gap: 10px; margin-top: auto; color: #d6ff3d; font-size: 8px; font-weight: 800; letter-spacing: .12em; }
 .home-capability-link b { font-size: 15px; }
 
-..site-header { background: color-mix(in srgb, var(--bg) 90%, transparent); color: var(--ink); border-bottom-color: var(--line); }
+ .site-header { background: color-mix(in srgb, var(--bg) 90%, transparent); color: var(--ink); border-bottom-color: var(--line); }
 .brand-mark { border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); }
 .header-cta { border-radius: 999px; }
 .button { border-radius: 999px; }
@@ -293,7 +293,7 @@
 .arena-primary-control { border-color: #d6ff3d; background: #d6ff3d; color: #0a0b0d; }
 .arena-camera-controls button { border-radius: 999px; }
 .arena-movement-picker > button.is-active { border-radius: 10px; }
-..site-footer { background: var(--panel); color: var(--ink); border-color: var(--line); }
+ .site-footer { background: var(--panel); color: var(--ink); border-color: var(--line); }
 
 @media (max-width: 1080px) {
   .home-hero-grid { grid-template-columns: minmax(0, 1fr) minmax(350px, .9fr); gap: 30px; }
