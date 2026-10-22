@@ -1,14 +1,13 @@
-# Asset credits and licensing
+# Asset credits and policy
 
-## Current project assets
+The fitness photography is delivered from Unsplash's image CDN. Image URLs are defined in src/App.tsx and are requested using crop/size query parameters to avoid loading source-size originals. The page needs an internet connection for these remote photos.
 
-- **3D workout scene:** equipment-only barbell, dumbbell, weight-plate, orbit-ring, gym-room, rack and planner geometry is authored in this repository with Three.js / React Three Fiber. There is no 3D human/character model, external GLB/GLTF, HDRI, texture pack or captured animation bundled.
-- **Fitness UI artwork:** CSS and inline SVG authored in this repository.
-- **Photo backgrounds and gallery images:** referenced from images.unsplash.com at runtime; no photo binaries are copied into this repository. The page links to [Unsplash's license](https://unsplash.com/license).
-- **Fonts:** Space Grotesk and Barlow Condensed are loaded from Google Fonts when network access is available. Local/system fallbacks are configured. The font files are not bundled in the repository.
-- **Fitness exercise descriptions:** short, hand-written starter copy maintained in source code; not copied from the reference websites.
-- **Reference websites:** WTF Gyms, Freeletics, Fitness.com, Thor Fitness Builder, Lusion, Bruno Simon, Immersive Garden, and Wild Interactive are research references only. Their logos, imagery, copy, code, and model assets are not included.
+- Gym interior hero and closing image: Unsplash image ID photo-1534438327276-14e5300c3a48.
+- Strength-training program image: Unsplash image ID photo-1583454110551-21f2fa2afe61.
+- Conditioning program image: Unsplash image ID photo-1538805060514-97d9cc17730c.
+- Mobility/recovery program image: Unsplash image ID photo-1518611012118-696072aa579a.
+- Nutrition/recovery section image: Unsplash image ID photo-1490645935967-10de6ba17061.
 
-## License review
+Find photography and review applicable attribution and license details at https://unsplash.com/. These CDN URLs are third-party dependencies and may change or become unavailable; replace them with licensed local assets for a fully self-contained production deployment.
 
-The 3D models are procedural project-authored geometry. Photographs are externally served from Unsplash and are not bundled locally; their availability and licensing are subject to Unsplash's terms. Review the terms before changing image providers or downloading external assets. A public URL alone is not permission to reuse an arbitrary asset.
+The animated 3D equipment sculpture, interface icons, orbit rings, procedural materials, and CSS art are generated directly in this project. No external 3D human model, motion capture, or character animation asset is included.

@@ -1,57 +1,46 @@
 # Implementation notes
 
-## Product and stack
+## Application structure
 
-KINETIK is an original, local-first fitness experience built with React, TypeScript, Vite, Three.js, React Three Fiber, Drei and Framer Motion. It is an independent concept; it is not the official product of any gym chain and is not an operating gym or medical service.
+- src/App.tsx composes the new responsive experience, section data, accessible navigation, local progress check-ins, FAQ accordion, and rule-based plan builder.
+- src/components/KineticObject.tsx builds an equipment-inspired object from Three.js geometry and materials. It contains no people or humanoid meshes, and uses an IntersectionObserver to delay WebGL setup until it is close to the viewport.
+- src/styles.css owns the responsive visual system, image overlays, type scale, page transitions, 3D CSS motifs, cards, form states, and reduced-motion fallbacks.
+- src/main.tsx is the React mount point.
+- scripts/verify-build.mjs checks the production HTML, emitted assets, expected section anchors, manifest, and 3D component.
+- scripts/browser-smoke.mjs exercises the plan generator, local progress control, FAQ, canvas loading, mobile navigation, page width, and captures screenshots in CI.
 
-## Main application
+## Page sections
 
-- **Application shell:** responsive section navigation, light/dark theme preference, a Ctrl/Command+K command palette wired to valid section IDs, share action, keyboard skip link, reduced-motion configuration and a semantic document structure.
-- **Image-led landing experience:** a photographic hero, four photo-backed training-path cards, a cinematic studio interlude, feature cards, a gallery and a closing CTA establish the visual story before the detailed tools. Unsplash images are referenced remotely rather than copied into the repository; the site links to the Unsplash license information.
-- **3D motion lab:** an equipment-only procedural Three.js scene uses a barbell, adjustable dumbbells, plate geometry and orbit rings. It has studio lighting, a rack, floor grid, contact shadows, orbit controls and front/side/three-quarter views. Users can pick a movement focus, adjust animation tempo and displayed load, start/pause the session timer, and follow movement guidance in HTML. It contains no 3D human or avatar model, and its plate sizing is illustrative—not a physical load estimate.
-- **Rep tracking modes:** manual training mode accepts explicit rep logging from the user and pauses at the selected movement's rep target; follow-along mode instead counts completed animation cycles. The interface labels these separately because the site does not use a camera or motion tracking to observe a user's body. Session history records the selected dumbbell load for weighted exercises and marks bodyweight movements separately.
-- **Session history:** completing the selected set target saves the exercise, tracking mode, counted reps/cycles, elapsed time, and tempo to browser-local storage. Users can choose two to five sets per movement; the prescription and save threshold follow that setting. Only the five most recent session records are retained and displayed.
-- **Workout planner:** transparent, browser-side rule-based programming using goal, level, equipment, location, intensity, time, days available and avoided-movement preferences. Compatible planned movements provide an explicit handoff into the primary 3D arena; the arena resets its session state and loads the selected pose.
-- **Workout templates:** up to eight named preference sets can be saved, loaded and deleted in browser-local storage. A loaded template regenerates its sessions from the current exercise catalogue and rules; it does not store a custom reordered routine.
-- **Workout execution:** start/pause, previous/next movement, rest timer, substitution where available, finish/cancel and completed session recording.
-- **Exercise library:** authored starter data can be searched across names, focus, equipment and guidance; filtered by category, primary muscle, equipment, difficulty and movement pattern; and sorted by name or session length. Expanded details include technique steps, common mistakes, secondary muscles and related movement alternatives. It is still a curated starter library without filmed demonstrations.
-- **Progress dashboard:** displays values computed from the recent locally saved completion records, including session count, movement count, assigned plan minutes and a five-week activity chart. The history is capped at twelve records; planned minutes are not measured time.
-- **Gym discovery:** a searchable directory of six explicitly labeled KINETIK sample venue concepts in Hyderabad, Bengaluru and Chennai, filterable by city and training focus. No live business, address, hours, price, map, or availability feed is connected.
-- **Gym designer:** one shared layout state powers a 1 m-snapped 2D floor plan and procedural 3D room scene. Fifteen equipment types have authored procedural shapes. Users can select, drag in 3D, precisely reposition, rotate, duplicate and delete items; overlapping or out-of-bounds placements are blocked. Room width, length and height, selectable rubber/concrete/wood floor finishes, chalk/sage/graphite wall tones, reset/top/front/side/focus camera presets, basic spacing summaries, undo/redo, local autosave, explicit local save/load, JSON import/export, 2D PNG export, and 3D preview PNG export are provided.
-- **First-session enquiry:** a validated local-only form can include a selected sample gym concept and prepare a copyable request. It does not submit to a service, send email, accept payment, or make a reservation.
+1. Hero / landing
+2. Repeating brand strip
+3. Training principles
+4. Strength, conditioning, mobility
+5. Interactive 3D motion lab
+6. Plan / train / recover
+7. Nutrition and recovery
+8. Sample weekly rhythm
+9. Browser-local consistency tracker
+10. Browser-local starter plan builder
+11. FAQ
+12. Closing call to action and footer
 
-## Data and privacy behavior
+## Interaction model
 
-Training templates, plan completion markers, 3D session history, theme preference and gym layouts use browser-local storage. They are not synchronized across devices or users. The enquiry request only exists in page state until the user copies it. There is no configured account system, server database, booking API, map provider, hosted AI model, or gym inventory integration.
+- Navigation is anchor-based and works without a client-side router.
+- Mobile navigation closes after a link is chosen and on Escape.
+- The motion lab uses orbit controls for pointer/touch rotation. The object is built with cylinders, torus rings, and small polyhedra; animation respects reduced-motion settings.
+- The weekly tracker logs chosen days in local storage under the key for the current week. The reset control clears those check-ins.
+- The starter plan is selected using three form inputs. A small explicit local rule map produces an example plan and stores it in local storage when possible.
+- Data stays in the browser. There is no API or server-side persistence.
 
-## Asset policy
+## Performance and accessibility
 
-The 3D stage, room, rack, barbells, dumbbells, plates, orbit geometry and gym-planner equipment are generated from project-authored geometry and materials; no third-party GLB/GLTF model or captured human animation is bundled. See [ASSET-CREDITS.md](./ASSET-CREDITS.md) for imagery sources and licensing.
+- Content images use lazy loading except for the hero image.
+- The 3D canvas mounts when near the viewport and caps device pixel ratio at 1.5.
+- Native links, radio buttons, select controls, buttons, semantic headings, visible keyboard focus, a skip link, and aria-live plan output support accessible interaction.
+- Framer Motion section reveals and CSS animations respect reduced-motion preferences.
+- CI builds the project and runs a Playwright smoke test against the production preview.
 
-## Local development
+## Limits
 
-- Node.js 20 or newer.
-- Install packages with `npm install`.
-- Start the development server with `npm run dev`.
-- Type-check with `npm run typecheck`.
-- Produce a production build and run the artifact smoke check with `npm run check`.
-- Preview built output with `npm run preview`.
-
-The GitHub Actions workflow on `main` runs the build/smoke-check workflow and publishes the static site to GitHub Pages.
-
-## Known limitations
-
-- All venue entries are sample concepts and must not be interpreted as real gyms.
-- Training recommendations are deterministic rules, not an AI coach or individualized medical advice.
-- The 3D stage animates equipment and geometry only; it does not show or analyze a human body. It is not an exercise biomechanics simulator, medical tool, or automated form-tracking system. In manual mode, rep counts are entered by the user and are not independently verified. In follow-along mode, the counter measures equipment animation cycles only; it does not observe physical repetitions.
-- Exercise coverage is curated starter content; there are no licensed demonstration videos, clinical claims, meal logging, or nutrition database.
-- Gym dimensions and equipment footprints are visual planning estimates, not architectural, building-code, accessibility, fire-safety, manufacturer-clearance or professional fit-out certification.
-- Saved layouts (including room finish settings), templates and session history live in the current browser only.
-- Enquiries do not reach a business. No booking, payment, or membership purchase is completed.
-- A successful build does not substitute for browser testing on physical devices. Browser automation/screenshot inspection must be run in an environment where those tools are available.
-
-## Engineering notes
-
-- Keep all active development on `main` for this repository workflow.
-- Do not add a `CLAUDE.md` file or require one for setup.
-- Preserve the shared typed data models and keep WebGL-specific UI optional rather than making it the only way to access core content.
+This is a fitness concept, not an operating gym. The week is illustrative rather than a real class schedule. The starter builder follows fixed rules rather than AI inference. No booking, payment, gym inventory, hosted coach, camera-based motion tracking, medical advice, accounts, or cloud synchronization are connected.

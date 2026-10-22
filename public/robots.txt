@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-
 Sitemap: https://mahitech580.github.io/3D-fitness-website/sitemap.xml

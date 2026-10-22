@@ -1,18 +1,18 @@
 {
-  "name": "KINETIK — Train with intent",
+  "name": "KINETIK — Move with intent",
   "short_name": "KINETIK",
-  "description": "A fitness discovery and planning experience.",
+  "description": "An intentional fitness concept with image-led storytelling and interactive 3D motion.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#101411",
-  "theme_color": "#101411",
+  "background_color": "#090c09",
+  "theme_color": "#090c09",
   "icons": [
     {
       "src": "./favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }

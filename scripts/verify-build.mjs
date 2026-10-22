@@ -10,7 +10,7 @@ const check = async (relativePath) => {
 
 const html = await readFile(path.join(root, 'index.html'), 'utf8').catch(() => '');
 if (!html) failures.push('Production index.html is missing or empty.');
-if (!/<title>KINETIK — Train with intent<\/title>/.test(html)) failures.push('Production page title is missing or outdated.');
+if (!/<title>KINETIK — Move with intent<\/title>/.test(html)) failures.push('Production page title is missing or outdated.');
 if (!/<meta\s+name="description"/.test(html)) failures.push('Search description is missing.');
 if (!/name="theme-color"/.test(html)) failures.push('Browser theme color is missing.');
 if (!/id="root"/.test(html)) failures.push('React mount target is missing.');
@@ -22,64 +22,27 @@ if (!assets.some((name) => /\.js$/.test(name))) failures.push('No JavaScript ass
 if (!assets.some((name) => /\.css$/.test(name))) failures.push('No CSS asset was emitted.');
 const scripts = await Promise.all(assets.filter((name) => /\.js$/.test(name)).map((name) => readFile(path.join(assetDir, name), 'utf8')));
 const bundleText = scripts.join('\n');
-for (const featureText of ['BUILD MY WEEK', 'MARK SESSION DONE', 'ROTATE 90°', 'PREPARE MY REQUEST', 'VIEW CONCEPT DETAILS', 'SAVE TEMPLATE', 'WEEKLY SESSION HISTORY', 'FOCUS SELECTED', 'FLOOR FINISH', 'COMMON MISTAKES', 'RELATED MOVEMENTS', 'GYM CONCEPTS', 'PROGRAMS FOR', 'LESS NOISE.', 'Equipment.', 'KINETIK / MOTION LAB', 'START SESSION', 'START NEXT SET', 'CHOOSE MOVEMENT', 'SET TARGET COMPLETE', 'REPS / SET', 'REP TRACKING MODE', 'LOG ONE COMPLETED REP', 'LOCAL TRAINING HISTORY', 'FOLLOW ALONG / AUTO', 'SESSION SAVED IN THIS BROWSER', 'REST LENGTH', 'START REST', 'TRAIN / LOG MY REPS', 'SETS PER MOVEMENT', 'DUMBBELL LOAD / HAND', 'OPEN IN 3D STUDIO']) {
-  if (!bundleText.includes(featureText)) failures.push('Expected interactive feature text was not found in the production JS: ' + featureText);
+for (const featureText of ['MOVE WITH', 'INTENT.', 'CHOOSE YOUR LANE', 'FORM MEETS', 'YOUR WEEK, YOUR PACE', 'Build my starter plan', 'INTERACTIVE SCENE', 'Does the motion lab track my real repetitions?']) {
+  if (!bundleText.includes(featureText)) failures.push('Expected experience text was not found in the production JS: ' + featureText);
 }
 for (const asset of ['favicon.svg', 'site.webmanifest', 'robots.txt', 'sitemap.xml', '404.html']) await check(asset);
 
-// Guard the app's keyboard-accessible command palette against stale section anchors.
-const sourcePaths = [
-  'src/App.tsx',
-  'src/components/LandingHero.tsx',
-  'src/components/BrandSections.tsx',
-  'src/components/WorkoutArena.tsx',
-  'src/components/WorkoutBuilder.tsx',
-  'src/components/ExerciseLibrary.tsx',
-  'src/components/GymDiscovery.tsx',
-  'src/components/GymPlanner.tsx',
-  'src/components/TrialBooking.tsx',
-  'src/components/CommandPalette.tsx',
-];
-const sourceContents = await Promise.all(sourcePaths.map((relativePath) =>
-  readFile(path.resolve(relativePath), 'utf8').catch(() => {
-    failures.push('Could not read source needed for navigation verification: ' + relativePath);
-    return '';
-  }),
-));
-const appSource = sourceContents[0];
-const arenaIndex = appSource.indexOf('<WorkoutArena');
-const plannerIndex = appSource.indexOf('<WorkoutBuilder');
-if (arenaIndex < 0) failures.push('The primary 3D WorkoutArena is not mounted in the application.');
-if (plannerIndex >= 0 && arenaIndex > plannerIndex) failures.push('The equipment motion lab must render before the workout-plan builder.');
-for (const section of ['<LandingHero', '<BrandMarquee', '<ProgramShowcase', '<StudioCulture', '<FitnessGallery', '<ClosingCTA']) {
-  if (!appSource.includes(section)) failures.push('The multi-section fitness experience is missing: ' + section);
+const appSource = await readFile(path.resolve('src/App.tsx'), 'utf8').catch(() => '');
+const sceneSource = await readFile(path.resolve('src/components/KineticObject.tsx'), 'utf8').catch(() => '');
+const styles = await readFile(path.resolve('src/styles.css'), 'utf8').catch(() => '');
+for (const sectionId of ['home', 'method', 'programs', 'experience', 'rhythm', 'progress', 'start', 'faq']) {
+  if (!appSource.includes('id="' + sectionId + '"')) failures.push('Missing expected section anchor: #' + sectionId);
 }
-const arenaSource = sourceContents[3];
-if (/function Athlete\s*\(|<Athlete\b|articulated athlete|3D athlete/.test(arenaSource)) failures.push('The 3D character model must be removed; the motion stage should use equipment only.');
-if (!arenaSource.includes('function EquipmentMotion(') || !arenaSource.includes('function Barbell(')) failures.push('The equipment-only 3D motion scene is not mounted in source.');
-if (appSource.includes('FitnessScene') || appSource.includes('className="hero-section"')) {
-  failures.push('The old marketing hero should not replace the primary 3D workout experience.');
-}
-const builderSource = sourceContents[2];
-if (!builderSource.includes("'db-press': 'press'")) {
-  failures.push('Workout planner does not map the dumbbell press to the 3D overhead-press movement.');
-}
-const sectionIds = new Set();
-for (const source of sourceContents.slice(0, -1)) {
-  for (const match of source.matchAll(/<section\b[^>]*\bid=["']([^"']+)["']/gs)) sectionIds.add(match[1]);
-}
-const paletteSource = sourceContents[sourceContents.length - 1];
-const commandTargetIds = [...paletteSource.matchAll(/\{\s*id:\s*'([^']+)'/g)].map((match) => match[1]);
-for (const targetId of commandTargetIds) {
-  if (!sectionIds.has(targetId)) failures.push('Command palette target does not match a section anchor: #' + targetId);
-}
-if (!commandTargetIds.includes('gyms')) failures.push('Command palette is missing the gym discovery section.');
+if (!appSource.includes('id="main-content"')) failures.push('Skip-link target is missing.');
+if (!sceneSource.includes('<Canvas') || !sceneSource.includes('OrbitControls')) failures.push('The interactive 3D scene or orbit controls are missing.');
+if (/SkinnedMesh|SkeletonUtils|humanoid|human model/i.test(sceneSource)) failures.push('The 3D scene should not contain a human character model.');
+if (!styles.includes('prefers-reduced-motion')) failures.push('Reduced-motion styles are missing.');
 
 const manifest = await readFile(path.join(root, 'site.webmanifest'), 'utf8').catch(() => '');
 if (manifest) {
   try {
     const data = JSON.parse(manifest);
-    if (data.name !== 'KINETIK — Train with intent') failures.push('Web manifest name does not match the site.');
+    if (data.name !== 'KINETIK — Move with intent') failures.push('Web manifest name does not match the site.');
     if (data.start_url !== './') failures.push('Web manifest start URL must stay relative for project Pages.');
   } catch { failures.push('Web manifest is not valid JSON.'); }
 }
@@ -91,5 +54,5 @@ if (failures.length) {
   for (const failure of failures) console.error(' - ' + failure);
   process.exitCode = 1;
 } else {
-  console.log('Production build verified: ' + assets.filter((name) => /\.(js|css)$/.test(name)).length + ' JS/CSS assets and required Pages metadata are present.');
+  console.log('Production build verified: ' + assets.filter((name) => /\.(js|css)$/.test(name)).length + ' JS/CSS assets, page anchors, 3D component and Pages metadata are present.');
 }

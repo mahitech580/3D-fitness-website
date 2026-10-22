@@ -1,100 +1,615 @@
-import { useEffect, useState } from 'react';
-import { MotionConfig } from 'framer-motion';
-import { ScrollProgress } from './components/ScrollProgress';
-import { WorkoutArena, type MoveId } from './components/WorkoutArena';
-import { WorkoutBuilder } from './components/WorkoutBuilder';
-import { ExerciseLibrary } from './components/ExerciseLibrary';
-import { GymPlanner } from './components/GymPlanner';
-import { TrialBooking } from './components/TrialBooking';
-import { CommandPalette } from './components/CommandPalette';
-import { ShareSiteButton } from './components/ShareSiteButton';
-import { GymDiscovery } from './components/GymDiscovery';
-import { BrandMarquee, ProgramShowcase, StudioCulture, FitnessGallery, ClosingCTA } from './components/BrandSections';
-import { LandingHero } from './components/LandingHero';
-import './styles/kinetik-refresh.css';
+import { Suspense, lazy, useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { MotionConfig, motion, useReducedMotion } from 'framer-motion';
 
-const navigation = [
-  { href: '#programs', label: 'PROGRAMS' },
-  { href: '#arena', label: '3D STUDIO' },
-  { href: '#training', label: 'TRAINING PLAN' },
-  { href: '#library', label: 'MOVEMENTS' },
-  { href: '#space', label: 'GYM DESIGN' },
-  { href: '#start', label: 'GET STARTED' },
+const KineticObject = lazy(() => import('./components/KineticObject'));
+
+const photos = {
+  hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2400&q=88',
+  strength: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=1100&q=84',
+  conditioning: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=1100&q=84',
+  mobility: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1100&q=84',
+  nutrition: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1600&q=84',
+};
+
+const navLinks = [
+  { label: 'Approach', href: '#method' },
+  { label: 'Programs', href: '#programs' },
+  { label: 'Motion lab', href: '#experience' },
+  { label: 'Weekly rhythm', href: '#rhythm' },
 ];
 
-export function App() {
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    try { return window.localStorage.getItem('kinetik-theme') === 'light' ? 'light' : 'dark'; }
-    catch { return 'dark'; }
-  });
+const programs = [
+  {
+    number: '01',
+    title: 'Strength / Build',
+    text: 'Progressive, purposeful sessions built around the basics: move well, add load slowly, and get stronger over time.',
+    image: photos.strength,
+    alt: 'Strength training equipment in a focused gym environment',
+    tag: 'FOUNDATION',
+    duration: '40–60 MIN',
+  },
+  {
+    number: '02',
+    title: 'Conditioning / Engine',
+    text: 'Intervals, carries, and smart effort that help build work capacity without turning every session into a race.',
+    image: photos.conditioning,
+    alt: 'Athlete training outdoors during a conditioning session',
+    tag: 'CAPACITY',
+    duration: '25–45 MIN',
+  },
+  {
+    number: '03',
+    title: 'Mobility / Restore',
+    text: 'Controlled movement and recovery work to keep your routine sustainable on the days between hard sessions.',
+    image: photos.mobility,
+    alt: 'Person moving through a controlled stretching routine',
+    tag: 'RECOVERY',
+    duration: '15–30 MIN',
+  },
+];
+
+const weeklyPlan = [
+  { day: 'MON', name: 'Lower-body strength', detail: 'Squat pattern · hinge · core', type: 'STRENGTH' },
+  { day: 'TUE', name: 'Engine work', detail: 'Intervals · steady pace · breathe', type: 'CONDITIONING' },
+  { day: 'WED', name: 'Mobility reset', detail: 'Hips · upper back · ankles', type: 'RECOVERY' },
+  { day: 'THU', name: 'Upper-body strength', detail: 'Push · pull · carry', type: 'STRENGTH' },
+  { day: 'FRI', name: 'Mixed capacity', detail: 'Simple circuit · repeatable effort', type: 'HYBRID' },
+  { day: 'SAT', name: 'Move for fun', detail: 'Walk · ride · play · explore', type: 'OPTIONAL' },
+  { day: 'SUN', name: 'Full rest', detail: 'Sleep · food · reset for Monday', type: 'RECOVER' },
+];
+
+const faqs = [
+  {
+    question: 'Is KINETIK suitable if I am new to training?',
+    answer: 'Yes. Start with a manageable level, choose movements you can perform with control, and increase difficulty gradually. The sample plans are educational starting points, not personal medical advice.',
+  },
+  {
+    question: 'Do I need a full gym?',
+    answer: 'No. You can adapt the examples to bodyweight, a pair of dumbbells, or a fully equipped gym. Choose equipment you actually have before you build your starting template.',
+  },
+  {
+    question: 'Does the motion lab track my real repetitions?',
+    answer: 'No camera-based body tracking is used. The motion lab is an interactive 3D object experience; any session notes you mark are entered by you and stay in this browser.',
+  },
+  {
+    question: 'Are the plans generated by an AI coach?',
+    answer: 'No. The starter plan uses a small set of transparent, browser-side rules. It does not call a hosted AI model or replace qualified coaching.',
+  },
+];
+
+type PlanResult = {
+  title: string;
+  meta: string;
+  moves: string[];
+};
+
+const goalLabels: Record<string, string> = {
+  strength: 'Strength foundation',
+  conditioning: 'Conditioning base',
+  mobility: 'Mobility reset',
+};
+
+const planTemplates: Record<string, string[]> = {
+  strength: [
+    'Goblet squat — 3 sets × 8 reps',
+    'Dumbbell floor press — 3 sets × 10 reps',
+    'Romanian deadlift — 3 sets × 10 reps',
+    'Suitcase carry — 3 × 30 seconds per side',
+  ],
+  conditioning: [
+    'Easy warm-up — 5 minutes',
+    'Bike or brisk-walk intervals — 6 rounds',
+    'Farmer carry — 4 × 30 seconds',
+    'Easy cool-down — 4 minutes',
+  ],
+  mobility: [
+    '90/90 hip switches — 2 × 8 per side',
+    'Thoracic rotations — 2 × 8 per side',
+    'Supported deep-squat hold — 3 × 20 seconds',
+    'Slow breathing reset — 3 minutes',
+  ],
+};
+
+function weeklyStorageKey() {
+  const monday = new Date();
+  monday.setHours(0, 0, 0, 0);
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  return 'kinetik-week-' + monday.getFullYear() + '-' + String(monday.getMonth() + 1).padStart(2, '0') + '-' + String(monday.getDate()).padStart(2, '0');
+}
+
+function loadCheckins(): string[] {
+  try {
+    const saved = window.localStorage.getItem(weeklyStorageKey());
+    if (!saved) return [];
+    const value: unknown = JSON.parse(saved);
+    return Array.isArray(value) ? value.filter((day): day is string => typeof day === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; delay?: number; className?: string }) {
+  const reducedMotion = useReducedMotion();
+  return (
+    <motion.div
+      className={className}
+      initial={reducedMotion ? false : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.14 }}
+      transition={{ duration: reducedMotion ? 0 : 0.62, delay, ease: 'easeOut' }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function Eyebrow({ children, light = false }: { children: ReactNode; light?: boolean }) {
+  return <p className={'eyebrow' + (light ? ' eyebrow--light' : '')}><span className="eyebrow-mark" aria-hidden="true" />{children}</p>;
+}
+
+function Arrow() {
+  return <span className="arrow-glyph" aria-hidden="true">↗</span>;
+}
+
+function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [selectedGym, setSelectedGym] = useState('');
-  const [studioLaunch, setStudioLaunch] = useState<{ moveId: MoveId; requestId: number } | null>(null);
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    try { window.localStorage.setItem('kinetik-theme', theme); } catch { /* Storage may be disabled. */ }
-  }, [theme]);
-
-  useEffect(() => {
-    function handleEscape(event: KeyboardEvent) {
+    const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setMenuOpen(false);
-    }
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
   }, []);
 
-  function startInStudio(moveId: MoveId) {
-    setStudioLaunch((current) => ({ moveId, requestId: (current?.requestId ?? 0) + 1 }));
-    window.location.hash = 'arena';
-    window.requestAnimationFrame(() => {
-      document.getElementById('arena')?.scrollIntoView({
-        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-        block: 'start',
-      });
+  return (
+    <header className="site-header">
+      <a className="brand" href="#home" aria-label="KINETIK home">
+        <span className="brand-symbol" aria-hidden="true"><span /><span /><span /></span>
+        <span className="brand-wordmark">KINETIK<span className="brand-dot">.</span><small>TRAINING / CULTURE</small></span>
+      </a>
+      <nav className={'main-nav' + (menuOpen ? ' main-nav--open' : '')} id="main-navigation" aria-label="Main navigation">
+        {navLinks.map((link) => (
+          <a href={link.href} key={link.href} onClick={() => setMenuOpen(false)}>{link.label}</a>
+        ))}
+        <a className="nav-mobile-cta" href="#start" onClick={() => setMenuOpen(false)}>Build a plan <Arrow /></a>
+      </nav>
+      <a className="header-cta" href="#start">Start here <Arrow /></a>
+      <button className="menu-toggle" type="button" aria-controls="main-navigation" aria-expanded={menuOpen} aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'} onClick={() => setMenuOpen((open) => !open)}>
+        <span /><span />
+      </button>
+    </header>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="hero" id="home" aria-labelledby="hero-title">
+      <div className="hero-photo" aria-hidden="true">
+        <img src={photos.hero} alt="" fetchPriority="high" decoding="async" />
+      </div>
+      <div className="hero-shade" aria-hidden="true" />
+      <div className="hero-grid" aria-hidden="true" />
+      <div className="hero-orbit hero-orbit--one" aria-hidden="true" />
+      <div className="hero-orbit hero-orbit--two" aria-hidden="true" />
+      <div className="hero-object" aria-hidden="true">
+        <div className="hero-object-ring hero-object-ring--outer" />
+        <div className="hero-object-ring hero-object-ring--inner" />
+        <div className="hero-object-bar"><i /><b /><i /></div>
+        <span className="hero-object-glint" />
+      </div>
+      <div className="hero-content page-shell">
+        <div className="hero-copy">
+          <Eyebrow light>THE TRAINING EXPERIENCE / 001</Eyebrow>
+          <h1 id="hero-title">MOVE WITH<br /><em>INTENT.</em></h1>
+          <p className="hero-lede">Less noise. More purpose. A smarter way to build strength, condition your engine, and stay in motion.</p>
+          <div className="hero-actions">
+            <a className="button button--acid" href="#start">Build your plan <Arrow /></a>
+            <a className="text-link text-link--light" href="#experience"><span className="play-symbol" aria-hidden="true">▶</span> Explore the motion lab</a>
+          </div>
+          <div className="hero-proof">
+            <span className="proof-line" />
+            <p>MADE FOR THE WORK<br /><strong>NOT THE HYPE.</strong></p>
+          </div>
+        </div>
+        <div className="hero-caption">
+          <span className="caption-number">01 / 04</span>
+          <span>STRENGTH<br />CONDITIONING<br />RECOVERY</span>
+          <span className="caption-vertical">SCROLL TO EXPLORE ↓</span>
+        </div>
+      </div>
+      <div className="hero-bottom page-shell">
+        <span>TRAINING IS A PRACTICE</span>
+        <span className="hero-bottom-line" />
+        <span>SHOW UP / DO THE WORK / REPEAT</span>
+      </div>
+    </section>
+  );
+}
+
+function Ticker() {
+  const words = ['TRAIN WITH PURPOSE', 'BUILD YOUR ENGINE', 'RESPECT THE RESET', 'REPEAT THE PROCESS'];
+  return (
+    <div className="ticker" aria-label="Train with purpose, build your engine, respect the reset, repeat the process">
+      <div className="ticker-track" aria-hidden="true">
+        {[0, 1].map((copy) => (
+          <div className="ticker-group" key={copy}>
+            {words.map((word) => <span className="ticker-word" key={word + copy}>{word}<i>✳</i></span>)}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Intro() {
+  return (
+    <section className="intro-section section-pad" id="method">
+      <div className="page-shell intro-layout">
+        <Reveal className="intro-heading">
+          <Eyebrow>THE KINETIK APPROACH</Eyebrow>
+          <h2>YOUR BODY CAN DO<br />MORE THAN <em>YOU THINK.</em></h2>
+        </Reveal>
+        <Reveal className="intro-copy" delay={0.1}>
+          <p>Progress is rarely one dramatic moment. It is the result of good movement, repeatable effort, and enough recovery to come back again.</p>
+          <a className="text-link" href="#programs">Find your training lane <Arrow /></a>
+        </Reveal>
+      </div>
+      <div className="page-shell principle-grid">
+        <Reveal className="principle-card" delay={0.02}>
+          <span className="principle-number">01</span>
+          <span className="principle-icon" aria-hidden="true">↗</span>
+          <h3>Make it clear.</h3>
+          <p>Know the goal before the first rep. Keep the plan simple enough to repeat.</p>
+          <span className="principle-foot">INTENTION OVER RANDOMNESS</span>
+        </Reveal>
+        <Reveal className="principle-card" delay={0.1}>
+          <span className="principle-number">02</span>
+          <span className="principle-icon" aria-hidden="true">⌁</span>
+          <h3>Respect the reps.</h3>
+          <p>Good technique and steady progression will outlast short bursts of motivation.</p>
+          <span className="principle-foot">QUALITY OVER EGO</span>
+        </Reveal>
+        <Reveal className="principle-card" delay={0.18}>
+          <span className="principle-number">03</span>
+          <span className="principle-icon" aria-hidden="true">◌</span>
+          <h3>Recover on purpose.</h3>
+          <p>Sleep, food, and lighter days are part of the work—not a break from it.</p>
+          <span className="principle-foot">CONSISTENCY OVER CHAOS</span>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function Programs() {
+  return (
+    <section className="programs-section section-pad" id="programs">
+      <div className="page-shell">
+        <Reveal className="section-heading section-heading--split">
+          <div><Eyebrow>CHOOSE YOUR LANE / 02</Eyebrow><h2>TRAIN FOR<br /><em>WHAT'S NEXT.</em></h2></div>
+          <p>Different goals need different tools. Start with one focus, build the habit, then add complexity when you are ready.</p>
+        </Reveal>
+        <div className="program-grid">
+          {programs.map((program, index) => (
+            <Reveal className="program-card-wrap" delay={index * 0.08} key={program.number}>
+              <article className="program-card">
+                <div className="program-image">
+                  <img src={program.image} alt={program.alt} loading="lazy" decoding="async" />
+                  <span className="image-index">{program.number} / 03</span>
+                  <span className="program-tag">{program.tag}</span>
+                  <a className="image-arrow" href="#start" aria-label={'Build a plan for ' + program.title}><Arrow /></a>
+                </div>
+                <div className="program-content">
+                  <div className="program-title-row"><h3>{program.title}</h3><span>{program.duration}</span></div>
+                  <p>{program.text}</p>
+                  <a className="program-link" href="#start">MAKE THIS MY FOCUS <Arrow /></a>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+        <p className="section-note"><span className="note-star">✳</span> START WHERE YOU ARE. BUILD FROM THERE.</p>
+      </div>
+    </section>
+  );
+}
+
+function MotionLab() {
+  return (
+    <section className="motion-section section-pad" id="experience">
+      <div className="motion-grid-texture" aria-hidden="true" />
+      <div className="page-shell motion-layout">
+        <Reveal className="motion-copy">
+          <Eyebrow light>INTERACTIVE / 03</Eyebrow>
+          <h2>FORM MEETS<br /><em>MOTION.</em></h2>
+          <p className="motion-lede">A small 3D study of balance, tension, and momentum. No avatars. No gimmicks. Just a piece of motion you can explore.</p>
+          <div className="motion-points">
+            <div><span>01</span><p><strong>Drag to orbit</strong><br />Look at the object from another angle.</p></div>
+            <div><span>02</span><p><strong>Watch the details</strong><br />Metal, light, and movement change together.</p></div>
+            <div><span>03</span><p><strong>Built in real time</strong><br />Procedural geometry. No character model.</p></div>
+          </div>
+          <a className="text-link text-link--light" href="#rhythm">See how training fits together <Arrow /></a>
+        </Reveal>
+        <Reveal className="motion-stage" delay={0.12}>
+          <div className="motion-stage-top"><span>OBJECT STUDY / 001</span><span className="live-dot">LIVE SCENE</span></div>
+          <div className="motion-canvas-wrap">
+            <Suspense fallback={<div className="scene-fallback"><span className="scene-ring" /><span>BUILDING THE SCENE</span></div>}>
+              <KineticObject />
+            </Suspense>
+            <div className="scene-label scene-label--top">STEEL / 01</div>
+            <div className="scene-label scene-label--bottom">DRAG TO ROTATE ↗</div>
+          </div>
+          <div className="motion-stage-bottom"><span>GEOMETRY / LIGHT / ROTATION</span><span>45° / 360°</span></div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function MethodCards() {
+  return (
+    <section className="method-section section-pad">
+      <div className="page-shell">
+        <Reveal className="section-heading">
+          <Eyebrow>THE LOOP THAT LASTS</Eyebrow>
+          <h2>PLAN. TRAIN.<br /><em>REPEAT.</em></h2>
+          <p>Make the important decisions before motivation gets a vote.</p>
+        </Reveal>
+        <div className="loop-grid">
+          <Reveal delay={0.02}><article className="loop-card loop-card--plan"><span className="loop-mark">A / PLAN</span><div className="loop-art loop-art--plan" aria-hidden="true"><i /><i /><i /><b /></div><h3>Give effort a direction.</h3><p>Choose one goal, a realistic schedule, and the equipment you can access.</p><span className="loop-footer">MAKE A SIMPLE PROMISE</span></article></Reveal>
+          <Reveal delay={0.1}><article className="loop-card loop-card--train"><span className="loop-mark">B / TRAIN</span><div className="loop-art loop-art--train" aria-hidden="true"><i /><i /><b /></div><h3>Do the work in front of you.</h3><p>Record the sessions you complete. Keep the standard high and the ego low.</p><span className="loop-footer">STACK ONE SESSION</span></article></Reveal>
+          <Reveal delay={0.18}><article className="loop-card loop-card--recover"><span className="loop-mark">C / RESET</span><div className="loop-art loop-art--recover" aria-hidden="true"><i /><i /><i /></div><h3>Come back ready.</h3><p>Let recovery support your next session, not compete with it.</p><span className="loop-footer">RETURN WITH INTENT</span></article></Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NutritionSection() {
+  return (
+    <section className="fuel-section">
+      <div className="fuel-image"><img src={photos.nutrition} loading="lazy" decoding="async" alt="A colorful balanced spread of vegetables, grains, and nourishing food" /></div>
+      <div className="fuel-copy">
+        <Reveal>
+          <Eyebrow light>BEYOND THE SESSION / 04</Eyebrow>
+          <h2>STRONG IS<br />A <em>WHOLE-LIFE</em><br />PRACTICE.</h2>
+          <p>Training is one part of the system. Build a routine around meals that fuel you, sleep that restores you, and rest days you can respect.</p>
+          <div className="fuel-pill-row"><span>FUEL</span><span>SLEEP</span><span>RESET</span></div>
+          <a className="button button--outline-light" href="#faq">Read the essentials <Arrow /></a>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function WeeklyRhythm() {
+  return (
+    <section className="rhythm-section section-pad" id="rhythm">
+      <div className="page-shell">
+        <Reveal className="section-heading section-heading--split section-heading--dark">
+          <div><Eyebrow light>AN EXAMPLE, NOT A RULE</Eyebrow><h2>FIND YOUR<br /><em>WEEKLY RHYTHM.</em></h2></div>
+          <p>A balanced training week makes room for harder days, lighter days, and life. Use this sample as a starting point, then adjust it to your ability and schedule.</p>
+        </Reveal>
+        <div className="week-list">
+          {weeklyPlan.map((item, index) => (
+            <Reveal key={item.day} delay={index * 0.025}>
+              <div className={'week-row' + (item.day === 'SUN' ? ' week-row--rest' : '')}>
+                <span className="week-day">{item.day}</span>
+                <div className="week-name"><h3>{item.name}</h3><p>{item.detail}</p></div>
+                <span className="week-type">{item.type}</span>
+                <span className="week-arrow" aria-hidden="true">↗</span>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <div className="rhythm-foot"><span>ADAPT THE PLAN TO YOUR LIFE.</span><span>CONSISTENCY IS THE FLEX.</span></div>
+      </div>
+    </section>
+  );
+}
+
+function ProgressTracker() {
+  const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+  const [checkins, setCheckins] = useState<string[]>(loadCheckins);
+
+  function toggleDay(day: string) {
+    setCheckins((current) => {
+      const next = current.includes(day) ? current.filter((item) => item !== day) : [...current, day];
+      try {
+        window.localStorage.setItem(weeklyStorageKey(), JSON.stringify(next));
+      } catch {
+        // Progress still works for this page view when storage is unavailable.
+      }
+      return next;
     });
   }
 
   return (
-    <MotionConfig reducedMotion="user">
-      <div className="kinetik-site" data-theme={theme}>
-        <a className="skip-link" href="#main-content">Skip to content</a>
-        <div className="ambient-grid" aria-hidden="true" />
-        <ScrollProgress />
-        <CommandPalette />
-        <header className="site-header">
-          <a className="brand-lockup" href="#home" aria-label="Kinetik home"><span className="brand-mark" aria-hidden="true">K</span><span>KINETIK<span className="brand-sub">INTERACTIVE 3D WORKOUT LAB</span></span></a>
-          <nav id="site-navigation" className={menuOpen ? 'site-nav is-open' : 'site-nav'} aria-label="Main navigation">
-            {navigation.map((item) => <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}</a>)}
-          </nav>
-          <div className="header-actions">
-            <button className="theme-button" type="button" onClick={() => setTheme((value) => value === 'dark' ? 'light' : 'dark')} aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'} aria-pressed={theme === 'light'}><span aria-hidden="true">{theme === 'dark' ? '◐' : '◑'}</span>{theme === 'dark' ? 'LIGHT' : 'DARK'}</button>
-            <a className="header-cta" href="#arena">ENTER STUDIO <span aria-hidden="true">↗</span></a>
-            <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="site-navigation" onClick={() => setMenuOpen((open) => !open)}><span>{menuOpen ? 'CLOSE' : 'MENU'}</span><span aria-hidden="true">{menuOpen ? '×' : '+'}</span></button>
+    <section className="progress-section section-pad" id="progress">
+      <div className="page-shell progress-layout">
+        <Reveal className="progress-copy">
+          <Eyebrow>SMALL WINS ADD UP / 05</Eyebrow>
+          <h2>PROOF IS IN<br /><em>THE PRACTICE.</em></h2>
+          <p>Mark the days you showed up this week. Your check-ins stay in this browser; nothing is uploaded to a server.</p>
+          <div className="progress-count"><strong data-testid="checkin-count">{checkins.length} / 7</strong><span>SESSIONS MARKED THIS WEEK</span></div>
+        </Reveal>
+        <Reveal className="checkin-panel" delay={0.1}>
+          <div className="checkin-panel-head"><span>YOUR WEEK, YOUR PACE</span><span>{Math.round((checkins.length / 7) * 100)}% CHECKED IN</span></div>
+          <div className="checkin-days" role="group" aria-label="Mark completed training days">
+            {days.map((day, index) => {
+              const checked = checkins.includes(day);
+              const fullDay = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][index];
+              return (
+                <button className={'checkin-day' + (checked ? ' checkin-day--done' : '')} key={day} type="button" aria-label={'Log ' + fullDay + ' session'} aria-pressed={checked} onClick={() => toggleDay(day)}>
+                  <span>{day}</span><strong>{checked ? '✓' : String(index + 1).padStart(2, '0')}</strong>
+                </button>
+              );
+            })}
           </div>
-        </header>
-        <main id="main-content" tabIndex={-1}>
-          <LandingHero />
-          <BrandMarquee />
-          <ProgramShowcase />
-          <StudioCulture />
-          <WorkoutArena launchRequest={studioLaunch} />
-          <WorkoutBuilder onStartIn3D={startInStudio} />
-          <FitnessGallery />
-          <ExerciseLibrary />
-          <GymDiscovery onEnquire={(gymName) => setSelectedGym(gymName)} />
-          <GymPlanner />
-          <ClosingCTA />
-          <TrialBooking selectedGym={selectedGym} />
+          <div className="checkin-progress" role="progressbar" aria-label="Weekly check-in progress" aria-valuemin={0} aria-valuemax={7} aria-valuenow={checkins.length}><span style={{ width: ((checkins.length / 7) * 100) + '%' }} /></div>
+          <div className="checkin-panel-foot"><span>{checkins.length === 0 ? 'START WITH ONE SESSION.' : checkins.length < 4 ? 'NICE. KEEP BUILDING.' : 'THAT IS CONSISTENCY IN ACTION.'}</span><button type="button" className="reset-checkins" onClick={() => { setCheckins([]); try { window.localStorage.removeItem(weeklyStorageKey()); } catch { /* Ignore unavailable storage. */ } }}>RESET WEEK</button></div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function PlanBuilder() {
+  const [goal, setGoal] = useState('strength');
+  const [level, setLevel] = useState('beginner');
+  const [duration, setDuration] = useState('45');
+  const [plan, setPlan] = useState<PlanResult | null>(() => {
+    try {
+      const saved = window.localStorage.getItem('kinetik-starter-plan');
+      return saved ? JSON.parse(saved) as PlanResult : null;
+    } catch {
+      return null;
+    }
+  });
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const targetMoves = planTemplates[goal] || planTemplates.strength;
+    const moveCount = duration === '30' ? 3 : 4;
+    const nextPlan: PlanResult = {
+      title: goalLabels[goal] || goalLabels.strength,
+      meta: level.charAt(0).toUpperCase() + level.slice(1) + ' level · ' + duration + ' minutes · rule-based sample',
+      moves: targetMoves.slice(0, moveCount),
+    };
+    setPlan(nextPlan);
+    try {
+      window.localStorage.setItem('kinetik-starter-plan', JSON.stringify(nextPlan));
+    } catch {
+      // The generated plan remains available in the current page view.
+    }
+  }
+
+  return (
+    <section className="builder-section section-pad" id="start">
+      <div className="page-shell builder-layout">
+        <Reveal className="builder-intro">
+          <Eyebrow>YOUR NEXT REP STARTS HERE / 06</Eyebrow>
+          <h2>MAKE A PLAN.<br /><em>MAKE IT YOURS.</em></h2>
+          <p>Three choices are enough to create a useful first draft. Start small, be honest about your level, and edit anything that does not fit.</p>
+          <div className="builder-aside"><span className="builder-aside-symbol">✳</span><p><strong>NO MAGIC FORMULA.</strong><br />Just a clear place to start, with the rules visible and the next step in your control.</p></div>
+        </Reveal>
+        <Reveal className="builder-card" delay={0.1}>
+          <div className="builder-card-top"><span>STARTER TEMPLATE</span><span>3 INPUTS / 1 PLAN</span></div>
+          <form onSubmit={handleSubmit}>
+            <label className="field-label" htmlFor="goal-choice">01 / What do you want to work on?</label>
+            <div className="choice-grid">
+              <label className={'choice-card' + (goal === 'strength' ? ' choice-card--selected' : '')}><input type="radio" name="goal" value="strength" checked={goal === 'strength'} onChange={(event) => setGoal(event.target.value)} /><span className="choice-symbol">↗</span><strong>Get stronger</strong><small>Strength</small></label>
+              <label className={'choice-card' + (goal === 'conditioning' ? ' choice-card--selected' : '')}><input type="radio" name="goal" value="conditioning" checked={goal === 'conditioning'} onChange={(event) => setGoal(event.target.value)} /><span className="choice-symbol">⌁</span><strong>Build my engine</strong><small>Conditioning</small></label>
+              <label className={'choice-card' + (goal === 'mobility' ? ' choice-card--selected' : '')}><input type="radio" name="goal" value="mobility" checked={goal === 'mobility'} onChange={(event) => setGoal(event.target.value)} /><span className="choice-symbol">◌</span><strong>Move better</strong><small>Mobility</small></label>
+            </div>
+            <div className="builder-fields">
+              <label><span className="field-label">02 / Your starting point</span><select value={level} onChange={(event) => setLevel(event.target.value)}><option value="beginner">Beginner — build the basics</option><option value="intermediate">Intermediate — build consistency</option><option value="advanced">Advanced — keep it deliberate</option></select></label>
+              <label><span className="field-label">03 / Time available</span><select value={duration} onChange={(event) => setDuration(event.target.value)}><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option></select></label>
+            </div>
+            <button className="button button--acid button--full" type="submit">Build my starter plan <Arrow /></button>
+          </form>
+          {plan && (
+            <div className="generated-plan" id="generated-plan" aria-live="polite">
+              <div className="generated-plan-heading"><span>YOUR FIRST DRAFT</span><span className="generated-plan-check">✓</span></div>
+              <h3>{plan.title}</h3>
+              <p>{plan.meta}</p>
+              <ol>{plan.moves.map((move) => <li key={move}>{move}</li>)}</ol>
+              <p className="plan-disclaimer">A simple educational template, not individualized medical advice or a substitute for a qualified coach. Adjust to your ability and stop if something hurts.</p>
+              <button className="text-link generated-plan-reset" type="button" onClick={() => { setPlan(null); try { window.localStorage.removeItem('kinetik-starter-plan'); } catch { /* Ignore unavailable storage. */ } }}>Clear saved plan <span aria-hidden="true">×</span></button>
+            </div>
+          )}
+          <p className="builder-local-note"><span aria-hidden="true">●</span> Preferences and saved plan stay in this browser only.</p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function FAQ() {
+  const [openItem, setOpenItem] = useState<number | null>(0);
+  return (
+    <section className="faq-section section-pad" id="faq">
+      <div className="page-shell faq-layout">
+        <Reveal className="faq-intro">
+          <Eyebrow>GOOD QUESTIONS / 07</Eyebrow>
+          <h2>BEFORE YOU<br /><em>BEGIN.</em></h2>
+          <p>Keep the process clear. Here is what this experience does—and what it does not claim to do.</p>
+        </Reveal>
+        <div className="faq-list">
+          {faqs.map((faq, index) => (
+            <Reveal key={faq.question} delay={index * 0.04}>
+              <article className={'faq-item' + (openItem === index ? ' faq-item--open' : '')}>
+                <h3><button type="button" aria-expanded={openItem === index} onClick={() => setOpenItem(openItem === index ? null : index)}><span>{faq.question}</span><i aria-hidden="true">{openItem === index ? '−' : '+'}</i></button></h3>
+                {openItem === index && <div className="faq-answer"><p>{faq.answer}</p></div>}
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <>
+      <section className="closing-section">
+        <div className="closing-photo" aria-hidden="true"><img src={photos.hero} loading="lazy" decoding="async" alt="" /></div>
+        <div className="closing-shade" aria-hidden="true" />
+        <div className="page-shell closing-content">
+          <Reveal>
+            <Eyebrow light>LESS TALK / MORE PRACTICE</Eyebrow>
+            <h2>YOUR NEXT<br /><em>MOVE IS YOURS.</em></h2>
+            <a className="button button--acid" href="#start">Build your first plan <Arrow /></a>
+          </Reveal>
+        </div>
+      </section>
+      <footer className="site-footer">
+        <div className="page-shell">
+          <div className="footer-main">
+            <a className="brand brand--footer" href="#home" aria-label="KINETIK back to top">
+              <span className="brand-symbol" aria-hidden="true"><span /><span /><span /></span>
+              <span className="brand-wordmark">KINETIK<span className="brand-dot">.</span><small>TRAINING / CULTURE</small></span>
+            </a>
+            <p>Built for the process.<br /><em>Not the shortcut.</em></p>
+            <a className="footer-top" href="#home">BACK TO TOP ↑</a>
+          </div>
+          <div className="footer-bottom"><span>© {String(new Date().getFullYear())} KINETIK / INDEPENDENT FITNESS CONCEPT</span><span>TRAIN / RECOVER / REPEAT</span><a href="#faq">EXPERIENCE NOTES</a></div>
+          <p className="footer-disclaimer">KINETIK is a browser-based concept experience. It is not a real gym or medical service; generated plans are simple examples. No bookings, payments, accounts, or cloud sync are connected.</p>
+        </div>
+      </footer>
+    </>
+  );
+}
+
+export function App() {
+  useEffect(() => {
+    document.documentElement.dataset.site = 'kinetik';
+  }, []);
+
+  return (
+    <MotionConfig reducedMotion="user">
+      <div className="kinetik-app">
+        <a className="skip-link" href="#main-content">Skip to content</a>
+        <Header />
+        <main id="main-content">
+          <Hero />
+          <Ticker />
+          <Intro />
+          <Programs />
+          <MotionLab />
+          <MethodCards />
+          <NutritionSection />
+          <WeeklyRhythm />
+          <ProgressTracker />
+          <PlanBuilder />
+          <FAQ />
+          <Footer />
         </main>
-        <footer className="site-footer">
-          <a className="footer-brand" href="#home"><span className="brand-mark" aria-hidden="true">K</span>KINETIK</a>
-          <p>Train with intent. Keep showing up.</p>
-          <div className="footer-links">{navigation.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}</div>
-          <ShareSiteButton />
-          <span className="footer-legal">© {new Date().getFullYear()} KINETIK / INDEPENDENT FITNESS CONCEPT</span>
-        </footer>
       </div>
     </MotionConfig>
   );
 }
+
+export default App;
