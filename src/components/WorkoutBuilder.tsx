@@ -14,6 +14,14 @@ const ARENA_MOVE_FOR_EXERCISE: Partial<Record<string, MoveId>> = {
   'hip-hinge': 'hinge',
   deadlift: 'hinge',
 };
+const ARENA_MOVE_LABELS: Record<MoveId, string> = {
+  squat: 'Bodyweight squat',
+  curl: 'Dumbbell curl',
+  press: 'Overhead press',
+  jacks: 'Jumping jack',
+  lunge: 'Reverse lunge',
+  hinge: 'Hip hinge / RDL',
+};
 type WorkoutSettings = {
   goal: TrainingGoal;
   level: string;
@@ -239,7 +247,7 @@ export function WorkoutBuilder({ onStartIn3D }: { onStartIn3D?: (moveId: MoveId)
                     {completedIds.includes(sessionKeys[plan.indexOf(day)]) ? 'SESSION COMPLETED' : 'MARK SESSION DONE'} <span aria-hidden="true">{completedIds.includes(sessionKeys[plan.indexOf(day)]) ? '✓' : '＋'}</span>
                   </button>
                   <button className="session-start-day" type="button" onClick={() => setActiveDay(day)}>START THIS SESSION <span aria-hidden="true">▶</span></button>
-                  {onStartIn3D && arenaMove && <button className="session-start-3d" type="button" onClick={() => onStartIn3D(arenaMove)}>OPEN IN 3D STUDIO <span aria-hidden="true">↗</span></button>}
+                  {onStartIn3D && arenaMove && <button className="session-start-3d" type="button" aria-label={'Open ' + ARENA_MOVE_LABELS[arenaMove] + ' in the 3D studio'} onClick={() => onStartIn3D(arenaMove)}><span className="session-start-3d-label">OPEN IN 3D STUDIO<small>{ARENA_MOVE_LABELS[arenaMove]}</small></span><span className="session-start-3d-arrow" aria-hidden="true">↗</span></button>}
                 </article>
                 );
               })}
