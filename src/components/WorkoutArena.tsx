@@ -129,7 +129,7 @@ function Athlete({ move, running, tempo, onRep }: { move: MoveId; running: boole
           <mesh castShadow><sphereGeometry args={[0.165, 28, 22]} /><meshStandardMaterial color="#c7a18b" roughness={0.58} /></mesh>
           <mesh position={[0, 0.105, -0.018]}><sphereGeometry args={[0.155, 24, 16]} /><meshStandardMaterial color="#171b19" roughness={0.8} /></mesh>
           <mesh position={[0, -0.015, 0.145]}><boxGeometry args={[0.13, 0.07, 0.055]} /><meshStandardMaterial color="#9c7261" roughness={0.58} /></mesh>
-          {[-1, 1].map((side) => <mesh key={side} position={[side * 0.062, 0.012, 0.144]}><sphereGeometry args={[0.013, 10, 8]} /><meshStandardMaterial color="#111513" /></mesh>)}
+          {[-1, 1].map((side) => <mesh key={side} position={[side * 0.062, 0.012, 0.16]}><sphereGeometry args={[0.015, 12, 10]} /><meshStandardMaterial color="#111513" /></mesh>)}
         </group>
 
         {([-1, 1] as const).map((side) => (
@@ -208,21 +208,23 @@ export function WorkoutArena() {
     return () => window.clearInterval(timer);
   }, [running]);
 
+  const currentRepRef = useRef(0);
   const countRep = useCallback(() => {
+    const next = currentRepRef.current + 1;
+    currentRepRef.current = next;
     setTotalReps((value) => value + 1);
-    setReps((value) => {
-      const next = value + 1;
-      if (next >= targetRepsRef.current) {
-        setRunning(false);
-        setSetsCompleted((completed) => Math.min(3, completed + 1));
-        return targetRepsRef.current;
-      }
-      return next;
-    });
+    if (next >= targetRepsRef.current) {
+      setRunning(false);
+      setSetsCompleted((completed) => Math.min(3, completed + 1));
+      setReps(targetRepsRef.current);
+    } else {
+      setReps(next);
+    }
   }, []);
 
   function selectMove(id: MoveId) {
     setMoveId(id);
+    currentRepRef.current = 0;
     setReps(0);
     setTotalReps(0);
     setSetsCompleted(0);
@@ -232,6 +234,7 @@ export function WorkoutArena() {
 
   function resetSession() {
     setRunning(false);
+    currentRepRef.current = 0;
     setReps(0);
     setTotalReps(0);
     setSetsCompleted(0);
@@ -240,6 +243,7 @@ export function WorkoutArena() {
 
   function startNextSet() {
     if (setsCompleted >= 3) return;
+    currentRepRef.current = 0;
     setReps(0);
     setRunning(true);
   }
