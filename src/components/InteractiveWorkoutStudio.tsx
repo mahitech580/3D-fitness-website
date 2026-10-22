@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { EXERCISES, type Exercise, type TrainingGoal } from '../data/exercises';
-import type { Mesh } from 'three';
+import { Vector3, type Mesh } from 'three';
 import '../styles/interactive-workout-studio.css';
 
 type Point = [number, number, number];
@@ -183,12 +183,10 @@ function AnimatedAthlete({ exerciseId, playing, resetToken, onCycleComplete }: {
   const lastCycleRef = useRef(0);
   const yAxis = useMemo(() => [0, 1, 0] as [number, number, number], []);
   const vectorFrom = useMemo(() => ({ set: (v: Point) => new Vector3(v[0], v[1], v[2]) }), []);
-  const unusedResetGuard = useRef(resetToken);
 
   useEffect(() => {
     phaseRef.current = 0;
     lastCycleRef.current = 0;
-    unusedResetGuard.current = resetToken;
   }, [exerciseId, resetToken]);
 
   useFrame((_, delta) => {
@@ -234,16 +232,6 @@ function AnimatedAthlete({ exerciseId, playing, resetToken, onCycleComplete }: {
         <sphereGeometry args={[JOINT_RADII[name], name === 'head' ? 24 : 12, name === 'head' ? 18 : 10]} />
         <meshStandardMaterial color={name === 'head' || name.startsWith('elbow') || name.startsWith('wrist') ? '#c68f72' : name.startsWith('ankle') || name.startsWith('foot') ? '#e6e8df' : name.startsWith('knee') || name.startsWith('hip') ? '#27312c' : '#b9df4a'} roughness={.76} />
       </mesh>)}
-      <mesh position={[0, 1.18, -.005]} scale={[.24, .37, .13]} castShadow>
-        <sphereGeometry args={[1, 24, 16]} />
-        <meshStandardMaterial color="#b9df4a" roughness={.72} />
-      </mesh>
-      <mesh position={[0, 1.93, .13]} scale={[.085, .11, .035]}>
-        <sphereGeometry args={[1, 20, 16]} />
-        <meshStandardMaterial color="#c68f72" roughness={.72} />
-      </mesh>
-      <mesh position={[-.047, 1.95, .16]}><sphereGeometry args={[.014, 10, 10]} /><meshBasicMaterial color="#141916" /></mesh>
-      <mesh position={[.047, 1.95, .16]}><sphereGeometry args={[.014, 10, 10]} /><meshBasicMaterial color="#141916" /></mesh>
     </group>
   );
 }
