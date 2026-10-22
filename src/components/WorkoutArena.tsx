@@ -367,7 +367,7 @@ export function WorkoutArena() {
     <section id="arena" className="workout-arena-section" aria-labelledby="arena-title">
       <div className="arena-section-head">
         <div><p className="arena-kicker"><span>01</span> KINETIK / MOTION LAB</p><h2 id="arena-title">Your form.<br /><em>In three dimensions.</em></h2></div>
-        <p>Step into the training floor. Choose a movement, rotate around the athlete, start a live rep cycle and follow the form cues. This is a procedural 3D demonstration—not a camera recording or a clinical form assessment.</p>
+        <p>Step onto the training floor. Choose a movement, orbit the articulated athlete, log the reps you actually perform or use the separate follow-along demo, and manage sets and rest. The scene is procedural 3D—not motion capture or an automated form assessment.</p>
       </div>
       <div className="arena-workspace">
         <div className="arena-stage">
@@ -396,7 +396,7 @@ export function WorkoutArena() {
             <div><span>ELAPSED</span><strong>{clock}</strong></div>
           </div>
           <div className="arena-rep-progress" role="progressbar" aria-label="Repetitions completed in current set" aria-valuemin={0} aria-valuemax={current.targetReps} aria-valuenow={reps}><span style={{ width: (reps / current.targetReps * 100) + '%' }} /></div>
-          <div className="arena-tempo-control"><label htmlFor="arena-tempo">MOVEMENT TEMPO</label><input id="arena-tempo" type="range" min={24} max={72} step={4} value={tempo} onChange={(event) => setTempo(Number(event.target.value))} /><div><span>SLOW / CONTROLLED</span><strong>{tempo} REPS / MIN TARGET</strong></div></div>
+          <div className="arena-tempo-control"><label htmlFor="arena-tempo">3D DEMONSTRATION TEMPO</label><input id="arena-tempo" type="range" min={24} max={72} step={4} value={tempo} onChange={(event) => setTempo(Number(event.target.value))} /><div><span>SLOW / CONTROLLED</span><strong>{tempo} DEMO CYCLES / MIN</strong></div></div>
           <div className="arena-load-control">
             <label htmlFor="arena-dumbbell-load">DUMBBELL LOAD / HAND</label>
             <select id="arena-dumbbell-load" value={loadKg} disabled={!(['curl', 'press', 'hinge'] as MoveId[]).includes(moveId)} onChange={(event) => setLoadKg(Number(event.target.value))}>
