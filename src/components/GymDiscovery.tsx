@@ -42,7 +42,7 @@ export function GymDiscovery({ onEnquire }: { onEnquire: (gymName: string) => vo
     <section className="section gym-discovery-section" id="gyms" aria-labelledby="gyms-title">
       <div className="section-shell">
         <div className="section-heading-row">
-          <div><p className="eyebrow"><span>03</span> FIND YOUR TRAINING SETUP</p><h2 id="gyms-title">Different spaces.<br /><em>One next step.</em></h2></div>
+          <div><p className="eyebrow"><span>04</span> FIND YOUR TRAINING SETUP</p><h2 id="gyms-title">Different spaces.<br /><em>One next step.</em></h2></div>
           <p className="section-intro">Explore sample KINETIK venue concepts by city and training focus, then carry your interest into the first-session enquiry.</p>
         </div>
         <div className="gym-discovery-tools">
