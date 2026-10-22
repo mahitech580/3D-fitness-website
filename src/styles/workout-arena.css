@@ -122,3 +122,15 @@
 @media (forced-colors: active) {
   .arena-rest-panel, .arena-rest-panel select, .arena-rest-panel button { border: 1px solid ButtonText; }
 }
+
+.arena-load-control { display: grid; grid-template-columns: minmax(0,1fr) 95px; align-items: center; gap: 8px 12px; margin: 0 0 13px; padding: 11px 12px; border: 1px solid #ffffff1c; background: #ffffff04; }
+.arena-load-control > label { color: #c1cbc1; font-size: 7px; font-weight: 850; letter-spacing: .1em; }
+.arena-load-control select { width: 100%; min-height: 36px; padding: 7px 8px; border: 1px solid #ffffff24; border-radius: 0; background: #111714; color: #edf3e9; font: inherit; font-size: 9px; letter-spacing: .02em; }
+.arena-load-control select:disabled { opacity: .48; cursor: not-allowed; }
+.arena-load-control > span { grid-column: 1 / -1; color: #89998d; font-size: 8px; line-height: 1.5; }
+@media (max-width: 620px) {
+  .arena-load-control { grid-template-columns: minmax(0,1fr) minmax(90px,.65fr); }
+}
+@media (forced-colors: active) {
+  .arena-load-control, .arena-load-control select { border: 1px solid ButtonText; }
+}
