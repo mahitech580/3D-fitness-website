@@ -1,10 +1,11 @@
-# KINETIK — Fitness, built around you
+# KINETIK — Interactive 3D workout and fitness lab
 
 An original fitness-planning prototype that combines a procedural 3D equipment hero, explainable workout programming, guided sessions, movement education, illustrative gym concepts, and a synchronized 2D/3D gym layout planner.
 
 ## Features
 
-- **Interactive 3D hero:** a procedural barbell and weight-plate study built with Three.js / React Three Fiber, a pause control, reduced-motion support, and a rendering fallback.
+- **3D motion lab (primary experience):** a procedural articulated athlete animates six exercise patterns in a Three.js / React Three Fiber training room. Orbit the camera or switch front/side views, choose movements, tune tempo, start/pause cycles, count reps, complete three sets, and follow movement cues. This is an authored 3D demo, not motion capture or automated form analysis.
+- **3D object hero:** a procedural barbell and weight-plate study with a pause control, reduced-motion support, and a rendering fallback.
 - **Workout builder:** configure goal, level, equipment, location, preferred intensity, session duration, available weekdays, and movements to avoid. The browser-side rule engine builds a repeatable week; it is not a hosted AI coach.
 - **Reusable workout templates:** save, reload, and remove up to eight named preference templates in this browser. Templates regenerate sessions from the current movement catalog.
 - **Guided session execution:** start, pause/resume, previous/next movement, change to an alternative movement, start/skip a rest timer, and finish a session.
@@ -14,7 +15,7 @@ An original fitness-planning prototype that combines a procedural 3D equipment h
 - **2D/3D gym planner:** shared room/equipment state across a 1 m floor grid and a procedural 3D room; edit room dimensions, add/select/move/rotate/duplicate/remove objects, use numeric position controls, and check basic bounds/overlap.
 - **Planner persistence and export:** undo/redo, auto-save, explicit browser-local save/load, validated JSON import/export, 2D floor-plan PNG export, and 3D preview PNG export. Browser-local data is not cloud-synced.
 - **First-session enquiry prototype:** prefill the concept of interest, validate an enquiry, then review/copy the prepared request. It does not contact a gym or create a booking.
-- **Accessibility and layout:** responsive navigation, keyboard-focus indicators, reduced-motion handling, semantic section headings, status announcements, and responsive planner/training controls.
+- **Accessibility and layout:** responsive navigation, keyboard-focus indicators, reduced-motion handling, semantic section headings, status announcements, and responsive planner/training controls. The 3D motion lab offers keyboard-operable HTML controls alongside pointer/touch camera navigation.
 
 ## Run locally
 
