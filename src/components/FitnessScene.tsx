@@ -1,14 +1,24 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useReducedMotion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 import { Athlete } from './WorkoutArena';
 
 export function FitnessScene({ paused = false }: { paused?: boolean }) {
   const reducedMotion = Boolean(useReducedMotion());
-  const staticScene = paused || reducedMotion;
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(true);
+  useEffect(() => {
+    const node = sceneRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver((entries) => setInView(Boolean(entries[0]?.isIntersecting)), { threshold: 0.02 });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  const staticScene = paused || reducedMotion || !inView;
 
   return (
-    <div className="fitness-scene" role="img" aria-label="Interactive three-dimensional athlete demonstrating a controlled squat inside a training space. Drag to orbit the view.">
+    <div ref={sceneRef} className="fitness-scene" role="img" aria-label="Interactive three-dimensional athlete demonstrating a controlled squat inside a training space. Drag to orbit the view.">
       <Canvas
         dpr={[1, 1.15]}
         frameloop={staticScene ? 'demand' : 'always'}
