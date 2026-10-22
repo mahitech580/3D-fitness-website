@@ -22,7 +22,7 @@ if (!assets.some((name) => /\.js$/.test(name))) failures.push('No JavaScript ass
 if (!assets.some((name) => /\.css$/.test(name))) failures.push('No CSS asset was emitted.');
 const scripts = await Promise.all(assets.filter((name) => /\.js$/.test(name)).map((name) => readFile(path.join(assetDir, name), 'utf8')));
 const bundleText = scripts.join('\n');
-for (const featureText of ['BUILD MY WEEK', 'MARK SESSION DONE', 'ROTATE 90°', 'PREPARE MY REQUEST', 'VIEW CONCEPT DETAILS', 'SAVE TEMPLATE', 'WEEKLY SESSION HISTORY', 'FOCUS SELECTED', 'FLOOR FINISH', 'COMMON MISTAKES', 'RELATED MOVEMENTS', 'GYM CONCEPTS', 'KINETIK / MOTION LAB', 'START SESSION', 'START NEXT SET', 'CHOOSE MOVEMENT', 'SET TARGET COMPLETE', 'REPS / SET', 'REP TRACKING MODE', 'LOG ONE COMPLETED REP', 'LOCAL TRAINING HISTORY', 'FOLLOW ALONG / AUTO', 'SESSION SAVED IN THIS BROWSER', 'REST LENGTH', 'START REST', 'TRAIN / LOG MY REPS', 'SETS PER MOVEMENT', 'DUMBBELL LOAD / HAND', 'OPEN IN 3D STUDIO', 'db-press': 'press']) {
+for (const featureText of ['BUILD MY WEEK', 'MARK SESSION DONE', 'ROTATE 90°', 'PREPARE MY REQUEST', 'VIEW CONCEPT DETAILS', 'SAVE TEMPLATE', 'WEEKLY SESSION HISTORY', 'FOCUS SELECTED', 'FLOOR FINISH', 'COMMON MISTAKES', 'RELATED MOVEMENTS', 'GYM CONCEPTS', 'KINETIK / MOTION LAB', 'START SESSION', 'START NEXT SET', 'CHOOSE MOVEMENT', 'SET TARGET COMPLETE', 'REPS / SET', 'REP TRACKING MODE', 'LOG ONE COMPLETED REP', 'LOCAL TRAINING HISTORY', 'FOLLOW ALONG / AUTO', 'SESSION SAVED IN THIS BROWSER', 'REST LENGTH', 'START REST', 'TRAIN / LOG MY REPS', 'SETS PER MOVEMENT', 'DUMBBELL LOAD / HAND', 'OPEN IN 3D STUDIO']) {
   if (!bundleText.includes(featureText)) failures.push('Expected interactive feature text was not found in the production JS: ' + featureText);
 }
 for (const asset of ['favicon.svg', 'site.webmanifest', 'robots.txt', 'sitemap.xml', '404.html']) await check(asset);
@@ -51,6 +51,10 @@ if (arenaIndex < 0) failures.push('The primary 3D WorkoutArena is not mounted in
 if (plannerIndex >= 0 && arenaIndex > plannerIndex) failures.push('The 3D WorkoutArena must render before the workout-plan builder.');
 if (appSource.includes('FitnessScene') || appSource.includes('className="hero-section"')) {
   failures.push('The old marketing hero should not replace the primary 3D workout experience.');
+}
+const builderSource = sourceContents[2];
+if (!builderSource.includes("'db-press': 'press'")) {
+  failures.push('Workout planner does not map the dumbbell press to the 3D overhead-press movement.');
 }
 const sectionIds = new Set();
 for (const source of sourceContents.slice(0, -1)) {
