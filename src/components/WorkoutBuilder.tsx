@@ -9,6 +9,7 @@ import '../styles/workout-templates.css';
 type WorkoutDay = PlannedWorkoutDay;
 const ARENA_MOVE_FOR_EXERCISE: Partial<Record<string, MoveId>> = {
   squat: 'squat',
+  'db-press': 'press',
   'reverse-lunge': 'lunge',
   'jumping-jack': 'jacks',
   'hip-hinge': 'hinge',
