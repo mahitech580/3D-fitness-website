@@ -2,7 +2,7 @@
 
 ## Current project assets
 
-- **3D equipment scene:** procedural geometry authored in this repository using Three.js / React Three Fiber. No external model, HDRI, texture pack, or character model is bundled with the fitness scene.
+- **3D workout scene:** the articulated athlete and six procedural movement cycles, gym room, rack, dumbbells and planner equipment are authored in this repository with Three.js / React Three Fiber. No external model, HDRI, texture pack, mocap clip or character model is bundled.
 - **Fitness UI artwork:** CSS and inline SVG authored in this repository.
 - **Fonts:** Space Grotesk and Barlow Condensed are loaded from Google Fonts when network access is available. Local/system fallbacks are configured. The font files are not bundled in the repository.
 - **Fitness exercise descriptions:** short, hand-written starter copy maintained in source code; not copied from the reference websites.
