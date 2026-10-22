@@ -109,10 +109,10 @@ function Athlete({ move, running, tempo, onRep }: { move: MoveId; running: boole
       {([-1, 1] as const).map((side) => (
         <group key={side} ref={side < 0 ? leftHip : rightHip} position={[side * 0.14, 0.98, 0]}>
           <mesh position={[0, -0.25, 0]} castShadow><capsuleGeometry args={[0.105, 0.39, 5, 12]} /><meshStandardMaterial color="#27322c" roughness={0.62} /></mesh>
-          <Joint position={[0, -0.51, 0]} radius={0.09} color="#c7a18b" />
+          <mesh position={[0, -0.51, 0]} castShadow><sphereGeometry args={[0.09, 18, 14]} /><meshStandardMaterial color="#303b33" roughness={0.67} /></mesh>
           <group ref={side < 0 ? leftKnee : rightKnee} position={[0, -0.51, 0]}>
             <mesh position={[0, -0.245, 0]} castShadow><capsuleGeometry args={[0.078, 0.37, 5, 12]} /><meshStandardMaterial color="#27322c" roughness={0.62} /></mesh>
-            <Joint position={[0, -0.49, 0]} radius={0.065} />
+            <mesh position={[0, -0.49, 0]}><sphereGeometry args={[0.065, 16, 12]} /><meshStandardMaterial color="#343e36" roughness={0.65} /></mesh>
             <mesh position={[0, -0.515, 0.09]} castShadow><boxGeometry args={[0.17, 0.105, 0.29]} /><meshStandardMaterial color="#121715" roughness={0.47} /></mesh>
             <mesh position={[0, -0.462, 0.16]}><boxGeometry args={[0.105, 0.012, 0.04]} /><meshStandardMaterial color="#d7ff58" emissive="#35430d" emissiveIntensity={0.12} /></mesh>
           </group>
@@ -122,26 +122,30 @@ function Athlete({ move, running, tempo, onRep }: { move: MoveId; running: boole
       {/* Torso has a pivot so hinges and braced movement read clearly */}
       <group ref={torso} position={[0, 1.12, 0]}>
         <mesh position={[0, 0.28, 0]} rotation={[0, 0, 0]} castShadow><capsuleGeometry args={[0.255, 0.44, 8, 20]} /><meshPhysicalMaterial color="#333f38" roughness={0.5} metalness={0.06} clearcoat={0.18} /></mesh>
-        <mesh position={[0, 0.48, 0.018]} castShadow><boxGeometry args={[0.28, 0.11, 0.14]} /><meshStandardMaterial color="#d7ff58" roughness={0.55} /></mesh>
-        <mesh position={[0, 0.09, 0.02]}><torusGeometry args={[0.23, 0.014, 8, 32]} /><meshStandardMaterial color="#65776b" metalness={0.55} roughness={0.34} /></mesh>
+        <mesh position={[0, 0.46, 0.018]} castShadow><boxGeometry args={[0.28, 0.11, 0.14]} /><meshStandardMaterial color="#d7ff58" roughness={0.55} /></mesh>
+        <mesh position={[0, 0.31, 0.16]} scale={[0.76, 0.42, 0.22]}><sphereGeometry args={[0.21, 24, 18]} /><meshStandardMaterial color="#435147" roughness={0.58} /></mesh>
+        {[-1, 1].map((side) => <mesh key={side} position={[side * 0.12, 0.02, 0.242]} rotation={[0, 0, side * -0.08]}><boxGeometry args={[0.014, 0.12, 0.008]} /><meshStandardMaterial color="#111714" roughness={0.8} /></mesh>)}
+        <mesh position={[0, 0.08, 0.02]}><torusGeometry args={[0.23, 0.014, 8, 32]} /><meshStandardMaterial color="#65776b" metalness={0.55} roughness={0.34} /></mesh>
         <mesh position={[0, 0.65, 0]} castShadow><cylinderGeometry args={[0.075, 0.095, 0.16, 20]} /><meshStandardMaterial color="#c7a18b" roughness={0.68} /></mesh>
         <group position={[0, 0.83, 0.012]}>
           <mesh castShadow><sphereGeometry args={[0.165, 28, 22]} /><meshStandardMaterial color="#c7a18b" roughness={0.58} /></mesh>
           <mesh position={[0, 0.105, -0.018]}><sphereGeometry args={[0.155, 24, 16]} /><meshStandardMaterial color="#171b19" roughness={0.8} /></mesh>
-          <mesh position={[0, -0.015, 0.145]}><boxGeometry args={[0.13, 0.07, 0.055]} /><meshStandardMaterial color="#9c7261" roughness={0.58} /></mesh>
-          {[-1, 1].map((side) => <mesh key={side} position={[side * 0.062, 0.012, 0.16]}><sphereGeometry args={[0.015, 12, 10]} /><meshStandardMaterial color="#111513" /></mesh>)}
+          {[-1, 1].map((side) => <mesh key={'ear-' + side} position={[side * 0.16, 0, 0]}><sphereGeometry args={[0.035, 14, 12]} /><meshStandardMaterial color="#b98e78" roughness={0.56} /></mesh>)}
+          <mesh position={[0, -0.015, 0.151]}><boxGeometry args={[0.13, 0.07, 0.045]} /><meshStandardMaterial color="#9c7261" roughness={0.58} /></mesh>
+          {[-1, 1].map((side) => <group key={'eye-' + side} position={[side * 0.062, 0.034, 0.151]}><mesh><sphereGeometry args={[0.025, 12, 10]} /><meshStandardMaterial color="#f0e7d8" roughness={0.42} /></mesh><mesh position={[0, 0, 0.021]}><sphereGeometry args={[0.012, 10, 8]} /><meshStandardMaterial color="#17201a" roughness={0.25} /></mesh><mesh position={[0, 0.03, -0.002]} rotation={[0, 0, side * -0.12]}><boxGeometry args={[0.055, 0.012, 0.012]} /><meshStandardMaterial color="#30241f" roughness={0.8} /></mesh></group>)}
         </group>
 
         {([-1, 1] as const).map((side) => (
           <group key={side} ref={side < 0 ? leftShoulder : rightShoulder} position={[side * 0.285, 0.52, 0]}>
             <Joint position={[0, 0, 0]} radius={0.105} color="#c7a18b" />
+            <mesh position={[side * 0.045, -0.13, 0]} scale={[0.98, 1.02, 0.92]}><sphereGeometry args={[0.105, 18, 14]} /><meshStandardMaterial color="#c7a18b" roughness={0.52} /></mesh>
             <mesh position={[side * 0.015, -0.2, 0]} castShadow><capsuleGeometry args={[0.082, 0.27, 5, 12]} /><meshStandardMaterial color="#c7a18b" roughness={0.5} /></mesh>
             <group ref={side < 0 ? leftElbow : rightElbow} position={[side * 0.015, -0.37, 0]}>
               <Joint position={[0, 0, 0]} radius={0.072} />
               <mesh position={[0, -0.19, 0]} castShadow><capsuleGeometry args={[0.065, 0.28, 5, 12]} /><meshStandardMaterial color="#c7a18b" roughness={0.5} /></mesh>
               <Joint position={[0, -0.37, 0]} radius={0.065} />
               <mesh position={[0, -0.43, 0.015]} castShadow><sphereGeometry args={[0.082, 16, 12]} /><meshStandardMaterial color="#c7a18b" roughness={0.56} /></mesh>
-              <Dumbbell position={[0, -0.49, 0.015]} />
+              {(move === 'curl' || move === 'press' || move === 'hinge' || move === 'lunge') && <Dumbbell position={[0, -0.49, 0.015]} />}
             </group>
           </group>
         ))}
