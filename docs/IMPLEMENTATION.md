@@ -10,7 +10,6 @@ KINETIK is an original, local-first fitness experience built with React, TypeScr
 - **3D motion lab (primary training experience):** a custom procedural articulated athlete is assembled from Three.js meshes and animated in six movement cycles (squat, curl, overhead press, jumping jack, reverse lunge and hip hinge/RDL). The gym scene has studio lighting, a rack, floor grid, contact shadows, orbit controls and front/side/three-quarter views. The user can pick movements, adjust tempo, start/pause the timer, and follow form guidance in HTML.
 - **Rep tracking modes:** manual training mode accepts explicit rep logging from the user and pauses at the selected movement's rep target; follow-along mode instead counts completed animation cycles. The interface labels these separately because the site does not use a camera or motion tracking to observe a user's body.
 - **Session history:** completing the third set saves the exercise, tracking mode, counted reps/cycles, elapsed time, and tempo to browser-local storage. Only the five most recent session records are retained and displayed.
-- **3D hero:** the original procedural barbell/equipment study remains as the visual intro; the interactive trainer immediately follows the hero.
 - **Workout planner:** transparent, browser-side rule-based programming using goal, level, equipment, location, intensity, time, days available and avoided-movement preferences.
 - **Workout templates:** up to eight named preference sets can be saved, loaded and deleted in browser-local storage. A loaded template regenerates its sessions from the current exercise catalogue and rules; it does not store a custom reordered routine.
 - **Workout execution:** start/pause, previous/next movement, rest timer, substitution where available, finish/cancel and completed session recording.
@@ -26,7 +25,7 @@ Training templates, plan completion markers, 3D session history, theme preferenc
 
 ## Asset policy
 
-The hero and gym equipment models are generated from project-authored geometry and materials; no third-party GLB or GLTF model is required for the core flow. See [ASSET-CREDITS.md](./ASSET-CREDITS.md) for the asset policy and attributions.
+The articulated trainer, room, rack, dumbbells, and gym-planner equipment are generated from project-authored geometry and materials; no third-party GLB/GLTF model or captured character animation is bundled. See [ASSET-CREDITS.md](./ASSET-CREDITS.md) for the asset policy and attributions.
 
 ## Local development
 
