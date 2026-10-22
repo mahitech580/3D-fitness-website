@@ -42,7 +42,7 @@ export function ExerciseLibrary() {
     <section className="section library-section" id="library" aria-labelledby="library-title">
       <div className="section-shell">
         <div className="section-heading-row">
-          <div><p className="eyebrow"><span>02</span> MOVEMENT INDEX</p><h2 id="library-title">Learn the move.<br /><em>Own the basics.</em></h2></div>
+          <div><p className="eyebrow"><span>03</span> MOVEMENT INDEX</p><h2 id="library-title">Learn the move.<br /><em>Own the basics.</em></h2></div>
           <p className="section-intro">A small, searchable starter library. Each movement includes a focus, suggested set range and one coaching cue.</p>
         </div>
         <div className="library-toolbar">
