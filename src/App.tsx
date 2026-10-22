@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { MotionConfig } from 'framer-motion';
 import { ScrollProgress } from './components/ScrollProgress';
 import { FitnessScene } from './components/FitnessScene';
+import { WorkoutArena } from './components/WorkoutArena';
 import { WorkoutBuilder } from './components/WorkoutBuilder';
 import { ExerciseLibrary } from './components/ExerciseLibrary';
 import { GymPlanner } from './components/GymPlanner';
@@ -11,7 +12,8 @@ import { ShareSiteButton } from './components/ShareSiteButton';
 import { GymDiscovery } from './components/GymDiscovery';
 
 const navigation = [
-  { href: '#training', label: 'TRAINING' },
+  { href: '#arena', label: '3D WORKOUT' },
+  { href: '#training', label: 'TRAINING PLAN' },
   { href: '#library', label: 'MOVEMENT INDEX' },
   { href: '#gyms', label: 'GYM CONCEPTS' },
   { href: '#space', label: 'GYM PLANNER' },
@@ -65,8 +67,8 @@ export function App() {
               <p className="eyebrow hero-eyebrow"><span className="status-dot" /> MOVEMENT IS A PRACTICE <span>/ EST. 2026</span></p>
               <h1 id="hero-title">TRAIN WITH<br /><em>INTENT.</em></h1>
               <p className="hero-description">A smarter starting point for building strength, moving better, and making training fit the life you actually have.</p>
-              <div className="hero-actions"><a className="button button-primary" href="#training">BUILD MY WEEK <span aria-hidden="true">↗</span></a><a className="button button-secondary" href="#space">PLAN YOUR SPACE <span aria-hidden="true">↓</span></a></div>
-              <div className="hero-note"><span className="note-index">01 / 05</span><p>START WHERE YOU ARE.<br />BUILD FROM THERE.</p></div>
+              <div className="hero-actions"><a className="button button-primary" href="#arena">ENTER 3D WORKOUT <span aria-hidden="true">↗</span></a><a className="button button-secondary" href="#training">BUILD MY WEEK <span aria-hidden="true">↓</span></a></div>
+              <div className="hero-note"><span className="note-index">01 / 06</span><p>START WHERE YOU ARE.<br />BUILD FROM THERE.</p></div>
             </div>
             <div className="hero-art">
               <div className="art-orbit orbit-one" aria-hidden="true" /><div className="art-orbit orbit-two" aria-hidden="true" />
@@ -78,6 +80,7 @@ export function App() {
             <div className="hero-bottomline"><span>STRENGTH / CONDITIONING / MOBILITY</span><a href="#training">SCROLL TO EXPLORE <span aria-hidden="true">↓</span></a><span>CONTROLLED EFFORT. REAL PROGRESS.</span></div>
           </section>
           <div className="ticker" aria-label="Training approaches"><div className="ticker-track"><span>STRENGTH</span><i>✳</i><span>CONDITIONING</span><i>✳</i><span>MOBILITY</span><i>✳</i><span>CONSISTENCY</span><i>✳</i><span>STRENGTH</span><i>✳</i><span>CONDITIONING</span><i>✳</i><span>MOBILITY</span><i>✳</i><span>CONSISTENCY</span><i>✳</i></div></div>
+          <WorkoutArena />
           <WorkoutBuilder />
           <ExerciseLibrary />
           <GymDiscovery onEnquire={(gymName) => setSelectedGym(gymName)} />
