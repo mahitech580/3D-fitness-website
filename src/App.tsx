@@ -56,7 +56,7 @@ export function App() {
           </nav>
           <div className="header-actions">
             <button className="theme-button" type="button" onClick={() => setTheme((value) => value === 'dark' ? 'light' : 'dark')} aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'} aria-pressed={theme === 'light'}><span aria-hidden="true">{theme === 'dark' ? '◐' : '◑'}</span>{theme === 'dark' ? 'LIGHT' : 'DARK'}</button>
-            <a className="header-cta" href="#start">LET’S START <span aria-hidden="true">↗</span></a>
+            <a className="header-cta" href="#arena">ENTER STUDIO <span aria-hidden="true">↗</span></a>
             <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="site-navigation" onClick={() => setMenuOpen((open) => !open)}><span>{menuOpen ? 'CLOSE' : 'MENU'}</span><span aria-hidden="true">{menuOpen ? '×' : '+'}</span></button>
           </div>
         </header>
