@@ -5,7 +5,7 @@ import { useReducedMotion } from 'framer-motion';
 import type { Group } from 'three';
 import '../styles/workout-arena.css';
 
-type MoveId = 'squat' | 'curl' | 'press' | 'jacks' | 'lunge' | 'hinge';
+export type MoveId = 'squat' | 'curl' | 'press' | 'jacks' | 'lunge' | 'hinge';
 type CameraMode = 'front' | 'side' | 'three-quarter';
 type TrackingMode = 'manual' | 'follow-along';
 type WorkoutHistoryEntry = {
@@ -69,7 +69,7 @@ function Dumbbell({ position = [0, 0, 0] as [number, number, number] }: { positi
   );
 }
 
-function Athlete({ move, running, tempo, onRep }: { move: MoveId; running: boolean; tempo: number; onRep: () => void }) {
+export function Athlete({ move, running, tempo, onRep }: { move: MoveId; running: boolean; tempo: number; onRep: () => void }) {
   const root = useRef<Group>(null);
   const torso = useRef<Group>(null);
   const leftShoulder = useRef<Group>(null);
