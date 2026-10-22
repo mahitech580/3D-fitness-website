@@ -4,11 +4,11 @@ An original 3D-first workout experience. Open directly into a Three.js training 
 
 ## Features
 
-- **3D motion lab (primary experience):** an articulated procedural athlete animates six movement patterns in a Three.js / React Three Fiber gym. Orbit the camera or switch views, select movements, change tempo, and follow technique cues.
+- **3D motion lab (primary experience):** an articulated procedural athlete animates six movement patterns inside an interactive Three.js / React Three Fiber gym. Orbit the camera or switch views, select movements, tune demo tempo, set a displayed dumbbell load for curls/presses/hinges, and follow movement-specific technique cues.
 - **Rep tracking modes:** log reps you physically perform, or use an explicitly labeled follow-along mode that counts 3D demo cycles. This is not camera-based body tracking.
 - **Configurable session:** choose 2–5 sets per movement, select the dumbbell load for weighted movements, use a tempo control and a 30–90 second rest timer, and review session history saved in this browser.
 - **Set completion and saved sessions:** complete your selected set target to store a record in this browser. The history labels manual reps versus demo cycles, records session duration and the chosen dumbbell load, and distinguishes bodyweight moves.
-- **Workout builder:** configure goal, level, equipment, location, preferred intensity, session duration, available weekdays, and movements to avoid. The browser-side rule engine builds a repeatable week; it is not a hosted AI coach.
+- **Workout builder:** configure goal, level, equipment, location, preferred intensity, session duration, available weekdays, and movements to avoid. Compatible planned days include **OPEN IN 3D STUDIO**, which loads that movement into the main workout scene. The browser-side rule engine builds a repeatable week; it is not a hosted AI coach.
 - **Reusable workout templates:** save, reload, and remove up to eight named preference templates in this browser. Templates regenerate sessions from the current movement catalog.
 - **Guided session execution:** start, pause/resume, previous/next movement, change to an alternative movement, start/skip a rest timer, and finish a session.
 - **Training history and progress:** completed sessions and weekly checkmarks are stored locally and summarized in a small progress view. Clearing site storage can remove this data.
