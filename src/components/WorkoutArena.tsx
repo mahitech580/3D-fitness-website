@@ -5,7 +5,8 @@ import { useReducedMotion } from 'framer-motion';
 import type { Group } from 'three';
 import '../styles/workout-arena.css';
 
-export type MoveId = 'squat' | 'curl' | 'press' | 'jacks' | 'lunge' | 'hinge';
+export export type MoveId = 'squat' | 'curl' | 'press' | 'jacks' | 'lunge' | 'hinge';
+type StudioLaunchRequest = { moveId: MoveId; requestId: number };
 type CameraMode = 'front' | 'side' | 'three-quarter';
 type TrackingMode = 'manual' | 'follow-along';
 type WorkoutHistoryEntry = {
@@ -222,7 +223,7 @@ function CameraDirector({ mode }: { mode: CameraMode }) {
   return <OrbitControls makeDefault target={[0, 1.05, 0]} enableDamping dampingFactor={0.075} minDistance={3.3} maxDistance={9.5} minPolarAngle={0.45} maxPolarAngle={1.48} />;
 }
 
-export function WorkoutArena() {
+export function WorkoutArena({ launchRequest = null }: { launchRequest?: StudioLaunchRequest | null }) {
   const reducedMotion = Boolean(useReducedMotion());
   const [moveId, setMoveId] = useState<MoveId>('squat');
   const [running, setRunning] = useState(false);
@@ -289,6 +290,20 @@ export function WorkoutArena() {
   }, [setsCompleted, setCount, sessionSaved, moveId, current.name, trackingMode, totalReps, elapsed, tempo, loadKg]);
 
   const currentRepRef = useRef(0);
+
+  useEffect(() => {
+    if (!launchRequest) return;
+    setMoveId(launchRequest.moveId);
+    currentRepRef.current = 0;
+    setRunning(false);
+    setReps(0);
+    setTotalReps(0);
+    setSetsCompleted(0);
+    setElapsed(0);
+    setResting(false);
+    setRestRemaining(0);
+    setSessionSaved(false);
+  }, [launchRequest]);
   const registerRep = useCallback((source: TrackingMode) => {
     if (source !== trackingMode || (source === 'manual' && !running)) return;
     const next = currentRepRef.current + 1;
