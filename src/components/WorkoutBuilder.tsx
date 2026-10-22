@@ -1,11 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { EXERCISES, gearMatches, type Exercise, type GearOption, type TrainingGoal } from '../data/exercises';
 import { WorkoutSession, type PlannedWorkoutDay, type CompletedWorkoutRecord } from './WorkoutSession';
+import type { MoveId } from './WorkoutArena';
 import { ProgressDashboard } from './ProgressDashboard';
 import '../styles/workout-session.css';
 import '../styles/workout-templates.css';
 
 type WorkoutDay = PlannedWorkoutDay;
+const ARENA_MOVE_FOR_EXERCISE: Partial<Record<string, MoveId>> = {
+  squat: 'squat',
+  'reverse-lunge': 'lunge',
+  'jumping-jack': 'jacks',
+  'hip-hinge': 'hinge',
+  deadlift: 'hinge',
+};
 type WorkoutSettings = {
   goal: TrainingGoal;
   level: string;
@@ -59,7 +67,7 @@ function buildPlan(goal: TrainingGoal, level: string, gear: GearOption, days: nu
   return result;
 }
 
-export function WorkoutBuilder() {
+export function WorkoutBuilder({ onStartIn3D }: { onStartIn3D?: (moveId: MoveId) => void }) {
   const [goal, setGoal] = useState<TrainingGoal>('Strength');
   const [level, setLevel] = useState('Regular');
   const [gear, setGear] = useState<GearOption>('Dumbbells');
@@ -219,7 +227,9 @@ export function WorkoutBuilder() {
               <button className="reset-progress" type="button" onClick={resetWeekProgress}>RESET WEEK</button>
             </div>
             <div className="workout-days">
-              {plan.map((day, dayIndex) => (
+              {plan.map((day, dayIndex) => {
+                const arenaMove = day.exercises.map((exercise) => ARENA_MOVE_FOR_EXERCISE[exercise.id]).find((move): move is MoveId => Boolean(move));
+                return (
                 <article className={completedIds.includes(sessionKeys[dayIndex]) ? 'workout-day is-complete' : 'workout-day'} key={day.label}>
                   <div className="workout-day-head"><span>{day.label}</span><small>{day.theme}</small></div>
                   <h3>{goal === 'Conditioning' ? 'Conditioning set' : goal === 'Mobility' ? 'Mobility flow' : 'Strength session'}</h3>
@@ -229,8 +239,10 @@ export function WorkoutBuilder() {
                     {completedIds.includes(sessionKeys[plan.indexOf(day)]) ? 'SESSION COMPLETED' : 'MARK SESSION DONE'} <span aria-hidden="true">{completedIds.includes(sessionKeys[plan.indexOf(day)]) ? '✓' : '＋'}</span>
                   </button>
                   <button className="session-start-day" type="button" onClick={() => setActiveDay(day)}>START THIS SESSION <span aria-hidden="true">▶</span></button>
+                  {onStartIn3D && arenaMove && <button className="session-start-3d" type="button" onClick={() => onStartIn3D(arenaMove)}>OPEN IN 3D STUDIO <span aria-hidden="true">↗</span></button>}
                 </article>
-              ))}
+                );
+              })}
             </div>
             <div className="workout-template-tools" aria-labelledby="workout-template-title">
               <div className="workout-template-heading"><div><p className="template-kicker">REUSABLE PROGRAMMING</p><h3 id="workout-template-title">Save this week as a template.</h3></div><span>{savedTemplates.length} / 8 SAVED</span></div>
