@@ -52,7 +52,7 @@ try {
   await page.waitForTimeout(900);
   const dimensions = await page.evaluate(() => ({ documentWidth: document.documentElement.scrollWidth, viewportWidth: document.documentElement.clientWidth }));
   assert.ok(dimensions.documentWidth <= dimensions.viewportWidth + 2, 'The mobile page should not have horizontal overflow: ' + JSON.stringify(dimensions));
-  const heroImageLoaded = await page.locator('.hero-photo img').evaluate((image) => (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0);
+  const heroImageLoaded = await page.locator('.hero-photo img').evaluate((image) => image.complete && image.naturalWidth > 0);
   assert.ok(heroImageLoaded, 'The photographic gym background should load on mobile.');
   await page.screenshot({ path: 'artifacts/kinetik-mobile.png', fullPage: false });
   await page.getByRole('button', { name: 'Open navigation menu' }).click();
