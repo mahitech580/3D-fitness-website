@@ -19,7 +19,7 @@ type WorkoutHistoryEntry = {
   totalReps: number;
   durationSeconds: number;
   tempo: number;
-  loadKg: number;
+  loadKg?: number;
 };
 
 function readArenaHistory(): WorkoutHistoryEntry[] {
@@ -34,7 +34,7 @@ function readArenaHistory(): WorkoutHistoryEntry[] {
         && (item.trackingMode === 'manual' || item.trackingMode === 'follow-along')
         && typeof item.setsCompleted === 'number' && typeof item.totalReps === 'number'
         && typeof item.durationSeconds === 'number' && typeof item.tempo === 'number'
-        && typeof item.loadKg === 'number';
+        && (typeof item.loadKg === 'number' || typeof item.loadKg === 'undefined');
     }).slice(0, 5);
   } catch { return []; }
 }
@@ -442,7 +442,7 @@ export function WorkoutArena() {
       </div>
       <div className="arena-history">
         <div className="arena-history-head"><div><p className="arena-kicker"><span>LOG</span> LOCAL TRAINING HISTORY</p><h3>Work completed.</h3></div><span>{history.length} / 5 SAVED SESSIONS</span></div>
-        {history.length ? <div className="arena-history-list">{history.map((record) => <article key={record.id}><div><strong>{record.moveName}</strong><small>{new Date(record.completedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })} · {record.trackingMode === 'manual' ? 'Manual rep log' : '3D demo cycles'} · {record.setsCompleted}/{record.setsTarget ?? 3} sets · {record.totalReps} counts{record.loadKg ? ' · ' + record.loadKg + ' kg / hand' : ' · bodyweight'}</small></div><span>{String(Math.floor(record.durationSeconds / 60)).padStart(2, '0') + ':' + String(record.durationSeconds % 60).padStart(2, '0')}</span></article>)}</div> : <p className="arena-history-empty">Complete the selected number of sets to save your first session. Records stay in this browser; demo cycles and manually logged reps are labeled separately.</p>}
+        {history.length ? <div className="arena-history-list">{history.map((record) => <article key={record.id}><div><strong>{record.moveName}</strong><small>{new Date(record.completedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })} · {record.trackingMode === 'manual' ? 'Manual rep log' : '3D demo cycles'} · {record.setsCompleted}/{record.setsTarget ?? 3} sets · {record.totalReps} counts{record.loadKg === undefined ? '' : record.loadKg ? ' · ' + record.loadKg + ' kg / hand' : ' · bodyweight'}</small></div><span>{String(Math.floor(record.durationSeconds / 60)).padStart(2, '0') + ':' + String(record.durationSeconds % 60).padStart(2, '0')}</span></article>)}</div> : <p className="arena-history-empty">Complete the selected number of sets to save your first session. Records stay in this browser; demo cycles and manually logged reps are labeled separately.</p>}
       </div>
     </section>
   );
