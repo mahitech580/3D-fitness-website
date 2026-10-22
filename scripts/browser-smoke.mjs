@@ -45,15 +45,20 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await page.locator('#hero-title').waitFor();
-  await page.waitForTimeout(400);
+  await page.evaluate(() => {
+    window.history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+  });
+  await page.waitForTimeout(900);
   const dimensions = await page.evaluate(() => ({ documentWidth: document.documentElement.scrollWidth, viewportWidth: document.documentElement.clientWidth }));
   assert.ok(dimensions.documentWidth <= dimensions.viewportWidth + 2, 'The mobile page should not have horizontal overflow: ' + JSON.stringify(dimensions));
+  const heroImageLoaded = await page.locator('.hero-photo img').evaluate((image) => (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0);
+  assert.ok(heroImageLoaded, 'The photographic gym background should load on mobile.');
+  await page.screenshot({ path: 'artifacts/kinetik-mobile.png', fullPage: false });
   await page.getByRole('button', { name: 'Open navigation menu' }).click();
   assert.equal(await page.getByRole('navigation', { name: 'Main navigation' }).getAttribute('class'), 'main-nav main-nav--open');
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Programs' }).click();
   assert.match(page.url(), /#programs$/);
-  await page.waitForTimeout(300);
-  await page.screenshot({ path: 'artifacts/kinetik-mobile.png', fullPage: false });
 
   assert.deepEqual(pageErrors, [], 'No uncaught browser errors should be recorded.');
   console.log('Browser smoke verified the redesigned landing, program sections, deferred 3D object, starter plan builder, local progress check-ins, FAQ, and mobile navigation.');
