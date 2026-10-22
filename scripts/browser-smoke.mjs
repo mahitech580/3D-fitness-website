@@ -21,10 +21,33 @@ try {
     try { localStorage.clear(); sessionStorage.clear(); } catch { /* Storage may be disabled. */ }
   });
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 45_000 });
-  await page.locator('#hero-title').waitFor({ state: 'visible', timeout: 30_000 });
+  await page.locator('#arena-title').waitFor({ state: 'visible', timeout: 30_000 });
   assert.match(await page.title(), /KINETIK/i, 'The site title should identify KINETIK.');
   await page.screenshot({ path: 'artifacts/kinetik-desktop.png' });
   desktopScreenshotTaken = true;
+
+  const arena = page.locator('#arena');
+  await arena.locator('#arena-set-count').selectOption('2');
+  await arena.getByRole('button', { name: 'FRONT' }).click();
+  await arena.getByRole('button', { name: 'SIDE' }).click();
+  assert.equal(await arena.locator('#arena-dumbbell-load').isDisabled(), true, 'Bodyweight squat should disable the dumbbell-load selector.');
+  await arena.getByRole('button', { name: /START SESSION/i }).click();
+  for (let rep = 0; rep < 10; rep += 1) {
+    await arena.getByRole('button', { name: /LOG ONE COMPLETED REP/i }).click();
+  }
+  assert.match(await arena.locator('.arena-session-state').innerText(), /SET COMPLETE/i, 'Manually logged reps should finish the current set target.');
+  await arena.getByRole('button', { name: /START NEXT SET 2/i }).click();
+  for (let rep = 0; rep < 10; rep += 1) {
+    await arena.getByRole('button', { name: /LOG ONE COMPLETED REP/i }).click();
+  }
+  await arena.getByText(/SET TARGET COMPLETE\. SESSION SAVED IN THIS BROWSER/i).waitFor({ state: 'visible', timeout: 10_000 });
+  assert.equal(await arena.locator('.arena-history-list article').count(), 1, 'A completed 3D workout should be saved to local history.');
+  await arena.getByRole('button', { name: /Dumbbell curl/i }).click();
+  assert.equal(await arena.locator('#arena-dumbbell-load').isDisabled(), false, 'A weighted movement should enable the dumbbell-load selector.');
+  await arena.locator('#arena-dumbbell-load').selectOption('10');
+  await arena.getByRole('button', { name: /FOLLOW ALONG \/ AUTO/i }).click();
+  assert.match(await arena.locator('.arena-stats').innerText(), /DEMO CYCLES \/ SET/i, 'Follow-along mode should label demo cycles separately from physical reps.');
+  await arena.getByRole('button', { name: /TRAIN \/ LOG MY REPS/i }).click();
 
   const training = page.locator('#training');
   await training.getByRole('button', { name: /BUILD MY WEEK/i }).click();
@@ -79,13 +102,13 @@ try {
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 45_000 });
-  await page.locator('#hero-title').waitFor({ state: 'visible', timeout: 30_000 });
+  await page.locator('#arena-title').waitFor({ state: 'visible', timeout: 30_000 });
   await page.screenshot({ path: 'artifacts/kinetik-mobile.png' });
   mobileScreenshotTaken = true;
   const menuToggle = page.locator('.menu-toggle');
   await menuToggle.click();
   assert.equal(await menuToggle.getAttribute('aria-expanded'), 'true', 'Mobile nav should open.');
-  await page.locator('#site-navigation').getByRole('link', { name: 'TRAINING' }).click();
+  await page.locator('#site-navigation').getByRole('link', { name: 'TRAINING PLAN' }).click();
   assert.equal(await menuToggle.getAttribute('aria-expanded'), 'false', 'Mobile nav should close after navigation.');
 
   const horizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
@@ -108,5 +131,5 @@ if (failure) {
   console.error('Browser smoke verification failed:', failure);
   process.exitCode = 1;
 } else {
-  console.log('Browser smoke verified workout execution/history, exercise coaching details, gym concept expansion, planner edits/saving/downloads, mobile navigation, and uncaught runtime errors.');
+  console.log('Browser smoke verified 3D camera controls, manual rep logging, set completion/local history, weighted-equipment controls, separate demo mode, workout-plan execution/history, coaching details, gym discovery, planner exports, mobile navigation, and uncaught runtime errors.');
 }
