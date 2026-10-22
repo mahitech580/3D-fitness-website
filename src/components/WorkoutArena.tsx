@@ -2,11 +2,39 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { ContactShadows, OrbitControls } from '@react-three/drei';
 import { useReducedMotion } from 'framer-motion';
-import { MathUtils, type Group } from 'three';
+import type { Group } from 'three';
 import '../styles/workout-arena.css';
 
 type MoveId = 'squat' | 'curl' | 'press' | 'jacks' | 'lunge' | 'hinge';
 type CameraMode = 'front' | 'side' | 'three-quarter';
+type TrackingMode = 'manual' | 'follow-along';
+type WorkoutHistoryEntry = {
+  id: string;
+  completedAt: string;
+  moveId: MoveId;
+  moveName: string;
+  trackingMode: TrackingMode;
+  setsCompleted: number;
+  totalReps: number;
+  durationSeconds: number;
+  tempo: number;
+};
+
+function readArenaHistory(): WorkoutHistoryEntry[] {
+  try {
+    const parsed: unknown = JSON.parse(window.localStorage.getItem('kinetik-arena-history') ?? '[]');
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((entry: unknown): entry is WorkoutHistoryEntry => {
+      if (!entry || typeof entry !== 'object') return false;
+      const item = entry as Partial<WorkoutHistoryEntry>;
+      return typeof item.id === 'string' && typeof item.completedAt === 'string'
+        && typeof item.moveId === 'string' && typeof item.moveName === 'string'
+        && (item.trackingMode === 'manual' || item.trackingMode === 'follow-along')
+        && typeof item.setsCompleted === 'number' && typeof item.totalReps === 'number'
+        && typeof item.durationSeconds === 'number' && typeof item.tempo === 'number';
+    }).slice(0, 5);
+  } catch { return []; }
+}
 
 type MoveDefinition = {
   id: MoveId;
@@ -199,6 +227,9 @@ export function WorkoutArena() {
   const [totalReps, setTotalReps] = useState(0);
   const [setsCompleted, setSetsCompleted] = useState(0);
   const [elapsed, setElapsed] = useState(0);
+  const [trackingMode, setTrackingMode] = useState<TrackingMode>('manual');
+  const [sessionSaved, setSessionSaved] = useState(false);
+  const [history, setHistory] = useState<WorkoutHistoryEntry[]>(readArenaHistory);
   const [cameraMode, setCameraMode] = useState<CameraMode>('three-quarter');
   const [showCue, setShowCue] = useState(true);
   const [sceneReady, setSceneReady] = useState(false);
@@ -212,8 +243,31 @@ export function WorkoutArena() {
     return () => window.clearInterval(timer);
   }, [running]);
 
+  useEffect(() => {
+    try { window.localStorage.setItem('kinetik-arena-history', JSON.stringify(history)); }
+    catch { /* Recent records remain available in memory when storage is unavailable. */ }
+  }, [history]);
+
+  useEffect(() => {
+    if (setsCompleted < 3 || sessionSaved) return;
+    const record: WorkoutHistoryEntry = {
+      id: new Date().toISOString() + ':' + moveId,
+      completedAt: new Date().toISOString(),
+      moveId,
+      moveName: current.name,
+      trackingMode,
+      setsCompleted,
+      totalReps,
+      durationSeconds: elapsed,
+      tempo,
+    };
+    setHistory((records) => [record, ...records.filter((item) => item.id !== record.id)].slice(0, 5));
+    setSessionSaved(true);
+  }, [setsCompleted, sessionSaved, moveId, current.name, trackingMode, totalReps, elapsed, tempo]);
+
   const currentRepRef = useRef(0);
-  const countRep = useCallback(() => {
+  const registerRep = useCallback((source: TrackingMode) => {
+    if (source !== trackingMode || (source === 'manual' && !running)) return;
     const next = currentRepRef.current + 1;
     currentRepRef.current = next;
     setTotalReps((value) => value + 1);
@@ -224,7 +278,20 @@ export function WorkoutArena() {
     } else {
       setReps(next);
     }
-  }, []);
+  }, [trackingMode, running]);
+
+  const countRep = useCallback(() => registerRep('follow-along'), [registerRep]);
+
+  function logCompletedRep() {
+    if (trackingMode !== 'manual') return;
+    if (!running) return;
+    registerRep('manual');
+  }
+
+  function changeTrackingMode(nextMode: TrackingMode) {
+    setTrackingMode(nextMode);
+    resetSession();
+  }
 
   function selectMove(id: MoveId) {
     setMoveId(id);
@@ -234,6 +301,7 @@ export function WorkoutArena() {
     setSetsCompleted(0);
     setRunning(false);
     setElapsed(0);
+    setSessionSaved(false);
   }
 
   function resetSession() {
@@ -243,6 +311,7 @@ export function WorkoutArena() {
     setTotalReps(0);
     setSetsCompleted(0);
     setElapsed(0);
+    setSessionSaved(false);
   }
 
   function startNextSet() {
