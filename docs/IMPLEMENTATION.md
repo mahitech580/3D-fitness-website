@@ -42,7 +42,7 @@ The GitHub Actions workflow on `main` runs the build/smoke-check workflow and pu
 
 - All venue entries are sample concepts and must not be interpreted as real gyms.
 - Training recommendations are deterministic rules, not an AI coach or individualized medical advice.
-- The 3D athlete is procedural animation designed for illustrative demonstration; it is not a motion-capture model, exercise biomechanics simulator, medical tool, or automated form-tracking system. Rep counts measure completed animation cycles, not a person's physical repetitions.
+- The 3D athlete is procedural animation designed for illustrative demonstration; it is not a motion-capture model, exercise biomechanics simulator, medical tool, or automated form-tracking system. In manual mode, rep counts are entered by the user and are not independently verified. In follow-along mode, the counter measures completed avatar animation cycles only; it does not observe a person's physical repetitions.
 - Exercise coverage is curated starter content; there are no licensed demonstration videos, clinical claims, meal logging, or nutrition database.
 - Gym dimensions and equipment footprints are visual planning estimates, not architectural, building-code, accessibility, fire-safety, manufacturer-clearance or professional fit-out certification.
 - Saved layouts (including room finish settings), templates and session history live in the current browser only.
