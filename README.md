@@ -4,7 +4,9 @@ An original fitness-planning prototype that combines a procedural 3D equipment h
 
 ## Features
 
-- **3D motion lab (primary experience):** a procedural articulated athlete animates six exercise patterns in a Three.js / React Three Fiber training room. Orbit the camera or switch front/side views, choose movements, tune tempo, start/pause cycles, count reps, complete three sets, and follow movement cues. This is an authored 3D demo, not motion capture or automated form analysis.
+- **3D motion lab (primary experience):** an articulated procedural athlete animates six movement patterns in a Three.js / React Three Fiber gym. Orbit the camera or switch views, select movements, change tempo, and follow technique cues.
+- **Real rep logging:** manual training mode counts reps only when you log a rep you physically completed. Optional follow-along mode counts avatar animation cycles separately; it never claims to track your body or camera.
+- **Set completion and saved sessions:** complete three sets to store a record in this browser. The history labels manual reps versus demo cycles and stores session duration.
 - **3D object hero:** a procedural barbell and weight-plate study with a pause control, reduced-motion support, and a rendering fallback.
 - **Workout builder:** configure goal, level, equipment, location, preferred intensity, session duration, available weekdays, and movements to avoid. The browser-side rule engine builds a repeatable week; it is not a hosted AI coach.
 - **Reusable workout templates:** save, reload, and remove up to eight named preference templates in this browser. Templates regenerate sessions from the current movement catalog.
