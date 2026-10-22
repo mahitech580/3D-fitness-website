@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MotionConfig } from 'framer-motion';
 import { ScrollProgress } from './components/ScrollProgress';
-import { FitnessScene } from './components/FitnessScene';
 import { WorkoutArena } from './components/WorkoutArena';
 import { WorkoutBuilder } from './components/WorkoutBuilder';
 import { ExerciseLibrary } from './components/ExerciseLibrary';
@@ -26,7 +25,6 @@ export function App() {
     catch { return 'dark'; }
   });
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scenePaused, setScenePaused] = useState(false);
   const [selectedGym, setSelectedGym] = useState('');
 
   useEffect(() => {
@@ -61,26 +59,7 @@ export function App() {
           </div>
         </header>
         <main id="main-content" tabIndex={-1}>
-          <section className="hero-section" id="home" aria-labelledby="hero-title">
-            <div className="hero-backdrop-word" aria-hidden="true">MOVE</div>
-            <div className="hero-copy">
-              <p className="eyebrow hero-eyebrow"><span className="status-dot" /> MOVEMENT IS A PRACTICE <span>/ EST. 2026</span></p>
-              <h1 id="hero-title">TRAIN WITH<br /><em>INTENT.</em></h1>
-              <p className="hero-description">A smarter starting point for building strength, moving better, and making training fit the life you actually have.</p>
-              <div className="hero-actions"><a className="button button-primary" href="#arena">ENTER 3D WORKOUT <span aria-hidden="true">↗</span></a><a className="button button-secondary" href="#training">BUILD MY WEEK <span aria-hidden="true">↓</span></a></div>
-              <div className="hero-note"><span className="note-index">01 / 06</span><p>START WHERE YOU ARE.<br />BUILD FROM THERE.</p></div>
-            </div>
-            <div className="hero-art">
-              <div className="art-orbit orbit-one" aria-hidden="true" /><div className="art-orbit orbit-two" aria-hidden="true" />
-              <div className="art-kicker"><span>FORM / FUNCTION</span><span>01 — TRAINING EQUIPMENT</span></div>
-              <FitnessScene paused={scenePaused} />
-              <button className="scene-toggle" type="button" aria-label={scenePaused ? 'Resume 3D athlete demonstration' : 'Pause 3D athlete demonstration'} aria-pressed={scenePaused} onClick={() => setScenePaused((paused) => !paused)}>{scenePaused ? 'RESUME DEMO' : 'PAUSE DEMO'} <span aria-hidden="true">{scenePaused ? '▶' : 'Ⅱ'}</span></button>
-              <p className="art-caption">BUILT FOR THE REPETITION THAT BUILDS YOU.</p>
-            </div>
-            <div className="hero-bottomline"><span>STRENGTH / CONDITIONING / MOBILITY</span><a href="#arena">ENTER THE MOTION LAB <span aria-hidden="true">↓</span></a><span>CONTROLLED EFFORT. REAL PROGRESS.</span></div>
-          </section>
           <WorkoutArena />
-          <div className="ticker" aria-label="Training approaches"><div className="ticker-track"><span>STRENGTH</span><i>✳</i><span>CONDITIONING</span><i>✳</i><span>MOBILITY</span><i>✳</i><span>CONSISTENCY</span><i>✳</i><span>STRENGTH</span><i>✳</i><span>CONDITIONING</span><i>✳</i><span>MOBILITY</span><i>✳</i><span>CONSISTENCY</span><i>✳</i></div></div>
           <WorkoutBuilder />
           <ExerciseLibrary />
           <GymDiscovery onEnquire={(gymName) => setSelectedGym(gymName)} />
