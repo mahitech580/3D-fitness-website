@@ -351,12 +351,20 @@ export function WorkoutArena() {
           <h3>{current.name}</h3>
           <p className="arena-muscle-line">{current.focus}</p>
           <div className="arena-stats">
-            <div><span>REPS / SET</span><strong>{String(reps).padStart(2, '0')}<small>/{current.targetReps}</small></strong></div>
+            <div><span>{trackingMode === 'manual' ? 'YOUR REPS / SET' : 'DEMO CYCLES / SET'}</span><strong>{String(reps).padStart(2, '0')}<small>/{current.targetReps}</small></strong></div>
             <div><span>SETS</span><strong>{setsCompleted}<small>/3</small></strong></div>
             <div><span>ELAPSED</span><strong>{clock}</strong></div>
           </div>
           <div className="arena-rep-progress" role="progressbar" aria-label="Repetitions completed in current set" aria-valuemin={0} aria-valuemax={current.targetReps} aria-valuenow={reps}><span style={{ width: (reps / current.targetReps * 100) + '%' }} /></div>
           <div className="arena-tempo-control"><label htmlFor="arena-tempo">MOVEMENT TEMPO</label><input id="arena-tempo" type="range" min={24} max={72} step={4} value={tempo} onChange={(event) => setTempo(Number(event.target.value))} /><div><span>SLOW / CONTROLLED</span><strong>{tempo} REPS / MIN TARGET</strong></div></div>
+          <div className="arena-tracking-mode">
+            <div className="arena-tracking-heading"><span>REP TRACKING MODE</span><span>{trackingMode === 'manual' ? 'YOU CONTROL THE COUNT' : '3D DEMO AUTO-COUNT'}</span></div>
+            <div className="arena-tracking-options" role="group" aria-label="Repetition tracking mode">
+              <button type="button" className={trackingMode === 'manual' ? 'is-active' : ''} aria-pressed={trackingMode === 'manual'} onClick={() => changeTrackingMode('manual')}>TRAIN / LOG MY REPS</button>
+              <button type="button" className={trackingMode === 'follow-along' ? 'is-active' : ''} aria-pressed={trackingMode === 'follow-along'} disabled={reducedMotion} onClick={() => changeTrackingMode('follow-along')}>FOLLOW ALONG / AUTO</button>
+            </div>
+            <p>{trackingMode === 'manual' ? 'Train in the real world and tap LOG REP after each rep you complete. This app does not track your body.' : 'Each complete avatar cycle counts as a demo cycle, not a physical repetition. Switch to manual mode to record your own reps.'}</p>
+          </div>
           <div className="arena-session-buttons">
             <button className="arena-primary-control" type="button" disabled={!running && setsCompleted >= 3} onClick={() => {
               if (running) setRunning(false);
@@ -365,7 +373,11 @@ export function WorkoutArena() {
             }}>{setsCompleted >= 3 ? 'TARGET COMPLETE' : running ? 'PAUSE SESSION' : reps >= current.targetReps ? 'START NEXT SET ' + (setsCompleted + 1) : elapsed > 0 ? 'RESUME SESSION' : 'START SESSION'} <span aria-hidden="true">{running ? 'Ⅱ' : setsCompleted >= 3 ? '✓' : reps >= current.targetReps ? '↗' : '▶'}</span></button>
             <button className="arena-secondary-control" type="button" onClick={resetSession}>RESET <span aria-hidden="true">↺</span></button>
           </div>
-          <p className="arena-session-state" role="status">{reducedMotion && running ? 'Reduced-motion preference detected. The timer runs without animated repetition cycles. Change your system motion preference to use the moving model.' : setsCompleted >= 3 ? 'THREE SET TARGET COMPLETE. Reset to run the movement again.' : reps >= current.targetReps ? 'SET COMPLETE. Recover as needed, then start the next set.' : running ? 'The procedural movement cycle is running. Each full cycle records one rep and pauses at the set target.' : totalReps > 0 ? totalReps + ' TOTAL REPS RECORDED. Resume the current set when ready.' : 'Paused. Start the session when you are ready.'}</p>
+          <button className="arena-log-rep" type="button" disabled={trackingMode !== 'manual' || !running || reps >= current.targetReps} onClick={logCompletedRep}>
+            {trackingMode === 'manual' ? reps >= current.targetReps ? 'SET TARGET REACHED' : 'LOG ONE COMPLETED REP' : 'AUTO-COUNTING AVATAR CYCLES'}
+            <span aria-hidden="true">{trackingMode === 'manual' ? '+1' : '↻'}</span>
+          </button>
+          <p className="arena-session-state" role="status">{reducedMotion && running ? 'Reduced motion is enabled. The scene stays still, but you can continue the timer and log each rep manually.' : setsCompleted >= 3 ? (sessionSaved ? 'THREE SET TARGET COMPLETE. SESSION SAVED IN THIS BROWSER.' : 'THREE SET TARGET COMPLETE. FINISHING YOUR LOCAL SESSION RECORD…') : reps >= current.targetReps ? 'SET COMPLETE. Recover as needed, then start the next set.' : running && trackingMode === 'manual' ? 'Training timer is running. Tap LOG ONE COMPLETED REP after you perform each rep yourself.' : running ? 'Follow-along is running. Each complete avatar cycle counts as a demo cycle, not a body-tracked rep.' : totalReps > 0 ? totalReps + ' TOTAL ' + (trackingMode === 'manual' ? 'REPS LOGGED' : 'DEMO CYCLES') + '. Resume this set when ready.' : 'Paused. Choose your tracking mode, then start the session.'}</p>
           <div className={showCue ? 'arena-form-card is-visible' : 'arena-form-card'} aria-live="polite">
             <div><span>FORM GUIDE</span><span>{current.prescription}</span></div>
             <h4>{current.tempo}</h4>
@@ -373,6 +385,10 @@ export function WorkoutArena() {
           </div>
           <div className="arena-movement-picker"><div className="arena-picker-head"><span>CHOOSE MOVEMENT</span><span>06 PATTERNS</span></div>{MOVES.map((move, index) => <button key={move.id} type="button" className={move.id === moveId ? 'is-active' : ''} aria-pressed={move.id === moveId} onClick={() => selectMove(move.id)}><span>{String(index + 1).padStart(2, '0')}</span><strong>{move.name}</strong><small>{move.focus}</small><i aria-hidden="true">{move.id === moveId ? '●' : '↗'}</i></button>)}</div>
         </aside>
+      </div>
+      <div className="arena-history">
+        <div className="arena-history-head"><div><p className="arena-kicker"><span>LOG</span> LOCAL TRAINING HISTORY</p><h3>Work completed.</h3></div><span>{history.length} / 5 SAVED SESSIONS</span></div>
+        {history.length ? <div className="arena-history-list">{history.map((record) => <article key={record.id}><div><strong>{record.moveName}</strong><small>{new Date(record.completedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })} · {record.trackingMode === 'manual' ? 'Manual rep log' : '3D demo cycles'} · {record.setsCompleted} sets · {record.totalReps} counts</small></div><span>{String(Math.floor(record.durationSeconds / 60)).padStart(2, '0') + ':' + String(record.durationSeconds % 60).padStart(2, '0')}</span></article>)}</div> : <p className="arena-history-empty">Complete all three sets to save your first session. Records stay in this browser; demo cycles and manually logged reps are labeled separately.</p>}
       </div>
     </section>
   );
