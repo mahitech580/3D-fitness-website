@@ -195,7 +195,7 @@ export function WorkoutBuilder() {
     <section className="section training-section" id="training" aria-labelledby="training-title">
       <div className="section-shell">
         <div className="section-heading-row">
-          <div><p className="eyebrow"><span>01</span> THE TRAINING DESK</p><h2 id="training-title">A plan that fits<br /><em>your real life.</em></h2></div>
+          <div><p className="eyebrow"><span>02</span> THE TRAINING DESK</p><h2 id="training-title">A plan that fits<br /><em>your real life.</em></h2></div>
           <p className="section-intro">Choose your goal, the gear you actually have, and the time you can give. Build a practical starting week in seconds.</p>
         </div>
         <div className="builder-panel">
