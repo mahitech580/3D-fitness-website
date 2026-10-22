@@ -59,7 +59,7 @@ URL: https://lusion.co/
 
 **Useful pattern:** A central 3D object should have a clear art direction and a reason to exist, rather than function as background decoration alone.
 
-**Implementation decision:** Use a purpose-built procedural barbell illustration, lit as an object study and integrated into the fitness headline and product story.
+**Implementation decision:** Make the 3D athlete and a controllable training floor the core experience, not just a decorative model. The separate gym designer also uses original procedural equipment geometry.
 
 **Do not copy:** Lusion's projects, branding, scene layouts, or creative assets.
 
@@ -137,8 +137,8 @@ The guide explains demand-driven rendering for scenes that can become idle, and 
 
 ## Synthesis
 
-- Lead with an assertive athletic identity and one signature 3D object.
-- Make the next action concrete: build a week, explore movements, plan a training space, or enquire about a first session.
+- Open directly into the interactive 3D motion lab with an articulated athlete, movement selection, manual rep logging, explicit follow-along demo cycles and local training history.
+- Keep secondary tools connected to the core training task: build a week, study a movement, design a gym space, or prepare a local-only enquiry.
 - Treat workout generation as an explainable local algorithm until a real coaching service is built.
 - Treat the planner as a small interactive concept tool, not a construction-grade 3D system.
 - Keep a non-WebGL route, reduced motion, keyboard navigation, and truthful product language.
