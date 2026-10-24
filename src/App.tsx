@@ -1,6 +1,6 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { MotionConfig, motion, useReducedMotion } from 'framer-motion';
-import KineticObject from './components/KineticObject';
+const KineticObject = lazy(() => import('./components/KineticObject'));
 
 const photos = {
   hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1800&q=85',
@@ -185,6 +185,28 @@ function Hero() {
 function Marquee() {
   const items = ['MOVE WITH INTENT', 'BUILD YOUR BASE', 'RESPECT RECOVERY', 'PROGRESS OVER PERFECTION'];
   return <div className="marquee" aria-label={items.join(' · ')}><div className="marquee-track" aria-hidden="true">{[0, 1].map((set) => <div className="marquee-group" key={set}>{items.map((item) => <span key={item + set}>{item}<i>✳</i></span>)}</div>)}</div></div>;
+}
+
+function EquipmentScenePreview({ equipment, status }: { equipment: Equipment; status: string }) {
+  return <div className="kinetic-object-host" role="img" aria-label={equipmentInfo[equipment].label + ' 3D preview'}><div className="scene-fallback"><span className="scene-ring scene-ring--one" /><span className="scene-ring scene-ring--two" /><span className={'scene-dumbbell scene-dumbbell--' + equipment}><i /><b />{equipment !== 'kettlebell' && <i />}</span><span className="scene-fallback-label">{status}</span></div></div>;
+}
+
+function KineticSceneLoader({ equipment, autoRotate, resetToken }: { equipment: Equipment; autoRotate: boolean; resetToken: number }) {
+  const host = useRef<HTMLDivElement>(null);
+  const [nearViewport, setNearViewport] = useState(false);
+  useEffect(() => {
+    if (!host.current) return;
+    if (!('IntersectionObserver' in window)) { setNearViewport(true); return; }
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        setNearViewport(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: '320px' });
+    observer.observe(host.current);
+    return () => observer.disconnect();
+  }, []);
+  return <div ref={host} className="kinetic-scene-loader">{nearViewport ? <Suspense fallback={<EquipmentScenePreview equipment={equipment} status="LOADING 3D ENGINE" />}><KineticObject key={equipment} equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} /></Suspense> : <EquipmentScenePreview equipment={equipment} status="SCENE STANDBY / APPROACH TO ACTIVATE" />}</div>;
 }
 
 function KineticLab() {
