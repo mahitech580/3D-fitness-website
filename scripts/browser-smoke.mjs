@@ -65,8 +65,12 @@ try {
   await page.getByRole('button', { name: 'Log Monday session' }).click();
   assert.equal((await page.locator('.tracker-counter strong').innerText()).replace(/\s+/g, ' ').trim(), '1 / 7');
   await page.locator('#faq').scrollIntoViewIfNeeded();
-  await page.getByRole('button', { name: /Is KINETIK a real gym or membership service/i }).click();
-  assert.equal(await page.getByText(/No\. KINETIK is a fitness website concept/i).count(), 1);
+  const conceptFaq = page.getByRole('button', { name: /Is KINETIK a real gym or membership service/i });
+  assert.equal(await conceptFaq.getAttribute('aria-expanded'), 'true', 'The first FAQ should start open.');
+  await conceptFaq.click();
+  assert.equal(await conceptFaq.getAttribute('aria-expanded'), 'false', 'The FAQ should collapse on click.');
+  await conceptFaq.click();
+  assert.equal(await page.getByText(/No\\. KINETIK is a fitness website concept/i).count(), 1, 'The FAQ answer should reopen on click.');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
