@@ -58,7 +58,8 @@ The active site uses separate Unsplash CDN assets documented in docs/ASSET-CREDI
 
 ## Implementation choices
 
-- The active page includes an original real-time 3D barbell scene built from Three.js geometry and materials through React Three Fiber. It is not a video or a 2D image; pointer/touch dragging rotates the object through Drei's orbit controls.
+- The active page includes three original real-time 3D equipment models—barbell, dumbbell, and kettlebell—built from Three.js geometry and materials through React Three Fiber. It is not a video or a 2D image; pointer/touch dragging rotates the model through Drei's orbit controls.
+- Equipment tabs switch between the three models. Visitors can enable/disable automatic rotation, zoom the view, and reset the camera/object state. Reduced-motion preferences automatically disable camera rotation.
 - The 3D canvas mounts near the section viewport and unmounts again when it is offscreen. This avoids continuously rendering the scene while the visitor reads other sections.
 - Rendering uses a capped device-pixel ratio and a low-power WebGL preference. A CSS barbell study is available while the canvas mounts and as the WebGL fallback.
 - The scene honors the reduced-motion preference by stopping automatic object rotation. The CSS fallback also disables its orbit animation for reduced-motion users.
