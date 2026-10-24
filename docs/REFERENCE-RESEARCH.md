@@ -1,25 +1,71 @@
-# Visual reference research
+# Gym website reference research and design decisions
 
-The current KINETIK stage prioritizes a polished, responsive fitness website before any 3D interaction is added. Reference browsing focused on modern gym websites and fitness interiors, with the goal of finding a strong visual direction rather than copying a site.
+Research reviewed on 24 October 2026. The goal was to study real fitness websites and current gym UX guidance, then apply the strongest general patterns to an original KINETIK concept. This research informed design choices; no source site's copy, exact composition, or source code was copied.
 
-## Visual patterns used
+## Main website references
 
-- Dark forest-green and black backgrounds paired with a restrained bright-green accent.
-- Large, condensed display typography with readable body copy.
-- Strong, direct calls to action and a clear navigation hierarchy.
-- Real gym photography and training images instead of a 3D hero object.
-- Training program cards, a weekly-routine section, recovery guidance, and responsive mobile navigation.
-- Modest hover states, smooth anchor scrolling, and scroll-triggered content reveals.
+### [Barry's](https://www.barrys.com/)
 
-## Online visual reference examples
+The site makes the core workout format easy to understand through distinct RUN and LIFT sections, a prominent first-class action, beginner guidance, and secondary lifestyle/amenity content.
 
-- IronPulse gym landing-page preview: https://www.getlandable.com/case-ironpulse.png
-- Relentless Strength gym interior: https://werelentless.com/cdn/shop/files/DSC02099_1024x1024.jpg?v=1679068967
-- Landmark Athletics gym interior: https://landmarkathletics.com/cdn/shop/files/Frame_98_2048x2048.jpg?v=1726739770
-- Today Fitness battle-rope training photo: https://framerusercontent.com/images/8Zg3Gffn02ymiplruDVhib8U3yU.jpg?scale-down-to=1024
+**Applied to KINETIK:** separate training paths into strength, conditioning, and mobility; place visible action links near the top; give every path a clear next step; include recovery and nutrition as part of the overall routine. KINETIK does not copy Barry's brand, booking links, claims, testimonials, or commercial offers.
 
-These references informed broad choices like contrast, image composition, and green accent use. KINETIK's implementation and copy are original. The live page currently uses Unsplash CDN images listed in docs/ASSET-CREDITS.md.
+### [Equinox](https://www.equinox.com/)
 
-## Motion and accessibility
+Equinox organizes its brand around a broader high-performance lifestyle, with clean navigation across clubs, membership, classes, personal training, and recovery/wellness experiences. Its homepage uses confident headline statements and large photography to create a premium editorial feel.
 
-Scroll reveals and hover states are intentionally subtle. The website respects the user's reduced-motion preference and keeps the mobile navigation, tracker, starter plan form, and FAQ keyboard-accessible. The Three.js component remains in the repository for a later phase but is not imported by the active page.
+**Applied to KINETIK:** use a lifestyle-oriented narrative, distinct photo/text compositions, and editorial pacing between sections. No club count, membership offer, or premium amenities are claimed for KINETIK.
+
+### [Rogue Fitness](https://www.roguefitness.com/)
+
+Rogue's site is highly structured around training categories, strength equipment, conditioning, mobility, recovery, and sports/athlete content.
+
+**Applied to KINETIK:** organize the experience around recognizable training goals and clear categories rather than one generic list of gym features.
+
+### [Relentless Strength](https://werelentless.com/)
+
+The gym interior imagery provides a useful green-accent reference: black equipment, long perspective lines, and crisp overhead lighting produce a serious strength-training atmosphere.
+
+**Applied to KINETIK:** forest-green and near-black surfaces, restrained lime accents, and gym photography with strong framing.
+
+### [Gymdesk — gym website examples and UX guidance](https://gymdesk.com/blog/9-gym-website-ideas-what-makes-a-good-gym-website)
+
+This May 2026 guide emphasizes a clear above-the-fold action, real photos of a venue and members, mobile-first interaction, easy schedule/pricing discovery, and avoiding friction in the next step.
+
+**Applied to KINETIK:** the hero has a direct action; navigation stays visible on desktop and becomes a mobile menu; the weekly schedule is built into the page and filterable; images are assigned alt text. Because KINETIK is only a concept, it does not invent a booking flow, price list, venue, customer reviews, or member totals.
+
+### [Zarla — gym website examples, updated September 2026](https://www.zarla.com/inspiration/gym)
+
+The review notes repeated patterns across real gym pages: lead with an aspirational promise, make the first action obvious, show photography, and communicate a clear training identity rather than a generic feature list.
+
+**Applied to KINETIK:** strong headline positioning (“Built by the work”), photo-led program cards, clear training categories, and a coherent green visual identity.
+
+### [UI Discovery — gym and fitness website pattern library](https://uidiscovery.com/websites/gym-fitness)
+
+The library aggregates sections from fitness brands and products such as Gymshark, Peloton, Equinox, Barry's, and others. Its overview shows recurring use of hero, feature, statement, and call-to-action sections.
+
+**Applied to KINETIK:** varied page rhythm—hero, principles, program cards, full-width image statement, interactive path explorer, photo collage, weekly plan, local tracker, and plan builder—rather than repeating the same card grid throughout.
+
+## Photography references reviewed
+
+- [Relentless Strength](https://werelentless.com/cdn/shop/files/DSC02099_1024x1024.jpg?v=1679068967)
+- [HypeFit](https://www.hypefit.de/images/_Q4dW_Fvu9-1920.jpeg)
+- [BLK BOX training facilities](https://www.blkboxfitness.com/pages/1-3-5-series)
+- [GreenTheory facility](https://greentheory.it/pages/osmannoro)
+- [Gym website design inspiration collection](https://dribbble.com/tags/gym-website)
+
+The active site uses separate Unsplash CDN assets documented in docs/ASSET-CREDITS.md, not the reference sites' images.
+
+## Implementation choices
+
+- No 3D objects are imported or displayed in the active React page; the existing Three.js scene remains dormant for the next stage.
+- Accent color is bright lime green against forest/near-black green; cream surfaces keep the long page readable.
+- Real photography is mixed with original typography and flat CSS details; no fake performance metrics or testimonials are used.
+- Motion is intentional: scroll-reveal entrances, a restrained marquee, hover image zooms, and smooth anchor navigation.
+- Reduced-motion styles remain available.
+- Interactions include mobile navigation, goal tabs that update training guidance, schedule filters, local session check-ins, a plan builder, and an accessible FAQ accordion.
+- KINETIK stays clearly labelled as a concept rather than pretending to be a real gym or medical service.
+
+## Further stage
+
+Review the current responsive layout, replace any photos that don't fit the final brand direction with licensed project assets, then reintroduce 3D as an optional enhancement rather than a prerequisite for the core page.
