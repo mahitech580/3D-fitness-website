@@ -70,7 +70,9 @@ try {
   await conceptFaq.click();
   assert.equal(await conceptFaq.getAttribute('aria-expanded'), 'false', 'The FAQ should collapse on click.');
   await conceptFaq.click();
-  assert.equal(await page.getByText(/No\\. KINETIK is a fitness website concept/i).count(), 1, 'The FAQ answer should reopen on click.');
+  const reopenedAnswer = page.locator('.faq-item--open .faq-answer');
+  await reopenedAnswer.waitFor();
+  assert.match(await reopenedAnswer.innerText(), /KINETIK is a fitness website concept/i, 'The FAQ answer should reopen on click.');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
