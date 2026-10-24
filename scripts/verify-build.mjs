@@ -50,7 +50,8 @@ for (const sectionId of ['home', 'kinetic-lab', 'approach', 'programs', 'trainin
   if (!appSource.includes('id="' + sectionId + '"')) failures.push('Missing expected section anchor: #' + sectionId);
 }
 if (!appSource.includes('id="main-content"')) failures.push('Skip-link target is missing.');
-if (!appSource.includes("import KineticObject from './components/KineticObject';") || !appSource.includes('<KineticObject')) failures.push('The active homepage must mount the interactive 3D training object.');
+if (!appSource.includes("lazy(() => import('./components/KineticObject'))") || !appSource.includes('<KineticSceneLoader') || !appSource.includes('<KineticObject')) failures.push('The active homepage must lazy-load and mount the interactive 3D training object near the viewport.');
+if (!appSource.includes("rootMargin: '320px'") || !appSource.includes('<Suspense fallback=')) failures.push('The 3D vendor code must be deferred until the lab approaches the viewport and provide a loading preview.');
 for (const model of ['BarbellModel', 'DumbbellModel', 'KettlebellModel']) {
   if (!sceneSource.includes(model)) failures.push('The 3D equipment lab is missing model: ' + model);
 }
