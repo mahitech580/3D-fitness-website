@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useReducedMotion } from 'framer-motion';
-import { Vector2, type Group } from 'three';
 
 type Equipment = 'barbell' | 'dumbbell' | 'kettlebell';
 type KineticObjectProps = { equipment: Equipment; autoRotate: boolean; resetToken: number };
@@ -88,17 +87,6 @@ function DumbbellModel() {
 }
 
 function KettlebellModel() {
-  const handlePoints = [
-    new Vector2(0.2, 0.42),
-    new Vector2(0.2, 0.58),
-    new Vector2(0.22, 0.72),
-    new Vector2(0.3, 0.83),
-    new Vector2(0.4, 0.86),
-    new Vector2(0.48, 0.81),
-    new Vector2(0.5, 0.72),
-    new Vector2(0.49, 0.58),
-    new Vector2(0.47, 0.43),
-  ];
   return (
     <group rotation={[0.08, 0.22, -0.04]}>
       <mesh position={[0, -0.19, 0]} scale={[0.69, 0.72, 0.58]}>
@@ -129,7 +117,6 @@ function KettlebellModel() {
         <torusGeometry args={[1.42, 0.007, 8, 120]} />
         <meshBasicMaterial color="#9da991" transparent opacity={0.55} />
       </mesh>
-      {handlePoints.length === 0 ? null : null}
     </group>
   );
 }
@@ -173,6 +160,7 @@ export default function KineticObject({ equipment, autoRotate, resetToken }: Kin
     <div ref={host} className="kinetic-object-host" role="group" aria-label={'Interactive 3D ' + equipment + '; drag to rotate the view'}>
       {visible ? (
         <Canvas
+          key={equipment + '-' + resetToken}
           dpr={[1, 1.5]}
           camera={{ position: [0, 0, equipment === 'kettlebell' ? 4.35 : 5.1], fov: 43 }}
           gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
@@ -188,7 +176,7 @@ export default function KineticObject({ equipment, autoRotate, resetToken }: Kin
             <circleGeometry args={[2.25, 64]} />
             <meshBasicMaterial color="#bfff4b" transparent opacity={0.055} />
           </mesh>
-          <OrbitControls key={resetToken} enablePan={false} enableZoom enableDamping dampingFactor={0.08} minDistance={3.1} maxDistance={7.2} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI * 3 / 4} autoRotate={autoRotate && !reducedMotion} autoRotateSpeed={0.8} />
+          <OrbitControls enablePan={false} enableZoom enableDamping dampingFactor={0.08} minDistance={3.1} maxDistance={7.2} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI * 3 / 4} autoRotate={autoRotate && !reducedMotion} autoRotateSpeed={0.8} />
         </Canvas>
       ) : (
         <SceneFallback equipment={equipment} />
