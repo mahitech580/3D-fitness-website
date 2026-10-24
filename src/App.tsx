@@ -248,7 +248,7 @@ function KineticLab() {
           <div className="kinetic-lab-stage">
             <div className="kinetic-lab-grid" aria-hidden="true" />
             <div className="kinetic-lab-stage-top"><span>OBJECT / {active.code}</span><span>{active.descriptor}</span></div>
-            <KineticObject key={equipment} equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} />
+            <KineticSceneLoader equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} />
             <div className="kinetic-lab-object-info" aria-live="polite"><span>{active.code} / 03</span><strong>{active.title}</strong><p>{active.copy}</p><div className="kinetic-lab-object-tag">{active.focus}</div></div>
             <div className="kinetic-lab-stage-bottom"><span>DRAG TO ORBIT · SCROLL TO EXPLORE</span><span className="kinetic-lab-live"><i /> SCENE READY</span></div>
             <span className="kinetic-lab-cross kinetic-lab-cross--one" aria-hidden="true">＋</span>
