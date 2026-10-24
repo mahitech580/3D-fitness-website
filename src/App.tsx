@@ -17,6 +17,14 @@ type Goal = 'strength' | 'conditioning' | 'mobility';
 type PlanResult = { title: string; meta: string; moves: string[] };
 type WeekFilter = 'ALL' | 'STRENGTH' | 'ENGINE' | 'RESTORE';
 
+type Equipment = 'barbell' | 'dumbbell' | 'kettlebell';
+type EquipmentInfo = { label: string; code: string; descriptor: string; title: string; copy: string; focus: string; symbol: string };
+const equipmentInfo: Record<Equipment, EquipmentInfo> = {
+  barbell: { label: 'Barbell', code: '01', descriptor: 'PLATE-LOADED SYSTEM', title: 'Built for big lifts.', copy: 'A balanced bar, stacked plates, and a silhouette made for compound strength work. Drag the model to inspect it from different angles.', focus: 'COMPOUND LIFTS', symbol: '═' },
+  dumbbell: { label: 'Dumbbell', code: '02', descriptor: 'SINGLE-HAND CONTROL', title: 'One side at a time.', copy: 'A compact free weight for unilateral work, controlled presses, rows, carries, and small adjustments to loading.', focus: 'CONTROL / RANGE', symbol: '╍' },
+  kettlebell: { label: 'Kettlebell', code: '03', descriptor: 'GRIP / MOMENTUM', title: 'Move with purpose.', copy: 'A compact bell and loop handle for carries, hinges, squats, and dynamic movements where technique matters.', focus: 'GRIP / FLOW', symbol: '◉' },
+};
+
 const navLinks = [
   { label: 'The method', href: '#approach' },
   { label: '3D training lab', href: '#kinetic-lab' },
@@ -180,26 +188,51 @@ function Marquee() {
 }
 
 function KineticLab() {
+  const [equipment, setEquipment] = useState<Equipment>('barbell');
+  const [autoRotate, setAutoRotate] = useState(true);
+  const [resetToken, setResetToken] = useState(0);
+  const active = equipmentInfo[equipment];
+  const choices = Object.keys(equipmentInfo) as Equipment[];
+
   return (
     <section className="kinetic-lab" id="kinetic-lab" aria-labelledby="kinetic-lab-title">
-      <div className="page-shell kinetic-lab-layout">
-        <Reveal className="kinetic-lab-copy">
-          <Eyebrow light>THE KINETIK LAB / OBJECT 001</Eyebrow>
-          <h2 id="kinetic-lab-title">FORM MEETS<br /><em>FORCE.</em></h2>
-          <p>Meet the weight behind the work. This real-time 3D barbell is built from geometry and materials in the browser—not a video or a flat image.</p>
-          <p className="kinetic-lab-instructions"><span aria-hidden="true">↻</span> Drag the object to rotate it. Take a closer look at the form, plates, and orbit rings.</p>
-          <a className="button button--lime" href="#programs">Choose your training path <Arrow /></a>
-          <div className="kinetic-lab-specs"><span>REAL-TIME 3D</span><span>DRAG TO ROTATE</span><span>BUILT IN WEBGL</span></div>
-        </Reveal>
-        <Reveal className="kinetic-lab-stage-wrap" delay={0.12}>
+      <div className="page-shell">
+        <div className="kinetic-lab-heading">
+          <Reveal className="kinetic-lab-copy">
+            <Eyebrow light>THE KINETIK LAB / LIVE OBJECTS</Eyebrow>
+            <h2 id="kinetic-lab-title">BUILT IN 3D.<br /><em>MADE TO MOVE.</em></h2>
+            <p>Not a video. Not a rendered poster. Explore custom-built training equipment in a real-time 3D scene, switch forms, and rotate each model with your pointer or finger.</p>
+          </Reveal>
+          <Reveal className="kinetic-lab-intro" delay={0.08}>
+            <span className="kinetic-lab-live"><i /> WEBGL / INTERACTIVE SCENE</span>
+            <p>Pick a piece. Spin it. Look closer.</p>
+            <a className="text-link text-link--light" href="#programs">Find your training path <Arrow /></a>
+          </Reveal>
+        </div>
+        <Reveal className="kinetic-lab-experience" delay={0.12}>
+          <div className="kinetic-lab-console">
+            <div className="kinetic-lab-picker" role="group" aria-label="Choose a 3D equipment model">
+              {choices.map((choice) => {
+                const info = equipmentInfo[choice];
+                return <button key={choice} type="button" className={'kinetic-equipment-choice' + (equipment === choice ? ' kinetic-equipment-choice--active' : '')} aria-pressed={equipment === choice} onClick={() => { setEquipment(choice); setResetToken((n) => n + 1); }}><span className="kinetic-equipment-symbol" aria-hidden="true">{info.symbol}</span><span className="kinetic-equipment-label"><strong>{info.label}</strong><small>{info.code} / {info.focus}</small></span><span className="kinetic-equipment-arrow" aria-hidden="true">↗</span></button>;
+              })}
+            </div>
+            <div className="kinetic-lab-tools">
+              <span className="kinetic-lab-tools-label">SCENE CONTROLS</span>
+              <button type="button" className={'kinetic-control' + (autoRotate ? ' kinetic-control--on' : '')} aria-pressed={autoRotate} onClick={() => setAutoRotate((value) => !value)}><span className="kinetic-control-indicator" /> Auto rotate <strong>{autoRotate ? 'ON' : 'OFF'}</strong></button>
+              <button type="button" className="kinetic-control" onClick={() => setResetToken((n) => n + 1)}><span aria-hidden="true">↻</span> Reset view</button>
+            </div>
+          </div>
           <div className="kinetic-lab-stage">
             <div className="kinetic-lab-grid" aria-hidden="true" />
-            <div className="kinetic-lab-stage-top"><span>INTERACTIVE OBJECT</span><span>001 / BARBELL</span></div>
-            <KineticObject />
-            <div className="kinetic-lab-stage-bottom"><span>ROTATE / EXPLORE</span><span className="kinetic-lab-live"><i /> SCENE READY</span></div>
+            <div className="kinetic-lab-stage-top"><span>OBJECT / {active.code}</span><span>{active.descriptor}</span></div>
+            <KineticObject key={equipment} equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} />
+            <div className="kinetic-lab-object-info" aria-live="polite"><span>{active.code} / 03</span><strong>{active.title}</strong><p>{active.copy}</p><div className="kinetic-lab-object-tag">{active.focus}</div></div>
+            <div className="kinetic-lab-stage-bottom"><span>DRAG TO ORBIT · SCROLL TO EXPLORE</span><span className="kinetic-lab-live"><i /> SCENE READY</span></div>
             <span className="kinetic-lab-cross kinetic-lab-cross--one" aria-hidden="true">＋</span>
             <span className="kinetic-lab-cross kinetic-lab-cross--two" aria-hidden="true">＋</span>
           </div>
+          <div className="kinetic-lab-caption"><span>INTERACTIVE OBJECT STUDY</span><span>BARBELL / DUMBBELL / KETTLEBELL</span><span>DRAG TO ROTATE ↗</span></div>
         </Reveal>
       </div>
     </section>
