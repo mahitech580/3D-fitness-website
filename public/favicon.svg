@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="12" fill="#090c09"/>
-  <g fill="#c9ff51" transform="translate(14 13)">
+  <rect width="64" height="64" rx="12" fill="#07180f"/>
+  <g fill="#bcf477" transform="translate(14 13)">
     <rect x="0" y="18" width="7" height="17" rx="1"/>
     <rect x="12" y="4" width="7" height="45" rx="1"/>
     <rect x="24" y="12" width="7" height="29" rx="1"/>
   </g>
-  <path d="M12 53h40" stroke="#c9ff51" stroke-width="2" opacity=".55"/>
+  <path d="M12 53h40" stroke="#bcf477" stroke-width="2" opacity=".55"/>
 </svg>
