@@ -61,6 +61,17 @@ function WeightedObject() {
   );
 }
 
+function SceneFallback({ unavailable = false }: { unavailable?: boolean }) {
+  return (
+    <div className="scene-fallback" role="img" aria-label={unavailable ? 'Stylized barbell preview; WebGL is unavailable' : 'Stylized barbell preview while the interactive scene loads'}>
+      <span className="scene-ring scene-ring--one" />
+      <span className="scene-ring scene-ring--two" />
+      <span className="scene-dumbbell"><i /><b /><i /></span>
+      <span className="scene-fallback-label">{unavailable ? 'WEBGL NOT AVAILABLE' : 'INTERACTIVE SCENE'}</span>
+    </div>
+  );
+}
+
 export default function KineticObject() {
   const host = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -72,22 +83,20 @@ export default function KineticObject() {
       return;
     }
     const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        setVisible(true);
-        observer.disconnect();
-      }
-    }, { rootMargin: '180px' });
+      setVisible(entries.some((entry) => entry.isIntersecting));
+    }, { rootMargin: '160px' });
     observer.observe(host.current);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <div ref={host} className="kinetic-object-host" aria-label="Interactive 3D dumbbell sculpture; drag to rotate the view">
+    <div ref={host} className="kinetic-object-host" role="group" aria-label="Interactive 3D dumbbell sculpture; drag to rotate the view">
       {visible ? (
         <Canvas
           dpr={[1, 1.5]}
           camera={{ position: [0, 0, 5.1], fov: 43 }}
           gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
+          fallback={<SceneFallback unavailable />}
           onCreated={({ gl }) => { gl.setClearColor('#0a0c0a', 0); }}
         >
           <ambientLight intensity={1.1} />
@@ -98,12 +107,7 @@ export default function KineticObject() {
           <OrbitControls enablePan={false} enableZoom={false} minPolarAngle={Math.PI / 3} maxPolarAngle={Math.PI * 2 / 3} />
         </Canvas>
       ) : (
-        <div className="scene-fallback" aria-hidden="true">
-          <span className="scene-ring scene-ring--one" />
-          <span className="scene-ring scene-ring--two" />
-          <span className="scene-dumbbell"><i /><b /><i /></span>
-          <span className="scene-fallback-label">INTERACTIVE SCENE</span>
-        </div>
+        <SceneFallback />
       )}
     </div>
   );
