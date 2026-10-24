@@ -58,14 +58,22 @@ The active site uses separate Unsplash CDN assets documented in docs/ASSET-CREDI
 
 ## Implementation choices
 
-- No 3D objects are imported or displayed in the active React page; the existing Three.js scene remains dormant for the next stage.
+- The active page includes an original real-time 3D barbell scene built from Three.js geometry and materials through React Three Fiber. It is not a video or a 2D image; pointer/touch dragging rotates the object through Drei's orbit controls.
+- The 3D canvas mounts near the section viewport and unmounts again when it is offscreen. This avoids continuously rendering the scene while the visitor reads other sections.
+- Rendering uses a capped device-pixel ratio and a low-power WebGL preference. A CSS barbell study is available while the canvas mounts and as the WebGL fallback.
+- The scene honors the reduced-motion preference by stopping automatic object rotation. The CSS fallback also disables its orbit animation for reduced-motion users.
 - Accent color is bright lime green against forest/near-black green; cream surfaces keep the long page readable.
 - Real photography is mixed with original typography and flat CSS details; no fake performance metrics or testimonials are used.
 - Motion is intentional: scroll-reveal entrances, a restrained marquee, hover image zooms, and smooth anchor navigation.
-- Reduced-motion styles remain available.
 - Interactions include mobile navigation, goal tabs that update training guidance, schedule filters, local session check-ins, a plan builder, and an accessible FAQ accordion.
 - KINETIK stays clearly labelled as a concept rather than pretending to be a real gym or medical service.
 
-## Further stage
+## Technical references for the 3D implementation
 
-Review the current responsive layout, replace any photos that don't fit the final brand direction with licensed project assets, then reintroduce 3D as an optional enhancement rather than a prerequisite for the core page.
+- [React Three Fiber — Canvas API](https://r3f.docs.pmnd.rs/api/canvas): used for the WebGL scene; its documented fallback and dpr options inform graceful fallback and bounded rendering resolution.
+- [Three.js — Responsive design](https://threejs.org/manual/pages/responsive.html): informed sizing the canvas through the surrounding CSS layout and avoiding unbounded device-pixel rendering on high-density displays.
+- [MDN — prefers-reduced-motion](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/%40media/prefers-reduced-motion): informs the reduced-motion treatment for the scene and CSS placeholder.
+
+## Further refinement
+
+Validate the live 3D interaction on a range of mobile screens, low-power devices, and browsers with WebGL unavailable; optimize the production bundle and imagery based on real device testing; and expand the 3D experience only when the additional interaction is useful.
