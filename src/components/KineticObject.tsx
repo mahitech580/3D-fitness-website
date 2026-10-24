@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useReducedMotion } from 'framer-motion';
-import { useEffect } from 'react';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 type Equipment = 'barbell' | 'dumbbell' | 'kettlebell';
