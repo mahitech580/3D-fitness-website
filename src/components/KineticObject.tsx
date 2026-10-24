@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useReducedMotion } from 'framer-motion';
+import { useEffect } from 'react';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 type Equipment = 'barbell' | 'dumbbell' | 'kettlebell';
 type KineticObjectProps = { equipment: Equipment; autoRotate: boolean; resetToken: number };
@@ -121,6 +123,21 @@ function KettlebellModel() {
   );
 }
 
+function SceneControls({ equipment, autoRotate, resetToken, reducedMotion }: { equipment: Equipment; autoRotate: boolean; resetToken: number; reducedMotion: boolean | null }) {
+  const controls = useRef<OrbitControlsImpl>(null);
+  const { camera } = useThree();
+
+  useEffect(() => {
+    const distance = equipment === 'kettlebell' ? 4.35 : equipment === 'dumbbell' ? 4.7 : 5.1;
+    camera.position.set(0, 0, distance);
+    camera.lookAt(0, 0, 0);
+    controls.current?.target.set(0, 0, 0);
+    controls.current?.update();
+  }, [camera, equipment, resetToken]);
+
+  return <OrbitControls ref={controls} enablePan={false} enableZoom enableDamping dampingFactor={0.08} minDistance={3.1} maxDistance={7.2} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI * 3 / 4} autoRotate={autoRotate && !reducedMotion} autoRotateSpeed={0.8} />;
+}
+
 function TrainingObject({ equipment }: { equipment: Equipment }) {
   if (equipment === 'dumbbell') return <DumbbellModel />;
   if (equipment === 'kettlebell') return <KettlebellModel />;
@@ -160,7 +177,6 @@ export default function KineticObject({ equipment, autoRotate, resetToken }: Kin
     <div ref={host} className="kinetic-object-host" role="group" aria-label={'Interactive 3D ' + equipment + '; drag to rotate the view'}>
       {visible ? (
         <Canvas
-          key={equipment + '-' + resetToken}
           dpr={[1, 1.5]}
           camera={{ position: [0, 0, equipment === 'kettlebell' ? 4.35 : 5.1], fov: 43 }}
           gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
@@ -171,12 +187,12 @@ export default function KineticObject({ equipment, autoRotate, resetToken }: Kin
           <directionalLight position={[3.5, 4, 3]} intensity={2.2} color="#efffe2" />
           <pointLight position={[-3, -1.8, 1.2]} intensity={11} color="#bfff4b" />
           <pointLight position={[0, 2, -2]} intensity={5} color="#7293a4" />
-          <TrainingObject key={equipment + '-' + resetToken} equipment={equipment} />
+          <TrainingObject key={equipment} equipment={equipment} />
           <mesh position={[0, -1.35, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <circleGeometry args={[2.25, 64]} />
             <meshBasicMaterial color="#bfff4b" transparent opacity={0.055} />
           </mesh>
-          <OrbitControls enablePan={false} enableZoom enableDamping dampingFactor={0.08} minDistance={3.1} maxDistance={7.2} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI * 3 / 4} autoRotate={autoRotate && !reducedMotion} autoRotateSpeed={0.8} />
+          <SceneControls equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} reducedMotion={reducedMotion} />
         </Canvas>
       ) : (
         <SceneFallback equipment={equipment} />
