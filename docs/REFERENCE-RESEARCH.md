@@ -1,37 +1,25 @@
-# Reference research and design decisions
+# Visual reference research
 
-The reference sites were reviewed for broad design patterns. This project uses those patterns as a direction, not as a source-code or layout copy.
+The current KINETIK stage prioritizes a polished, responsive fitness website before any 3D interaction is added. Reference browsing focused on modern gym websites and fitness interiors, with the goal of finding a strong visual direction rather than copying a site.
 
-## 3D portfolio — Deri Kurniawan
-Reference: https://3d-portfolio.derikn.com/ and https://github.com/Deri-Kurniawan/3d-portfolio
+## Visual patterns used
 
-What informed the direction: confident typography, intentional motion, clear section hierarchy, and treating the 3D style as part of the whole interface rather than a separate demo. KINETIK adapts that idea to a fitness setting with a restrained lime accent, cinematic photography, and 3D geometry.
+- Dark forest-green and black backgrounds paired with a restrained bright-green accent.
+- Large, condensed display typography with readable body copy.
+- Strong, direct calls to action and a clear navigation hierarchy.
+- Real gym photography and training images instead of a 3D hero object.
+- Training program cards, a weekly-routine section, recovery guidance, and responsive mobile navigation.
+- Modest hover states, smooth anchor scrolling, and scroll-triggered content reveals.
 
-## PR Fitness
-Reference: https://prfitnessmundur.vercel.app/ and https://github.com/GYM-3D-WEBSITES/prfitness
+## Online visual reference examples
 
-What informed the direction: 3D equipment as a visual focus, prominent navigation, and multiple dedicated content sections. KINETIK's motion lab uses its own procedural dumbbell-like sculpture; no character model is included.
+- IronPulse gym landing-page preview: https://www.getlandable.com/case-ironpulse.png
+- Relentless Strength gym interior: https://werelentless.com/cdn/shop/files/DSC02099_1024x1024.jpg?v=1679068967
+- Landmark Athletics gym interior: https://landmarkathletics.com/cdn/shop/files/Frame_98_2048x2048.jpg?v=1726739770
+- Today Fitness battle-rope training photo: https://framerusercontent.com/images/8Zg3Gffn02ymiplruDVhib8U3yU.jpg?scale-down-to=1024
 
-## Gym@freaks / 3D Gym Website
-Reference: https://pawar-pratik.github.io/3D-Gym-Website/ and https://github.com/Pawar-Pratik/3D-Gym-Website
+These references informed broad choices like contrast, image composition, and green accent use. KINETIK's implementation and copy are original. The live page currently uses Unsplash CDN images listed in docs/ASSET-CREDITS.md.
 
-What informed the direction: a sense of depth, scroll-led storytelling, and a clear link between movement and the page. The rebuild uses lightweight CSS motion for background details and reveals, while preserving readable content and responsive layouts rather than requiring users to wait for a long sequence of rendered frames.
+## Motion and accessibility
 
-## Gym Trainer
-Reference: https://isax5.github.io/gym-trainer/
-
-What informed the direction: a focused fitness identity and straightforward action paths.
-
-## Fitlife and Futras
-References: https://codewithsadee.github.io/fitlife/ and https://codewithsadee.github.io/futras/
-
-What informed the direction: separating training formats into digestible cards, maintaining a visible route to the next action, and giving nutrition and recovery their own place in the page.
-
-## Decisions for KINETIK
-
-- Replace the existing app shell and section composition rather than layering more styles onto the old experience.
-- Use real fitness photography for the page's visual storytelling.
-- Do not use 3D human or athlete models. The only 3D canvas is a procedurally built object with non-human geometry.
-- Defer the 3D canvas until it approaches the viewport, and keep the HTML controls/content available without interacting with it.
-- Support mobile layouts, keyboard navigation, and reduced-motion preferences.
-- Label sample workouts and sample weekly programming honestly; do not imply live bookings, real venue data, a medical service, or hosted AI functionality.
+Scroll reveals and hover states are intentionally subtle. The website respects the user's reduced-motion preference and keeps the mobile navigation, tracker, starter plan form, and FAQ keyboard-accessible. The Three.js component remains in the repository for a later phase but is not imported by the active page.
