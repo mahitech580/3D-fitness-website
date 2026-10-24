@@ -26,6 +26,9 @@ const scripts = await Promise.all(jsAssets.map((name) => readFile(path.join(asse
 const bundleText = scripts.join('');
 for (const featureText of [
   'BUILT BY',
+  'FORM MEETS',
+  'REAL-TIME 3D',
+  'DRAG TO ROTATE',
   'PICK YOUR PATH',
   'YOUR TRAINING.',
   'YOUR WEEK, YOUR PACE',
@@ -40,12 +43,13 @@ for (const asset of ['favicon.svg', 'site.webmanifest', 'robots.txt', 'sitemap.x
 const appSource = await readFile(path.resolve('src/App.tsx'), 'utf8').catch(() => '');
 const sceneSource = await readFile(path.resolve('src/components/KineticObject.tsx'), 'utf8').catch(() => '');
 const styles = await readFile(path.resolve('src/styles.css'), 'utf8').catch(() => '');
-for (const sectionId of ['home', 'approach', 'programs', 'training-path', 'weekly', 'tracker', 'start', 'faq']) {
+for (const sectionId of ['home', 'kinetic-lab', 'approach', 'programs', 'training-path', 'weekly', 'tracker', 'start', 'faq']) {
   if (!appSource.includes('id="' + sectionId + '"')) failures.push('Missing expected section anchor: #' + sectionId);
 }
 if (!appSource.includes('id="main-content"')) failures.push('Skip-link target is missing.');
-if (appSource.includes('KineticObject') || appSource.includes('@react-three') || appSource.includes('<Canvas')) failures.push('The active homepage must not import or render 3D components in this design phase.');
-if (!sceneSource.includes('<Canvas') || !sceneSource.includes('OrbitControls')) failures.push('The dormant 3D scene source should remain available for the later 3D phase.');
+if (!appSource.includes("import KineticObject from './components/KineticObject';") || !appSource.includes('<KineticObject />')) failures.push('The active homepage must mount the interactive 3D training object.');
+if (!sceneSource.includes('<Canvas') || !sceneSource.includes('OrbitControls') || !sceneSource.includes('WeightedObject')) failures.push('The 3D training lab must render the custom barbell in a WebGL canvas with rotation controls.');
+if (!styles.includes('.kinetic-lab-stage') || !styles.includes('.kinetic-object-host')) failures.push('The 3D lab presentation styles are missing.');
 const lowerScene = sceneSource.toLowerCase();
 if (lowerScene.includes('skinnedmesh') || lowerScene.includes('skeletonutils') || lowerScene.includes('humanoid') || lowerScene.includes('human model')) failures.push('The stored 3D scene should not contain a human character model.');
 if (!styles.includes('prefers-reduced-motion')) failures.push('Reduced-motion styles are missing.');
@@ -69,5 +73,5 @@ if (failures.length) {
   for (const failure of failures) console.error(' - ' + failure);
   process.exitCode = 1;
 } else {
-  console.log('Production build verified: ' + jsAssets.length + ' JavaScript and ' + cssAssets.length + ' CSS assets, new page sections, active no-3D state, and Pages metadata are present.');
+  console.log('Production build verified: ' + jsAssets.length + ' JavaScript and ' + cssAssets.length + ' CSS assets, active interactive 3D canvas, rotating barbell controls, responsive lab styling, page sections, and Pages metadata are present.');
 }
