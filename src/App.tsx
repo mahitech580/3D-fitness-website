@@ -206,7 +206,7 @@ function KineticSceneLoader({ equipment, autoRotate, resetToken }: { equipment: 
     observer.observe(host.current);
     return () => observer.disconnect();
   }, []);
-  return <div ref={host} className="kinetic-scene-loader">{nearViewport ? <Suspense fallback={<EquipmentScenePreview equipment={equipment} status="LOADING 3D ENGINE" />}><KineticObject key={equipment} equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} /></Suspense> : <EquipmentScenePreview equipment={equipment} status="SCENE STANDBY / APPROACH TO ACTIVATE" />}</div>;
+  return <div ref={host} className="kinetic-scene-loader">{nearViewport ? <Suspense fallback={<EquipmentScenePreview equipment={equipment} status="LOADING 3D ENGINE" />}><KineticObject equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} /></Suspense> : <EquipmentScenePreview equipment={equipment} status="SCENE STANDBY / APPROACH TO ACTIVATE" />}</div>;
 }
 
 function KineticLab() {
