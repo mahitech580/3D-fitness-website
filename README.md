@@ -1,10 +1,11 @@
 # KINETIK — Train With Intent
 
-KINETIK is a responsive, photo-led fitness website concept. This phase focuses on the full website experience, a distinctive forest-green and lime visual identity, interactive training paths, and usable mobile layouts. The 3D equipment study is intentionally not loaded by the active page; it is reserved for a later phase.
+KINETIK is a responsive, photo-led fitness website concept with a real-time interactive 3D training lab. It combines a forest-green and lime visual identity, a custom WebGL barbell built from Three.js geometry, drag-to-rotate controls, training-path exploration, and usable mobile layouts.
 
 ## Experience map
 
 - Editorial hero: oversized typography, layered fitness photography, and clear calls to explore training.
+- Interactive 3D training lab: an original barbell sculpture with metal materials, animated orbit rings, and pointer/touch rotation controls. The canvas mounts as the user approaches the section.
 - Sticky navigation, an accessible mobile menu, and smooth in-page navigation.
 - Training philosophy: intent, repeatable effort, and recovery.
 - Three photo-led program cards: strength, conditioning, and mobility.
@@ -23,7 +24,7 @@ The visual research combines the confident identity and focused calls to action 
 
 ## Stack
 
-React, TypeScript, Vite, Framer Motion, HTML, and CSS. GitHub Pages deploys the production build from main.
+React, TypeScript, Vite, Framer Motion, Three.js, React Three Fiber, Drei, HTML, and CSS. GitHub Pages deploys the production build from main.
 
 ## Run locally
 
@@ -42,6 +43,6 @@ This is a website concept, not a real gym or coaching service. There is no backe
 
 Fitness photographs load remotely from Unsplash and require an internet connection. Review the current Unsplash terms and attribution guidance before using the assets in a commercial service. See docs/ASSET-CREDITS.md for the image inventory and docs/REFERENCE-RESEARCH.md for the design references.
 
-## Next stage
+## Further refinement
 
-Reintroduce the Three.js equipment experience after the core responsive layout, photos, interactions, and content have been reviewed. The existing scene component is retained but is not imported or rendered by the current homepage.
+The 3D lab is part of the active homepage. Future improvements should focus on validating the experience on real mobile devices, optimizing the WebGL bundle and imagery, and adding only those further 3D interactions that help visitors understand the training concept.
