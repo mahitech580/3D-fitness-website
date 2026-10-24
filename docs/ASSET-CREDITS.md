@@ -1,14 +1,23 @@
 # Photo asset notes
 
-The fitness and lifestyle photography is loaded from Unsplash's image CDN. Each URL in src/App.tsx uses crop and size parameters to reduce the amount of image data requested. An internet connection is required to load the photos.
+The current page uses online fitness photography delivered from Unsplash's image CDN. URLs in src/App.tsx include crop/size parameters so they don't request the largest original image. Remote images need an internet connection and can be changed by their hosts.
 
-- Hero and closing background: Unsplash image ID photo-1534438327276-14e5300c3a48.
+## Active image inventory
+
+- Hero gym interior: Unsplash image ID photo-1534438327276-14e5300c3a48.
 - Strength program: Unsplash image ID photo-1583454110551-21f2fa2afe61.
 - Conditioning program: Unsplash image ID photo-1538805060514-97d9cc17730c.
-- Mobility and recovery program: Unsplash image ID photo-1518611012118-696072aa579a.
-- Nutrition and recovery section: Unsplash image ID photo-1490645935967-10de6ba17061.
-- Training floor feature: Unsplash image ID photo-1571902943202-507ec2618e8f.
+- Mobility/recovery: Unsplash image ID photo-1518611012118-696072aa579a.
+- Nutrition/recovery: Unsplash image ID photo-1490645935967-10de6ba17061.
+- Gym floor feature: Unsplash image ID photo-1571902943202-507ec2618e8f.
+- Athlete/gallery: Unsplash image ID photo-1517836357463-d25dfeac3438.
+- Functional training/gallery: Unsplash image ID photo-1534258936925-c58bed479fcb.
 
-Online visual references reviewed for general direction included dark gym interiors, strong contrast, green lighting details, and photo-led hero sections. No reference site's source code or exact page layout was copied.
+## Visual reference images/sites reviewed
 
-These CDN URLs are third-party dependencies and can change or become unavailable. Review the applicable Unsplash terms at https://unsplash.com/ and consider replacing remote URLs with appropriately licensed local assets for a fully self-contained commercial deployment.
+- [Relentless Strength gym interior](https://werelentless.com/cdn/shop/files/DSC02099_1024x1024.jpg?v=1679068967) — dark space, green equipment accents, strong central perspective.
+- [HypeFit gym interior](https://www.hypefit.de/images/_Q4dW_Fvu9-1920.jpeg) — green-lit training area and equipment density.
+- [BLK BOX 1-3-5 facility images](https://www.blkboxfitness.com/pages/1-3-5-series) — functional training layout and equipment photography.
+- [GreenTheory facility image](https://greentheory.it/pages/osmannoro) — green equipment and large gym floor.
+
+These references are for visual study; the active site photography is sourced separately from Unsplash. Review the applicable Unsplash terms at [unsplash.com](https://unsplash.com/) and replace remote CDN images with appropriately licensed local assets if a self-contained commercial deployment is required.
