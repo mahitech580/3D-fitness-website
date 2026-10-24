@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { MotionConfig, motion, useReducedMotion } from 'framer-motion';
+import KineticObject from './components/KineticObject';
 
 const photos = {
   hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1800&q=85',
@@ -18,6 +19,7 @@ type WeekFilter = 'ALL' | 'STRENGTH' | 'ENGINE' | 'RESTORE';
 
 const navLinks = [
   { label: 'The method', href: '#approach' },
+  { label: '3D training lab', href: '#kinetic-lab' },
   { label: 'Training paths', href: '#programs' },
   { label: 'Weekly rhythm', href: '#weekly' },
   { label: 'Your progress', href: '#tracker' },
@@ -177,6 +179,33 @@ function Marquee() {
   return <div className="marquee" aria-label={items.join(' · ')}><div className="marquee-track" aria-hidden="true">{[0, 1].map((set) => <div className="marquee-group" key={set}>{items.map((item) => <span key={item + set}>{item}<i>✳</i></span>)}</div>)}</div></div>;
 }
 
+function KineticLab() {
+  return (
+    <section className="kinetic-lab" id="kinetic-lab" aria-labelledby="kinetic-lab-title">
+      <div className="page-shell kinetic-lab-layout">
+        <Reveal className="kinetic-lab-copy">
+          <Eyebrow light>THE KINETIK LAB / OBJECT 001</Eyebrow>
+          <h2 id="kinetic-lab-title">FORM MEETS<br /><em>FORCE.</em></h2>
+          <p>Meet the weight behind the work. This real-time 3D barbell is built from geometry and materials in the browser—not a video or a flat image.</p>
+          <p className="kinetic-lab-instructions"><span aria-hidden="true">↻</span> Drag the object to rotate it. Take a closer look at the form, plates, and orbit rings.</p>
+          <a className="button button--lime" href="#programs">Choose your training path <Arrow /></a>
+          <div className="kinetic-lab-specs"><span>REAL-TIME 3D</span><span>DRAG TO ROTATE</span><span>BUILT IN WEBGL</span></div>
+        </Reveal>
+        <Reveal className="kinetic-lab-stage-wrap" delay={0.12}>
+          <div className="kinetic-lab-stage">
+            <div className="kinetic-lab-grid" aria-hidden="true" />
+            <div className="kinetic-lab-stage-top"><span>INTERACTIVE OBJECT</span><span>001 / BARBELL</span></div>
+            <KineticObject />
+            <div className="kinetic-lab-stage-bottom"><span>ROTATE / EXPLORE</span><span className="kinetic-lab-live"><i /> SCENE READY</span></div>
+            <span className="kinetic-lab-cross kinetic-lab-cross--one" aria-hidden="true">＋</span>
+            <span className="kinetic-lab-cross kinetic-lab-cross--two" aria-hidden="true">＋</span>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 function Approach() {
   return (
     <section className="approach section-pad" id="approach">
@@ -326,7 +355,7 @@ function Footer() {
 
 export function App() {
   useEffect(() => { document.documentElement.dataset.site = 'kinetik'; }, []);
-  return <MotionConfig reducedMotion="user"><div className="kinetik-app"><a className="skip-link" href="#main-content">Skip to content</a><Header /><main id="main-content"><Hero /><Marquee /><Approach /><Programs /><FeatureSection /><PathExplorer /><Gallery /><FuelSection /><WeeklyPlan /><ProgressTracker /><PlanBuilder /><FAQ /><Closing /></main><Footer /></div></MotionConfig>;
+  return <MotionConfig reducedMotion="user"><div className="kinetik-app"><a className="skip-link" href="#main-content">Skip to content</a><Header /><main id="main-content"><Hero /><Marquee /><KineticLab /><Approach /><Programs /><FeatureSection /><PathExplorer /><Gallery /><FuelSection /><WeeklyPlan /><ProgressTracker /><PlanBuilder /><FAQ /><Closing /></main><Footer /></div></MotionConfig>;
 }
 
 export default App;
