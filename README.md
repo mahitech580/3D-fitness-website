@@ -1,41 +1,42 @@
-# KINETIK — Move with intent
+# KINETIK — Find Your Strong
 
-KINETIK is a complete visual rebuild of the fitness experience: a photo-led, editorial landing page with motion design, interactive 3D geometry, training education, and small browser-side tools. The visual focus is real fitness photography and animated 3D objects—not a rendered 3D human.
+KINETIK is a responsive, photo-led fitness website concept. This stage focuses on the core user experience, clear information architecture, green-forward visual design, and smooth motion. The 3D experience is intentionally paused and can be added in a later stage.
 
-## Experience map
+## What is included
 
-- **Cinematic landing:** full-bleed gym photography, high-contrast type, CSS 3D geometry, and animated orbit rings.
-- **Training approach:** a practical set of principles about planning, technique, and recovery.
-- **Three training lanes:** strength, conditioning, and mobility with photographic cards.
-- **Interactive motion lab:** a procedural Three.js dumbbell sculpture with metallic materials, animated rings, lighting, and drag-to-orbit controls. The scene is mounted when it approaches the viewport.
-- **Training loop:** animated CSS 3D illustration cards for planning, training, and recovery.
-- **Fuel and recovery:** photography-led nutrition and recovery section.
-- **Example weekly rhythm:** a clearly labelled sample week—not a live timetable.
-- **Local consistency tracker:** toggle days completed this week; check-ins are stored in this browser only.
-- **Starter plan builder:** build a simple rule-based example based on goal, level, and available time. It is not a hosted AI coach.
-- **FAQ and clear product notes:** explains the experience and its limitations.
-- **Responsive interaction:** mobile navigation, accessible accordions, focus styles, keyboard navigation, scroll reveals, and reduced-motion support.
+- Cinematic gym-photography hero, bold display type, and lime/forest-green palette.
+- Sticky navigation with an accessible mobile menu.
+- Training approach and three photo-led program cards: strength, conditioning, and mobility.
+- Consistency feature, three-step training loop, and nutrition/recovery section.
+- Example weekly training rhythm (clearly labelled as a sample, not a live schedule).
+- Weekly habit tracker stored locally in the current browser.
+- Starter plan builder based on goal, experience level, and available time.
+- Accessible FAQ accordion, focus states, skip link, and reduced-motion support.
+- Responsive layouts for desktop, tablet, and mobile screens.
+- Scroll reveal animations and smooth in-page navigation.
+- Online photography loaded from the Unsplash image CDN.
 
 ## Stack
 
-React, TypeScript, Vite, Three.js, React Three Fiber, Drei, and Framer Motion. GitHub Pages deploys the production build from the main branch.
+React, TypeScript, Vite, Framer Motion, HTML, and CSS. GitHub Pages deploys the production build from the main branch.
 
 ## Run locally
 
-1. Use Node.js 20 or newer.
-2. Install packages with npm install.
-3. Start the development server with npm run dev.
-4. Check TypeScript and the production bundle with npm run check.
-5. Preview the production build with npm run preview.
+Use Node.js 20 or newer.
 
-The CI workflow runs the production checks and a Playwright browser smoke test.
+1. Install dependencies with npm install.
+2. Start the dev server with npm run dev.
+3. Run the production/type checks with npm run check.
+4. Preview the production build with npm run preview.
+
+The GitHub Actions workflow runs production checks before deployment.
 
 ## Data and limitations
 
-There is no backend, user account, real gym directory, booking service, membership checkout, hosted AI model, camera-based repetition tracking, or cloud synchronization. The progress tracker and generated starter plan use browser-local storage when available. The weekly rhythm and workouts are examples, not individual coaching or medical advice. Users should adapt exercise choices to their ability and stop if an exercise causes pain.
+This is a website concept, not a real gym service. There is no backend, user account, real gym directory, booking system, membership checkout, hosted AI coach, or cloud synchronization. The weekly tracker and generated sample plan are stored in browser-local storage when available. Example routines are educational starting points, not individualized coaching or medical advice.
 
-The photo assets are loaded from Unsplash's image CDN, so viewing imagery requires an internet connection. See docs/ASSET-CREDITS.md for the asset notes and docs/REFERENCE-RESEARCH.md for the design direction.
+Images are remote Unsplash CDN assets and require an internet connection. Check the current terms and attribution guidance at Unsplash before adapting assets for a commercial deployment. See docs/ASSET-CREDITS.md for the image inventory and docs/REFERENCE-RESEARCH.md for the visual direction.
 
-## Design references reviewed
+## Next stage
 
-The rebuild takes broad inspiration from the references supplied for the task: the 3D-themed polish and motion language of Deri Kurniawan's portfolio, the object-focused 3D direction of PR Fitness and Gym@freaks, and the section hierarchy of Fitlife, Futras, and Gym Trainer. Their source code and layouts were not copied into this project.
+The Three.js equipment study is kept in the repository for potential future use, but it is not loaded or displayed in the current experience. The current priority is the responsive website and its content structure.
