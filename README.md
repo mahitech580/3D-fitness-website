@@ -1,11 +1,11 @@
 # KINETIK — Train With Intent
 
-KINETIK is a responsive, photo-led fitness website concept with a real-time interactive 3D training lab. It combines a forest-green and lime visual identity, a custom WebGL barbell built from Three.js geometry, drag-to-rotate controls, training-path exploration, and usable mobile layouts.
+KINETIK is a responsive, photo-led fitness website concept with a real-time interactive 3D training lab. It combines a forest-green and lime visual identity, three custom WebGL equipment models, zoom/rotation/reset controls, training-path exploration, and responsive mobile layouts.
 
 ## Experience map
 
 - Editorial hero: oversized typography, layered fitness photography, and clear calls to explore training.
-- Interactive 3D training lab: an original barbell sculpture with metal materials, animated orbit rings, and pointer/touch rotation controls. The canvas mounts as the user approaches the section.
+- Interactive 3D training lab: custom barbell, dumbbell, and kettlebell models with metallic materials and orbit rings. Visitors can change equipment, drag to rotate, zoom in, toggle automatic rotation, and reset the view. The canvas mounts near the viewport and unmounts offscreen.
 - Sticky navigation, an accessible mobile menu, and smooth in-page navigation.
 - Training philosophy: intent, repeatable effort, and recovery.
 - Three photo-led program cards: strength, conditioning, and mobility.
@@ -45,4 +45,4 @@ Fitness photographs load remotely from Unsplash and require an internet connecti
 
 ## Further refinement
 
-The 3D lab is part of the active homepage. Future improvements should focus on validating the experience on real mobile devices, optimizing the WebGL bundle and imagery, and adding only those further 3D interactions that help visitors understand the training concept.
+The 3D lab is part of the active homepage. Future improvements should focus on validating all equipment controls on real mobile devices, optimizing the WebGL bundle and imagery, and adding further 3D interactions only when they help visitors understand the training concept.
