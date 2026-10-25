@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { MotionConfig, motion, useReducedMotion } from 'framer-motion';
 const KineticObject = lazy(() => import('./components/KineticObject'));
 
@@ -105,16 +105,30 @@ function loadCheckins(): string[] {
   try {
     if (typeof window === 'undefined') return [];
     const value: unknown = JSON.parse(window.localStorage.getItem(weekKey()) || '[]');
-    return Array.isArray(value) ? value.filter((day): day is string => typeof day === 'string') : [];
-  } catch { return []; }
+    if (!Array.isArray(value)) return [];
+    const allowedDays = new Set(['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']);
+    return [...new Set(value.filter((day): day is string => typeof day === 'string' && allowedDays.has(day)))];
+  } catch {
+    return [];
+  }
 }
 
 function loadPlan(): PlanResult | null {
   try {
     if (typeof window === 'undefined') return null;
-    const value = JSON.parse(window.localStorage.getItem('kinetik-starter-plan') || 'null') as PlanResult | null;
-    return value && typeof value.title === 'string' && typeof value.meta === 'string' && Array.isArray(value.moves) ? value : null;
-  } catch { return null; }
+    const parsed: unknown = JSON.parse(window.localStorage.getItem('kinetik-starter-plan') || 'null');
+    if (typeof parsed !== 'object' || parsed === null) return null;
+    const candidate = parsed as Record<string, unknown>;
+    if (typeof candidate.title !== 'string' || !candidate.title.trim()) return null;
+    if (typeof candidate.meta !== 'string' || !candidate.meta.trim() || !Array.isArray(candidate.moves)) return null;
+    const moves = candidate.moves
+      .filter((move): move is string => typeof move === 'string' && move.trim().length > 0)
+      .slice(0, 8);
+    if (!moves.length) return null;
+    return { title: candidate.title, meta: candidate.meta, moves };
+  } catch {
+    return null;
+  }
 }
 
 function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; delay?: number; className?: string }) {
@@ -306,24 +320,88 @@ function FeatureSection() {
 function PathExplorer() {
   const [goal, setGoal] = useState<Goal>('strength');
   const [active, setActive] = useState(paths.strength);
+  const goals: Goal[] = ['strength', 'conditioning', 'mobility'];
+
   useEffect(() => {
     function choosePath(event: Event) {
       const next = (event as CustomEvent<Goal>).detail;
-      if (next === 'strength' || next === 'conditioning' || next === 'mobility') { setGoal(next); setActive(paths[next]); }
+      if (next === 'strength' || next === 'conditioning' || next === 'mobility') {
+        setGoal(next);
+        setActive(paths[next]);
+      }
     }
     window.addEventListener('kinetik-path', choosePath);
     return () => window.removeEventListener('kinetik-path', choosePath);
   }, []);
-  function selectGoal(next: Goal) { setGoal(next); setActive(paths[next]); }
-  function buildPlan() { window.dispatchEvent(new CustomEvent('kinetik-focus', { detail: goal })); window.location.hash = 'start'; }
+
+  function selectGoal(next: Goal) {
+    setGoal(next);
+    setActive(paths[next]);
+  }
+
+  function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, current: Goal) {
+    const currentIndex = goals.indexOf(current);
+    let nextIndex = currentIndex;
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % goals.length;
+    else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') nextIndex = (currentIndex + goals.length - 1) % goals.length;
+    else if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = goals.length - 1;
+    else return;
+
+    event.preventDefault();
+    const nextGoal = goals[nextIndex];
+    selectGoal(nextGoal);
+    document.getElementById('path-tab-' + nextGoal)?.focus();
+  }
+
+  function buildPlan() {
+    window.dispatchEvent(new CustomEvent('kinetik-focus', { detail: goal }));
+    window.location.hash = 'start';
+  }
+
   return (
     <section className="path-section section-pad" id="training-path">
       <div className="page-shell">
-        <Reveal className="section-heading section-heading--split"><div><Eyebrow>04 / FIND YOUR STARTING POINT</Eyebrow><h2>YOUR TRAINING.<br /><em>YOUR PACE.</em></h2></div><p>Choose the type of work that fits your current goal. Explore a few practical starting points, then use the builder to sketch a first session.</p></Reveal>
-        <div className="path-tabs" role="tablist" aria-label="Choose training path">{(Object.keys(paths) as Goal[]).map((key) => <button type="button" role="tab" aria-selected={goal === key} className={goal === key ? 'path-tab path-tab--active' : 'path-tab'} key={key} onClick={() => selectGoal(key)}>{paths[key].label}<Arrow diagonal={false} /></button>)}</div>
-        <div className="path-content" role="tabpanel">
-          <div className="path-photo"><img src={active.image} alt={active.imageAlt} loading="lazy" decoding="async" /><span className="path-photo-caption">{active.note}</span><span className="path-photo-index">KINETIK / 0{(Object.keys(paths) as Goal[]).indexOf(goal) + 1}</span></div>
-          <div className="path-detail"><Eyebrow>THE STARTING POINT</Eyebrow><h3>{active.title}</h3><p className="path-statement">{active.statement}</p><div className="path-steps">{active.steps.map((step, index) => <div className="path-step" key={step.title}><span>0{index + 1}</span><div><strong>{step.title}</strong><p>{step.copy}</p></div></div>)}</div><button type="button" className="button button--dark" onClick={buildPlan}>Build from this path <Arrow /></button></div>
+        <Reveal className="section-heading section-heading--split">
+          <div><Eyebrow>04 / FIND YOUR STARTING POINT</Eyebrow><h2>YOUR TRAINING.<br /><em>YOUR PACE.</em></h2></div>
+          <p>Choose the type of work that fits your current goal. Explore a few practical starting points, then use the builder to sketch a first session.</p>
+        </Reveal>
+        <div className="path-tabs" role="tablist" aria-label="Choose training path">
+          {goals.map((key) => (
+            <button
+              id={'path-tab-' + key}
+              type="button"
+              role="tab"
+              aria-selected={goal === key}
+              aria-controls="path-panel"
+              tabIndex={goal === key ? 0 : -1}
+              className={goal === key ? 'path-tab path-tab--active' : 'path-tab'}
+              key={key}
+              onClick={() => selectGoal(key)}
+              onKeyDown={(event) => handleTabKeyDown(event, key)}
+            >{paths[key].label}<Arrow diagonal={false} /></button>
+          ))}
+        </div>
+        <div className="path-content" id="path-panel" role="tabpanel" aria-labelledby={'path-tab-' + goal} tabIndex={0}>
+          <div className="path-photo">
+            <img src={active.image} alt={active.imageAlt} loading="lazy" decoding="async" />
+            <span className="path-photo-caption">{active.note}</span>
+            <span className="path-photo-index">KINETIK / 0{goals.indexOf(goal) + 1}</span>
+          </div>
+          <div className="path-detail">
+            <Eyebrow>THE STARTING POINT</Eyebrow>
+            <h3>{active.title}</h3>
+            <p className="path-statement">{active.statement}</p>
+            <div className="path-steps">
+              {active.steps.map((step, index) => (
+                <div className="path-step" key={step.title}>
+                  <span>0{index + 1}</span>
+                  <div><strong>{step.title}</strong><p>{step.copy}</p></div>
+                </div>
+              ))}
+            </div>
+            <button type="button" className="button button--dark" onClick={buildPlan}>Build from this path <Arrow /></button>
+          </div>
         </div>
       </div>
     </section>
@@ -374,25 +452,107 @@ function PlanBuilder() {
   const [level, setLevel] = useState('beginner');
   const [duration, setDuration] = useState('45');
   const [plan, setPlan] = useState<PlanResult | null>(loadPlan);
+
+  function invalidatePlan() {
+    setPlan(null);
+    try {
+      window.localStorage.removeItem('kinetik-starter-plan');
+    } catch {
+      // Keep the form usable when browser storage is unavailable.
+    }
+  }
+
   useEffect(() => {
     function onFocus(event: Event) {
       const next = (event as CustomEvent<Goal>).detail;
-      if (next === 'strength' || next === 'conditioning' || next === 'mobility') setGoal(next);
+      if (next === 'strength' || next === 'conditioning' || next === 'mobility') {
+        setGoal(next);
+        invalidatePlan();
+      }
     }
     window.addEventListener('kinetik-focus', onFocus);
     return () => window.removeEventListener('kinetik-focus', onFocus);
   }, []);
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const next: PlanResult = { title: goalTitles[goal], meta: level[0].toUpperCase() + level.slice(1) + ' level · ' + duration + ' minutes · browser-made sample', moves: planTemplates[goal].slice(0, duration === '30' ? 3 : 4) };
+    const next: PlanResult = {
+      title: goalTitles[goal],
+      meta: level[0].toUpperCase() + level.slice(1) + ' level · ' + duration + ' minutes · browser-made sample',
+      moves: planTemplates[goal].slice(0, duration === '30' ? 3 : 4),
+    };
     setPlan(next);
-    try { window.localStorage.setItem('kinetik-starter-plan', JSON.stringify(next)); } catch { /* Keep the generated result visible. */ }
+    try {
+      window.localStorage.setItem('kinetik-starter-plan', JSON.stringify(next));
+    } catch {
+      // The generated plan remains visible for this session.
+    }
   }
-  function clear() {
-    setPlan(null);
-    try { window.localStorage.removeItem('kinetik-starter-plan'); } catch { /* Ignore unavailable storage. */ }
-  }
-  return <section className="builder section-pad" id="start"><div className="page-shell builder-layout"><Reveal className="builder-intro"><Eyebrow>09 / START WITH A FIRST DRAFT</Eyebrow><h2>MAKE A PLAN.<br /><em>MAKE IT YOURS.</em></h2><p>Choose a goal, your starting point, and the time you have. KINETIK will put together a simple session template you can review and adapt.</p><div className="builder-note"><span>✳</span><p><strong>NO MAGIC FORMULA.</strong><br />Just a practical place to begin. Keep the plan realistic and progress at your own pace.</p></div></Reveal><Reveal className="builder-card" delay={0.1}><div className="builder-card-head"><span>STARTER PLAN BUILDER</span><span>3 INPUTS / 1 PLAN</span></div><form onSubmit={submit}><fieldset className="goal-fieldset"><legend className="field-label">01 / What is your focus?</legend><div className="goal-options"><label className={'goal-option' + (goal === 'strength' ? ' goal-option--selected' : '')}><input type="radio" name="goal" value="strength" checked={goal === 'strength'} onChange={() => setGoal('strength')} /><span className="goal-icon">↗</span><strong>Get stronger</strong><small>Strength</small></label><label className={'goal-option' + (goal === 'conditioning' ? ' goal-option--selected' : '')}><input type="radio" name="goal" value="conditioning" checked={goal === 'conditioning'} onChange={() => setGoal('conditioning')} /><span className="goal-icon">⌁</span><strong>Build my engine</strong><small>Conditioning</small></label><label className={'goal-option' + (goal === 'mobility' ? ' goal-option--selected' : '')}><input type="radio" name="goal" value="mobility" checked={goal === 'mobility'} onChange={() => setGoal('mobility')} /><span className="goal-icon">↻</span><strong>Move with ease</strong><small>Mobility</small></label></div></fieldset><div className="builder-fields"><label><span className="field-label">02 / Starting point</span><select value={level} onChange={(event) => setLevel(event.target.value)}><option value="beginner">Beginner — learn the basics</option><option value="intermediate">Intermediate — build consistency</option><option value="advanced">Advanced — stay deliberate</option></select></label><label><span className="field-label">03 / Time available</span><select value={duration} onChange={(event) => setDuration(event.target.value)}><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option></select></label></div><button className="button button--lime button--full" type="submit">Build my starter plan <Arrow /></button></form>{plan && <div className="generated-plan" aria-live="polite"><div className="generated-plan-head"><span>YOUR FIRST DRAFT</span><span className="plan-check">✓</span></div><h3>{plan.title}</h3><p className="plan-meta">{plan.meta}</p><ol>{plan.moves.map((move) => <li key={move}>{move}</li>)}</ol><p className="plan-disclaimer">Educational example only—not individualized medical advice. Adapt movements to your ability and stop if an exercise causes pain.</p><button type="button" className="clear-plan" onClick={clear}>Clear saved plan ×</button></div>}<p className="builder-local-note"><span /> Preferences and plan stay in this browser only.</p></Reveal></div></section>;
+
+  return (
+    <section className="builder section-pad" id="start">
+      <div className="page-shell builder-layout">
+        <Reveal className="builder-intro">
+          <Eyebrow>09 / START WITH A FIRST DRAFT</Eyebrow>
+          <h2>MAKE A PLAN.<br /><em>MAKE IT YOURS.</em></h2>
+          <p>Choose a goal, your starting point, and the time you have. KINETIK will put together a simple session template you can review and adapt.</p>
+          <div className="builder-note"><span>✳</span><p><strong>NO MAGIC FORMULA.</strong><br />Just a practical place to begin. Keep the plan realistic and progress at your own pace.</p></div>
+        </Reveal>
+        <Reveal className="builder-card" delay={0.1}>
+          <div className="builder-card-head"><span>STARTER PLAN BUILDER</span><span>3 INPUTS / 1 PLAN</span></div>
+          <form onSubmit={submit}>
+            <fieldset className="goal-fieldset">
+              <legend className="field-label">01 / What is your focus?</legend>
+              <div className="goal-options">
+                <label className={'goal-option' + (goal === 'strength' ? ' goal-option--selected' : '')}>
+                  <input type="radio" name="goal" value="strength" checked={goal === 'strength'} onChange={() => { setGoal('strength'); invalidatePlan(); }} />
+                  <span className="goal-icon">↗</span><strong>Get stronger</strong><small>Strength</small>
+                </label>
+                <label className={'goal-option' + (goal === 'conditioning' ? ' goal-option--selected' : '')}>
+                  <input type="radio" name="goal" value="conditioning" checked={goal === 'conditioning'} onChange={() => { setGoal('conditioning'); invalidatePlan(); }} />
+                  <span className="goal-icon">⌁</span><strong>Build my engine</strong><small>Conditioning</small>
+                </label>
+                <label className={'goal-option' + (goal === 'mobility' ? ' goal-option--selected' : '')}>
+                  <input type="radio" name="goal" value="mobility" checked={goal === 'mobility'} onChange={() => { setGoal('mobility'); invalidatePlan(); }} />
+                  <span className="goal-icon">↻</span><strong>Move with ease</strong><small>Mobility</small>
+                </label>
+              </div>
+            </fieldset>
+            <div className="builder-fields">
+              <label>
+                <span className="field-label">02 / Starting point</span>
+                <select value={level} onChange={(event) => { setLevel(event.target.value); invalidatePlan(); }}>
+                  <option value="beginner">Beginner — learn the basics</option>
+                  <option value="intermediate">Intermediate — build consistency</option>
+                  <option value="advanced">Advanced — stay deliberate</option>
+                </select>
+              </label>
+              <label>
+                <span className="field-label">03 / Time available</span>
+                <select value={duration} onChange={(event) => { setDuration(event.target.value); invalidatePlan(); }}>
+                  <option value="30">30 minutes</option>
+                  <option value="45">45 minutes</option>
+                  <option value="60">60 minutes</option>
+                </select>
+              </label>
+            </div>
+            <button className="button button--lime button--full" type="submit">Build my starter plan <Arrow /></button>
+          </form>
+          {plan && (
+            <div className="generated-plan" aria-live="polite">
+              <div className="generated-plan-head"><span>YOUR FIRST DRAFT</span><span className="plan-check">✓</span></div>
+              <h3>{plan.title}</h3>
+              <p className="plan-meta">{plan.meta}</p>
+              <ol>{plan.moves.map((move) => <li key={move}>{move}</li>)}</ol>
+              <p className="plan-disclaimer">Educational example only—not individualized medical advice. Adapt movements to your ability and stop if an exercise causes pain.</p>
+              <button type="button" className="clear-plan" onClick={invalidatePlan}>Clear saved plan ×</button>
+            </div>
+          )}
+          <p className="builder-local-note"><span /> Preferences and plan stay in this browser only.</p>
+        </Reveal>
+      </div>
+    </section>
+  );
 }
 
 function FAQ() {
