@@ -21,6 +21,12 @@ type Equipment = 'barbell' | 'dumbbell' | 'kettlebell';
 type Finish = 'kinetik' | 'carbon' | 'steel';
 type LightingPreset = 'studio' | 'contrast' | 'neon';
 type CameraPreset = 'hero' | 'front' | 'side';
+type StoryBeat = 0 | 1 | 2;
+const storyBeats: Array<{ id: StoryBeat; eyebrow: string; title: string; copy: string }> = [
+  { id: 0, eyebrow: '01 / FORM', title: 'Built for the basics.', copy: 'Start with the silhouette. Scroll to move through the object, or take control and inspect it yourself.' },
+  { id: 1, eyebrow: '02 / FINISH', title: 'Made to feel different.', copy: 'Change the material and light rig to see how the same piece responds to a new finish.' },
+  { id: 2, eyebrow: '03 / DETAIL', title: 'Find your angle.', copy: 'Move closer, change the view, and rotate the equipment by hand for your own inspection.' },
+];
 const lightingOptions: Array<{ id: LightingPreset; label: string; note: string }> = [
   { id: 'studio', label: 'Studio', note: 'BALANCED' },
   { id: 'contrast', label: 'Contrast', note: 'HARD EDGE' },
@@ -225,7 +231,7 @@ function EquipmentScenePreview({ equipment, status }: { equipment: Equipment; st
   return <div className="kinetic-object-host" role="img" aria-label={equipmentInfo[equipment].label + ' 3D preview'}><div className="scene-fallback"><span className="scene-ring scene-ring--one" /><span className="scene-ring scene-ring--two" /><span className={'scene-dumbbell scene-dumbbell--' + equipment}><i /><b />{equipment !== 'kettlebell' && <i />}</span><span className="scene-fallback-label">{status}</span></div></div>;
 }
 
-function KineticSceneLoader({ equipment, autoRotate, resetToken, finish, lighting, cameraPreset }: { equipment: Equipment; autoRotate: boolean; resetToken: number; finish: Finish; lighting: LightingPreset; cameraPreset: CameraPreset }) {
+function KineticSceneLoader({ equipment, autoRotate, resetToken, finish, lighting, cameraPreset, storyBeat }: { equipment: Equipment; autoRotate: boolean; resetToken: number; finish: Finish; lighting: LightingPreset; cameraPreset: CameraPreset; storyBeat: StoryBeat }) {
   const host = useRef<HTMLDivElement>(null);
   const [nearViewport, setNearViewport] = useState(false);
   useEffect(() => {
@@ -240,7 +246,7 @@ function KineticSceneLoader({ equipment, autoRotate, resetToken, finish, lightin
     observer.observe(host.current);
     return () => observer.disconnect();
   }, []);
-  return <div ref={host} className="kinetic-scene-loader">{nearViewport ? <Suspense fallback={<EquipmentScenePreview equipment={equipment} status="LOADING 3D ENGINE" />}><KineticObject equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} finish={finish} lighting={lighting} cameraPreset={cameraPreset} /></Suspense> : <EquipmentScenePreview equipment={equipment} status="SCENE STANDBY / APPROACH TO ACTIVATE" />}</div>;
+  return <div ref={host} className="kinetic-scene-loader">{nearViewport ? <Suspense fallback={<EquipmentScenePreview equipment={equipment} status="LOADING 3D ENGINE" />}><KineticObject equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} finish={finish} lighting={lighting} cameraPreset={cameraPreset} storyBeat={storyBeat} /></Suspense> : <EquipmentScenePreview equipment={equipment} status="SCENE STANDBY / APPROACH TO ACTIVATE" />}</div>;
 }
 
 function KineticLab() {
@@ -250,6 +256,8 @@ function KineticLab() {
   const [finish, setFinish] = useState<Finish>('kinetik');
   const [lighting, setLighting] = useState<LightingPreset>('studio');
   const [cameraPreset, setCameraPreset] = useState<CameraPreset>('hero');
+  const [storyBeat, setStoryBeat] = useState<StoryBeat>(0);
+  const story = storyBeats[storyBeat];
   const active = equipmentInfo[equipment];
   const choices = Object.keys(equipmentInfo) as Equipment[];
 
@@ -288,13 +296,19 @@ function KineticLab() {
           <div className="kinetic-lab-stage">
             <div className="kinetic-lab-grid" aria-hidden="true" />
             <div className="kinetic-lab-stage-top"><span>OBJECT / {active.code}</span><span>{active.descriptor}</span></div>
-            <KineticSceneLoader equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} finish={finish} lighting={lighting} cameraPreset={cameraPreset} />
+            <KineticSceneLoader equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} finish={finish} lighting={lighting} cameraPreset={cameraPreset} storyBeat={storyBeat} />
             <div className="kinetic-lab-object-info" aria-live="polite"><span>{active.code} / 03</span><strong>{active.title}</strong><p>{active.copy}</p><div className="kinetic-lab-object-tag">{active.focus}</div></div>
             <div className="kinetic-lab-stage-bottom"><span>DRAG TO ORBIT · SCROLL TO EXPLORE</span><span className="kinetic-lab-live"><i /> SCENE READY</span></div>
             <span className="kinetic-lab-cross kinetic-lab-cross--one" aria-hidden="true">＋</span>
             <span className="kinetic-lab-cross kinetic-lab-cross--two" aria-hidden="true">＋</span>
           </div>
-          <div className="kinetic-lab-caption"><span>INTERACTIVE OBJECT STUDY</span><span>BARBELL / DUMBBELL / KETTLEBELL</span><span>DRAG TO ROTATE ↗</span></div>
+          <div className="kinetic-story" aria-labelledby="kinetic-story-title">
+            <div className="kinetic-story-track" role="group" aria-label="Explore the 3D product story">
+              {storyBeats.map((beat) => <button key={beat.id} type="button" className={'kinetic-story-step' + (storyBeat === beat.id ? ' kinetic-story-step--active' : '')} aria-pressed={storyBeat === beat.id} onClick={() => setStoryBeat(beat.id)}><span>{String(beat.id + 1).padStart(2, '0')}</span><i aria-hidden="true" /></button>)}
+            </div>
+            <div className="kinetic-story-copy" aria-live="polite"><span>{story.eyebrow}</span><h3 id="kinetic-story-title">{story.title}</h3><p>{story.copy}</p><div className="kinetic-story-nav"><button type="button" disabled={storyBeat === 0} onClick={() => setStoryBeat((value) => (value - 1) as StoryBeat)}>← Previous</button><button type="button" disabled={storyBeat === 2} onClick={() => setStoryBeat((value) => (value + 1) as StoryBeat)}>Next detail →</button></div></div>
+          </div>
+          <div className="kinetic-lab-caption"><span>INTERACTIVE OBJECT STUDY</span><span>SCROLL / SELECT / INSPECT</span><span>DRAG TO ROTATE ↗</span></div>
         </Reveal>
       </div>
     </section>
