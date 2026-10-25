@@ -5,11 +5,17 @@ import { useReducedMotion } from 'framer-motion';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 type Equipment = 'barbell' | 'dumbbell' | 'kettlebell';
-type KineticObjectProps = { equipment: Equipment; autoRotate: boolean; resetToken: number };
+type Finish = 'kinetik' | 'carbon' | 'steel';
+type KineticObjectProps = { equipment: Equipment; autoRotate: boolean; resetToken: number; finish: Finish };
+
+const finishAccent: Record<Finish, string> = { kinetik: '#c8ff62', carbon: '#9da991', steel: '#e6eee0' };
+const finishBody: Record<Finish, string> = { kinetik: '#343d30', carbon: '#141916', steel: '#8b9890' };
 
 const plateTones = ['#353d32', '#242b23', '#4b5547'];
 
-function BarbellModel() {
+function BarbellModel({ finish }: { finish: Finish }) {
+  const accent = finishAccent[finish];
+  const body = finishBody[finish];
   return (
     <group rotation={[0.16, 0.18, -0.08]}>
       <mesh rotation={[0, 0, Math.PI / 2]}>
@@ -30,7 +36,7 @@ function BarbellModel() {
           ))}
           <mesh position={[side * 0.43, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
             <cylinderGeometry args={[0.18, 0.18, 0.08, 36]} />
-            <meshStandardMaterial color="#c8ff62" metalness={0.48} roughness={0.22} emissive="#496b12" emissiveIntensity={0.36} />
+            <meshStandardMaterial color={accent} metalness={0.48} roughness={0.22} emissive={finish === 'steel' ? '#73877a' : '#496b12'} emissiveIntensity={0.36} />
           </mesh>
           <mesh position={[side * 0.25, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
             <cylinderGeometry args={[0.04, 0.04, 0.05, 24]} />
@@ -58,7 +64,9 @@ function BarbellModel() {
   );
 }
 
-function DumbbellModel() {
+function DumbbellModel({ finish }: { finish: Finish }) {
+  const accent = finishAccent[finish];
+  const body = finishBody[finish];
   return (
     <group rotation={[0.12, 0.2, -0.1]} scale={0.92}>
       <mesh rotation={[0, 0, Math.PI / 2]}>
@@ -70,7 +78,7 @@ function DumbbellModel() {
           {[0, 1].map((layer) => (
             <mesh key={layer} position={[side * layer * 0.18, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
               <cylinderGeometry args={[0.34 - layer * 0.035, 0.34 - layer * 0.035, 0.16, 48]} />
-              <meshStandardMaterial color={layer === 0 ? '#283027' : '#485243'} metalness={0.84} roughness={0.25} />
+              <meshStandardMaterial color={layer === 0 ? body : finish === 'steel' ? '#b9c4bb' : '#485243'} metalness={0.84} roughness={0.25} />
             </mesh>
           ))}
           <mesh position={[side * 0.37, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
@@ -87,16 +95,18 @@ function DumbbellModel() {
   );
 }
 
-function KettlebellModel() {
+function KettlebellModel({ finish }: { finish: Finish }) {
+  const accent = finishAccent[finish];
+  const body = finishBody[finish];
   return (
     <group rotation={[0.08, 0.22, -0.04]}>
       <mesh position={[0, -0.19, 0]} scale={[0.69, 0.72, 0.58]}>
         <sphereGeometry args={[0.72, 48, 40]} />
-        <meshStandardMaterial color="#343d30" metalness={0.78} roughness={0.24} />
+        <meshStandardMaterial color={body} metalness={0.78} roughness={0.24} />
       </mesh>
       <mesh position={[0, 0.01, 0]} scale={[0.44, 0.34, 0.4]}>
         <sphereGeometry args={[0.48, 32, 24]} />
-        <meshStandardMaterial color="#242d22" metalness={0.84} roughness={0.22} />
+        <meshStandardMaterial color={finish === 'steel' ? '#65726a' : body} metalness={0.84} roughness={0.22} />
       </mesh>
       <mesh position={[0, 0.01, 0]}>
         <torusGeometry args={[0.3, 0.085, 18, 56]} />
@@ -137,10 +147,10 @@ function SceneControls({ equipment, autoRotate, resetToken, reducedMotion }: { e
   return <OrbitControls ref={controls} enablePan={false} enableZoom enableDamping dampingFactor={0.08} minDistance={3.1} maxDistance={7.2} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI * 3 / 4} autoRotate={autoRotate && !reducedMotion} autoRotateSpeed={0.8} />;
 }
 
-function TrainingObject({ equipment }: { equipment: Equipment }) {
-  if (equipment === 'dumbbell') return <DumbbellModel />;
-  if (equipment === 'kettlebell') return <KettlebellModel />;
-  return <BarbellModel />;
+function TrainingObject({ equipment, finish }: { equipment: Equipment; finish: Finish }) {
+  if (equipment === 'dumbbell') return <DumbbellModel finish={finish} />;
+  if (equipment === 'kettlebell') return <KettlebellModel finish={finish} />;
+  return <BarbellModel finish={finish} />;
 }
 
 function SceneFallback({ equipment, unavailable = false }: { equipment: Equipment; unavailable?: boolean }) {
@@ -154,7 +164,7 @@ function SceneFallback({ equipment, unavailable = false }: { equipment: Equipmen
   );
 }
 
-export default function KineticObject({ equipment, autoRotate, resetToken }: KineticObjectProps) {
+export default function KineticObject({ equipment, autoRotate, resetToken, finish }: KineticObjectProps) {
   const host = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const reducedMotion = useReducedMotion();
@@ -186,7 +196,7 @@ export default function KineticObject({ equipment, autoRotate, resetToken }: Kin
           <directionalLight position={[3.5, 4, 3]} intensity={2.2} color="#efffe2" />
           <pointLight position={[-3, -1.8, 1.2]} intensity={11} color="#bfff4b" />
           <pointLight position={[0, 2, -2]} intensity={5} color="#7293a4" />
-          <TrainingObject key={equipment} equipment={equipment} />
+          <TrainingObject key={equipment + '-' + finish} equipment={equipment} finish={finish} />
           <mesh position={[0, -1.35, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <circleGeometry args={[2.25, 64]} />
             <meshBasicMaterial color="#bfff4b" transparent opacity={0.055} />
