@@ -29,6 +29,13 @@ function BarbellModel({ finish }: { finish: Finish }) {
         <cylinderGeometry args={[0.105, 0.105, 0.42, 32]} />
         <meshStandardMaterial color={finish === 'steel' ? '#d4ddd6' : finish === 'carbon' ? '#343c35' : '#737e6d'} metalness={0.82} roughness={0.28} />
       </mesh>
+      {/* Fine grip ridges give the centre shaft a more believable machined finish. */}
+      {Array.from({ length: 15 }, (_, index) => (
+        <mesh key={'shaft-knurl-' + index} position={[(index - 7) * 0.064, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <torusGeometry args={[0.075, 0.0035, 6, 24]} />
+          <meshStandardMaterial color={finish === 'steel' ? '#dce5dd' : '#8e9988'} metalness={0.9} roughness={0.32} />
+        </mesh>
+      ))}
       {([-1, 1] as const).map((side) => (
         <group key={side} position={[side * 0.95, 0, 0]}>
           {[0, 1, 2].map((layer) => (
@@ -37,6 +44,15 @@ function BarbellModel({ finish }: { finish: Finish }) {
               <meshStandardMaterial color={plates[layer]} metalness={0.82} roughness={0.26} />
             </mesh>
           ))}
+          {/* Fine concentric grooves catch the studio lights on each outer plate. */}
+          <mesh position={[side * 0.345, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+            <torusGeometry args={[0.305, 0.008, 6, 48]} />
+            <meshStandardMaterial color={finish === 'steel' ? '#eef3ef' : '#778373'} metalness={0.76} roughness={0.28} />
+          </mesh>
+          <mesh position={[side * 0.345, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+            <torusGeometry args={[0.235, 0.005, 6, 48]} />
+            <meshStandardMaterial color={accent} metalness={0.55} roughness={0.25} emissive={finish === 'steel' ? '#73877a' : '#496b12'} emissiveIntensity={0.18} />
+          </mesh>
           <mesh position={[side * 0.43, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
             <cylinderGeometry args={[0.18, 0.18, 0.08, 36]} />
             <meshStandardMaterial color={accent} metalness={0.48} roughness={0.22} emissive={finish === 'steel' ? '#73877a' : '#496b12'} emissiveIntensity={0.36} />
@@ -76,6 +92,13 @@ function DumbbellModel({ finish }: { finish: Finish }) {
         <cylinderGeometry args={[0.085, 0.085, 1.65, 36]} />
         <meshStandardMaterial color={finish === 'steel' ? '#f0f4f0' : finish === 'carbon' ? '#3b453c' : '#aeb8a7'} metalness={0.94} roughness={0.22} />
       </mesh>
+      {/* Knurled handle rings remain visible across each material finish. */}
+      {Array.from({ length: 11 }, (_, index) => (
+        <mesh key={'dumbbell-grip-' + index} position={[(index - 5) * 0.061, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <torusGeometry args={[0.085, 0.003, 6, 24]} />
+          <meshStandardMaterial color={finish === 'steel' ? '#dce5dd' : '#7e8978'} metalness={0.92} roughness={0.3} />
+        </mesh>
+      ))}
       {([-1, 1] as const).map((side) => (
         <group key={side} position={[side * 0.73, 0, 0]}>
           {[0, 1].map((layer) => (
@@ -84,6 +107,10 @@ function DumbbellModel({ finish }: { finish: Finish }) {
               <meshStandardMaterial color={layer === 0 ? body : finish === 'steel' ? '#b9c4bb' : '#485243'} metalness={0.84} roughness={0.25} />
             </mesh>
           ))}
+          <mesh position={[side * 0.265, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+            <torusGeometry args={[0.235, 0.007, 6, 42]} />
+            <meshStandardMaterial color={finish === 'steel' ? '#edf3ed' : '#768271'} metalness={0.78} roughness={0.28} />
+          </mesh>
           <mesh position={[side * 0.37, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
             <cylinderGeometry args={[0.13, 0.13, 0.06, 32]} />
             <meshStandardMaterial color={accent} metalness={0.48} roughness={0.22} emissive={finish === 'steel' ? '#73877a' : '#496b12'} emissiveIntensity={0.32} />

@@ -196,3 +196,23 @@ References reviewed:
 - Added browser smoke coverage for selecting beats, advancing and reversing, and retaining the same canvas; added production bundle checks for story content and camera wiring.
 
 This is a guided, user-controlled story rather than a full scroll-scrubbed camera timeline. That is intentional for this iteration: it adds narrative to the existing code without introducing GSAP/ScrollTrigger or a second animation loop before mobile profiling. CI must pass before the feature is considered verified or deployed.
+
+## Follow-up visual pass: interactive 3D reference direction (25 October 2026)
+
+### [mesh3d.gallery](https://mesh3d.gallery/)
+The live gallery describes itself as a curated collection of interactive, real-time Three.js experiences, with examples such as immersive product, storytelling, and studio sites. The useful pattern is not a particular page layout; it is the sense that a website can have a real-time visual element with its own lighting, material, and motion instead of relying entirely on a static hero image.
+
+**Applied to KINETIK:** the hero includes an original Three.js heavy-bag scene with a restrained orbital rig, particle accents, a small grid overlay, and a viewport observer that stops rendering when the scene is far off-screen. The 3D equipment lab remains independently interactive and keeps its existing finish, lighting, camera, and story controls.
+
+### [RUSTRIOT Gym](https://rustriot-gym.netlify.app/)
+This was supplied as the second visual reference for a more distinctive sport/fitness mood. The target for KINETIK is a similarly assertive, equipment-focused visual rhythm, without copying its code, content, assets, or exact layout.
+
+**Applied to KINETIK:** the typography, metallic details on equipment models, layered image framing, and dimensional hover treatments now carry more of the same energetic direction across the full page—from training principles and programs to the movement index, weekly plan, tracker, builder, and closing call to action.
+
+### Quality constraints retained
+- Existing wording, page sections, anchors, and user interactions remain unchanged.
+- 3D work is built from the existing Three.js / React Three Fiber dependencies; no new runtime dependencies or external 3D model downloads are required.
+- The additional hero canvas is observed against the viewport and unmounted when far off-screen.
+- Reduced-motion handling remains in place, and new hover depth is restricted to pointer-capable devices where possible.
+- Automated verification now checks that the hero WebGL scene is present, sized, and viewport-aware as well as checking the existing equipment configurator.
+

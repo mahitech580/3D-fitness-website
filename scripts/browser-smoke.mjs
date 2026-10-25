@@ -15,6 +15,12 @@ try {
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await page.locator('#hero-title').waitFor();
   assert.match(await page.title(), /KINETIK.*Train With Intent/i);
+  assert.equal(await page.locator('.hero-three-layer').count(), 1, 'The hero should include its dedicated 3D visual layer.');
+  assert.match(await page.locator('.hero-three-status').innerText(), /LIVE OBJECT \/ 3D/i, 'The hero should label its live 3D object.');
+  const heroCanvas = page.locator('.hero-three-layer canvas');
+  await heroCanvas.waitFor({ timeout: 15000 });
+  const heroBounds = await heroCanvas.boundingBox();
+  assert.ok(heroBounds && heroBounds.width > 100 && heroBounds.height > 100, 'The hero WebGL scene should have a meaningful visible render area.');
   const imageAudit = await page.locator('img').evaluateAll((images) => images
     .filter((image) => !image.hasAttribute('alt'))
     .map((image) => image.getAttribute('src') || image.outerHTML.slice(0, 120)));

@@ -82,12 +82,19 @@ if (cssText.includes('@import url(')) failures.push('CSS should not repeat the G
 
 const appSource = await readFile(path.resolve('src/App.tsx'), 'utf8').catch(() => '');
 const sceneSource = await readFile(path.resolve('src/components/KineticObject.tsx'), 'utf8').catch(() => '');
+const heroSceneSource = await readFile(path.resolve('src/components/HeroScene.tsx'), 'utf8').catch(() => '');
 const sourceStyles = await readFile(path.resolve('src/styles.css'), 'utf8').catch(() => '');
 for (const sectionId of ['home', 'kinetic-lab', 'approach', 'programs', 'training-path', 'movement-library', 'weekly', 'tracker', 'start', 'faq']) {
   if (!appSource.includes('id="' + sectionId + '"')) failures.push('Missing expected section anchor: #' + sectionId);
 }
 if (!appSource.includes('id="main-content"')) failures.push('Skip-link target is missing.');
 if (!appSource.includes("lazy(() => import('./components/KineticObject'))") || !appSource.includes('<KineticSceneLoader')) failures.push('The active homepage must lazy-load the interactive 3D training scene near the viewport.');
+if (!appSource.includes("lazy(() => import('./components/HeroScene'))") || !appSource.includes('<HeroScene />')) failures.push('The hero should lazy-load its custom 3D feature scene.');
+if (!heroSceneSource.includes('<Canvas') || !heroSceneSource.includes('new IntersectionObserver') || !heroSceneSource.includes("rootMargin: '180px'")) failures.push('The hero 3D scene should use a viewport observer to avoid rendering when far off-screen.');
+if (!heroSceneSource.includes('BoxingBag') || !heroSceneSource.includes('OrbitRings') || !heroSceneSource.includes('prefersReducedMotion')) failures.push('The hero 3D scene should include its custom model, orbital detail, and reduced-motion handling.');
+for (const depthSelector of ['.hero-three-layer', '.principle-card', '.program-card', '.path-content', '.gallery-item', '.session-step', '.movement-card', '.week-row', '.tracker-panel', '.builder-card', '.faq-item']) {
+  if (!sourceStyles.includes(depthSelector)) failures.push('Whole-site visual depth polish is missing for ' + depthSelector);
+}
 if (!appSource.includes("rootMargin: '320px'") || !appSource.includes('<Suspense fallback=')) failures.push('The deferred scene should include a viewport trigger and loading preview.');
 for (const model of ['BarbellModel', 'DumbbellModel', 'KettlebellModel']) {
   if (!sceneSource.includes(model)) failures.push('The 3D equipment lab is missing model: ' + model);

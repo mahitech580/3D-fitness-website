@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Sparkles } from '@react-three/drei';
 import { useReducedMotion } from 'framer-motion';
@@ -95,23 +95,47 @@ function OrbitRings({ reducedMotion }: { reducedMotion: boolean }) {
 }
 
 export default function HeroScene() {
+  const host = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
   const prefersReducedMotion = Boolean(useReducedMotion());
 
+  useEffect(() => {
+    const element = host.current;
+    if (!element) return;
+    if (!('IntersectionObserver' in window)) {
+      setVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      setVisible(entries.some((entry) => entry.isIntersecting));
+    }, { rootMargin: '180px' });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <Canvas
-      aria-hidden="true"
-      dpr={[1, 1.5]}
-      frameloop={prefersReducedMotion ? 'demand' : 'always'}
-      camera={{ position: [0, 0, 5.7], fov: 37 }}
-      gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
-    >
-      <ambientLight intensity={1.25} />
-      <directionalLight position={[3.2, 4, 5]} color="#eef9e7" intensity={3.4} />
-      <pointLight position={[-2.1, 0.2, 1.4]} color="#c8ff62" intensity={17} distance={6} />
-      <pointLight position={[2.2, -0.8, -1.8]} color="#f49b55" intensity={7} distance={5} />
-      <OrbitRings reducedMotion={prefersReducedMotion} />
-      <BoxingBag reducedMotion={prefersReducedMotion} />
-      <Sparkles count={30} scale={[3.4, 3.3, 2.1]} size={1.8} speed={prefersReducedMotion ? 0 : 0.18} opacity={0.56} color="#c8ff62" />
-    </Canvas>
+    <div ref={host} className="hero-three-scene" aria-hidden="true">
+      {visible ? (
+        <Canvas
+          dpr={[1, 1.5]}
+          frameloop={prefersReducedMotion ? 'demand' : 'always'}
+          camera={{ position: [0, 0, 5.7], fov: 37 }}
+          gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
+        >
+          <ambientLight intensity={1.25} />
+          <directionalLight position={[3.2, 4, 5]} color="#eef9e7" intensity={3.4} />
+          <pointLight position={[-2.1, 0.2, 1.4]} color="#c8ff62" intensity={17} distance={6} />
+          <pointLight position={[2.2, -0.8, -1.8]} color="#f49b55" intensity={7} distance={5} />
+          <OrbitRings reducedMotion={prefersReducedMotion} />
+          <BoxingBag reducedMotion={prefersReducedMotion} />
+          <Sparkles count={30} scale={[3.4, 3.3, 2.1]} size={1.8} speed={prefersReducedMotion ? 0 : 0.18} opacity={0.56} color="#c8ff62" />
+        </Canvas>
+      ) : (
+        <div className="hero-three-fallback">
+          <span className="hero-three-fallback-ring" />
+          <span className="hero-three-fallback-core" />
+        </div>
+      )}
+    </div>
   );
 }
