@@ -154,3 +154,21 @@
 .kinetic-object-host canvas:active{cursor:grabbing}
 .path-tabs [role=tab]:focus-visible{outline:2px solid var(--lime);outline-offset:4px}
 .kinetic-control:focus-visible,.kinetic-equipment-choice:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+
+
+/* Session blueprint — editorial cards inspired by premium training and wellness sites. */
+.session-guide{background:var(--paper-2);border-block:1px solid var(--line)}
+.session-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;margin-top:48px;background:var(--line);border:1px solid var(--line)}
+.session-step{min-height:290px;padding:25px 23px 28px;background:var(--paper);transition:background .25s ease,transform .25s ease}
+.session-step:hover{background:#fbfff5;transform:translateY(-4px)}
+.session-step-top{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.12em}
+.session-step-top span:last-child{white-space:nowrap}
+.session-step-mark{display:grid;place-items:center;width:52px;height:52px;margin:35px 0 24px;border:1px solid rgba(101,156,63,.4);border-radius:50%;color:var(--lime-dark);font-size:25px}
+.session-step h3{margin:0 0 12px;font-family:var(--display);font-size:clamp(23px,2.1vw,31px);font-weight:800;letter-spacing:-.025em;text-transform:uppercase}
+.session-step p{max-width:32ch;margin:0;color:var(--muted);font-size:12px;line-height:1.8}
+.session-guide-foot{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-top:25px}
+.session-guide-foot>span{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.12em}
+.session-guide-foot>span i{width:7px;height:7px;background:var(--lime-dark);border-radius:50%}
+@media(max-width:900px){.session-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.session-step{min-height:260px}}
+@media(max-width:560px){.session-steps{grid-template-columns:1fr}.session-step{min-height:0;padding:22px}.session-step-mark{margin:24px 0 18px}.session-guide-foot{align-items:flex-start;flex-direction:column;gap:14px}}
+@media(prefers-reduced-motion:reduce){.session-step{transition:none}.session-step:hover{transform:none}}
