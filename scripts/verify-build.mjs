@@ -60,6 +60,7 @@ for (const featureText of [
   'Made to feel different.',
   'Find your angle.',
   'Explore the 3D product story',
+  'Copy setup link',
   'SCROLL / SELECT / INSPECT',
   'YOUR TRAINING.',
   'MAKE EVERY',
