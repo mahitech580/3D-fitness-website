@@ -99,3 +99,16 @@ The new Session Blueprint section adds a four-stage routine—arrive, prepare, p
 - Confirm the 3D models visibly render on real mobile hardware, not only that a canvas element exists.
 - Prefer locally hosted, appropriately licensed photos if the site must remain reliable when third-party CDNs are unavailable.
 - Keep example schedule, progress tracking, and generated plans clearly labeled as browser-only concepts.
+
+
+### New feature: searchable movement index
+
+The movement index adds a small reference library of 12 starter movements across strength, conditioning, and mobility/reset. Visitors can search by movement name, equipment, focus, or coaching cue; filter by category; and reset a no-results state. This extends the design research into a practical, low-friction interaction rather than adding decorative sections alone.
+
+Research informing the decision:
+- [Gymdesk's 2026 fitness website review](https://gymdesk.com/blog/9-gym-website-ideas-what-makes-a-good-gym-website) recommends clear navigation, mobile usability, and useful next steps.
+- [Zarla's gym website examples](https://www.zarla.com/inspiration/gym) emphasizes helping visitors understand the training identity and journey quickly.
+- [UI Discovery's 54-site fitness index](https://uidiscovery.com/websites/gym-fitness) shows common patterns around feature sections, hero sections, and calls to action.
+- [Hostinger's fitness website examples](https://www.hostinger.com/tutorials/fitness-website-examples/) reinforces clear navigation and informative content as recurring design choices.
+
+Implementation notes: the library is intentionally educational, not a prescription or a claim of professional coaching. It does not fabricate testimonials, reviews, pricing, membership availability, or medical outcomes. The responsive card grid and filter controls include keyboard focus styles and an explicit no-results/reset path. Browser smoke tests exercise the default list, category filtering, search, and reset interaction.
