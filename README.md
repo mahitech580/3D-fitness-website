@@ -12,6 +12,8 @@
 - **Live material configurator:** switch the active 3D model between Kinetik lime, matte Carbon, and brushed Steel finishes; the real-time model updates without replacing the WebGL canvas.
 - **Camera presets:** switch the live camera between Hero angle, Front, and Side profile for quick model inspection.
 - **Lighting studio:** compare Studio, Contrast, and Neon light rigs by changing actual Three.js scene lights without reloading the canvas.
+- **Guided 3D story:** step through Form, Finish, and Detail beats; each beat adjusts the camera and model presentation to give the lab a deliberate product-story arc.
+- **Shareable scene presets:** use **Copy setup link** to share the selected equipment, finish, lighting rig, camera angle, and story beat. Opening the link restores that configuration from URL query parameters.
 - **Training paths:** goal tabs for strength, conditioning, and mobility, with keyboard navigation and a direct hand-off to the plan builder.
 - **Session blueprint:** four-stage arrive / prepare / practise / reset guide with flexible time ranges and responsive cards.
 - **Movement index:** searchable 12-movement reference with strength, conditioning, and mobility/reset filters, equipment cues, responsive cards, and a clear no-results reset.
