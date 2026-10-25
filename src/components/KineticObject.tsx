@@ -102,7 +102,7 @@ function KettlebellModel() {
         <torusGeometry args={[0.3, 0.085, 18, 56]} />
         <meshStandardMaterial color="#aebba2" metalness={0.92} roughness={0.2} />
       </mesh>
-      <mesh position={[0, 0.41, 0]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0.41, 0]}>
         <torusGeometry args={[0.28, 0.085, 18, 56]} />
         <meshStandardMaterial color="#bbc8ae" metalness={0.94} roughness={0.19} />
       </mesh>
