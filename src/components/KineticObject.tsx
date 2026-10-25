@@ -6,7 +6,9 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 type Equipment = 'barbell' | 'dumbbell' | 'kettlebell';
 type Finish = 'kinetik' | 'carbon' | 'steel';
-type KineticObjectProps = { equipment: Equipment; autoRotate: boolean; resetToken: number; finish: Finish };
+type LightingPreset = 'studio' | 'contrast' | 'neon';
+type CameraPreset = 'hero' | 'front' | 'side';
+type KineticObjectProps = { equipment: Equipment; autoRotate: boolean; resetToken: number; finish: Finish; lighting: LightingPreset; cameraPreset: CameraPreset };
 
 const finishAccent: Record<Finish, string> = { kinetik: '#c8ff62', carbon: '#9da991', steel: '#e6eee0' };
 const finishBody: Record<Finish, string> = { kinetik: '#343d30', carbon: '#141916', steel: '#8b9890' };
@@ -132,17 +134,19 @@ function KettlebellModel({ finish }: { finish: Finish }) {
   );
 }
 
-function SceneControls({ equipment, autoRotate, resetToken, reducedMotion }: { equipment: Equipment; autoRotate: boolean; resetToken: number; reducedMotion: boolean | null }) {
+function SceneControls({ equipment, autoRotate, resetToken, reducedMotion, cameraPreset }: { equipment: Equipment; autoRotate: boolean; resetToken: number; reducedMotion: boolean | null; cameraPreset: CameraPreset }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const { camera } = useThree();
 
   useEffect(() => {
     const distance = equipment === 'kettlebell' ? 4.35 : equipment === 'dumbbell' ? 4.7 : 5.1;
-    camera.position.set(0, 0, distance);
+    if (cameraPreset === 'side') camera.position.set(distance, 0.08, 0.25);
+    else if (cameraPreset === 'front') camera.position.set(0, 0.02, distance);
+    else camera.position.set(0.18, 0.38, distance);
     camera.lookAt(0, 0, 0);
     controls.current?.target.set(0, 0, 0);
     controls.current?.update();
-  }, [camera, equipment, resetToken]);
+  }, [camera, cameraPreset, equipment, resetToken]);
 
   return <OrbitControls ref={controls} enablePan={false} enableZoom enableDamping dampingFactor={0.08} minDistance={3.1} maxDistance={7.2} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI * 3 / 4} autoRotate={autoRotate && !reducedMotion} autoRotateSpeed={0.8} />;
 }
@@ -164,7 +168,7 @@ function SceneFallback({ equipment, unavailable = false }: { equipment: Equipmen
   );
 }
 
-export default function KineticObject({ equipment, autoRotate, resetToken, finish }: KineticObjectProps) {
+export default function KineticObject({ equipment, autoRotate, resetToken, finish, lighting, cameraPreset }: KineticObjectProps) {
   const host = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const reducedMotion = useReducedMotion();
@@ -192,16 +196,17 @@ export default function KineticObject({ equipment, autoRotate, resetToken, finis
           fallback={<SceneFallback equipment={equipment} unavailable />}
           onCreated={({ gl }) => { gl.setClearColor('#0a0c0a', 0); }}
         >
-          <ambientLight intensity={1.05} />
-          <directionalLight position={[3.5, 4, 3]} intensity={2.2} color="#efffe2" />
-          <pointLight position={[-3, -1.8, 1.2]} intensity={11} color="#bfff4b" />
-          <pointLight position={[0, 2, -2]} intensity={5} color="#7293a4" />
+          <ambientLight intensity={lighting === 'contrast' ? 0.55 : lighting === 'neon' ? 0.8 : 1.05} />
+          <directionalLight position={[3.5, 4, 3]} intensity={lighting === 'contrast' ? 3.1 : lighting === 'neon' ? 1.4 : 2.2} color={lighting === 'contrast' ? '#ffffff' : lighting === 'neon' ? '#bfff4b' : '#efffe2'} />
+          <directionalLight position={[-3, 1, -2]} intensity={lighting === 'contrast' ? 2.4 : lighting === 'neon' ? 3.0 : 0.8} color={lighting === 'contrast' ? '#9da991' : lighting === 'neon' ? '#5d82ff' : '#7293a4'} />
+          <pointLight position={[-3, -1.8, 1.2]} intensity={lighting === 'contrast' ? 5 : lighting === 'neon' ? 14 : 11} color={lighting === 'contrast' ? '#e4ebdf' : '#bfff4b'} />
+          <pointLight position={[0, 2, -2]} intensity={lighting === 'neon' ? 8 : lighting === 'contrast' ? 2 : 5} color={lighting === 'neon' ? '#5d82ff' : '#7293a4'} />
           <TrainingObject key={equipment + '-' + finish} equipment={equipment} finish={finish} />
           <mesh position={[0, -1.35, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <circleGeometry args={[2.25, 64]} />
             <meshBasicMaterial color="#bfff4b" transparent opacity={0.055} />
           </mesh>
-          <SceneControls equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} reducedMotion={reducedMotion} />
+          <SceneControls equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} reducedMotion={reducedMotion} cameraPreset={cameraPreset} />
         </Canvas>
       ) : (
         <SceneFallback equipment={equipment} />
