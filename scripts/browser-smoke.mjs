@@ -62,6 +62,26 @@ try {
   const signatureFinish = page.getByRole('button', { name: /Kinetik lime/ });
   await signatureFinish.click();
   assert.equal(await signatureFinish.getAttribute('aria-pressed'), 'true', 'The signature finish should be restorable.');
+  const lightingStudio = page.getByRole('button', { name: /Studio/ });
+  const lightingContrast = page.getByRole('button', { name: /Contrast/ });
+  const lightingNeon = page.getByRole('button', { name: /Neon/ });
+  await lightingContrast.click();
+  assert.equal(await lightingContrast.getAttribute('aria-pressed'), 'true', 'Contrast lighting should become active.');
+  assert.equal(await canvasHandle.evaluate((element) => element.isConnected), true, 'Lighting changes should preserve the live canvas.');
+  await lightingNeon.click();
+  assert.equal(await lightingNeon.getAttribute('aria-pressed'), 'true', 'Neon lighting should become active.');
+  await lightingStudio.click();
+  assert.equal(await lightingStudio.getAttribute('aria-pressed'), 'true', 'Studio lighting should be restorable.');
+  const frontView = page.getByRole('button', { name: 'Front', exact: true });
+  const sideView = page.getByRole('button', { name: 'Side profile' });
+  const heroView = page.getByRole('button', { name: 'Hero angle' });
+  await frontView.click();
+  assert.equal(await frontView.getAttribute('aria-pressed'), 'true', 'Front camera preset should become active.');
+  await sideView.click();
+  assert.equal(await sideView.getAttribute('aria-pressed'), 'true', 'Side camera preset should become active.');
+  await heroView.click();
+  assert.equal(await heroView.getAttribute('aria-pressed'), 'true', 'Hero camera preset should be restorable.');
+  assert.equal(await canvasHandle.evaluate((element) => element.isConnected), true, 'Camera changes should preserve the live canvas.');
   assert.equal(await canvasHandle.evaluate((element) => element.isConnected), true, 'Switching the model should not recreate the WebGL canvas.');
 
   const kettlebell = page.locator('.kinetic-equipment-choice').filter({ hasText: 'Kettlebell' });
