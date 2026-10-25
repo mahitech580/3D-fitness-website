@@ -49,6 +49,8 @@ for (const featureText of [
   'YOUR TRAINING.',
   'MAKE EVERY',
   'SESSION BLUEPRINT',
+  'THE MOVEMENT INDEX',
+  'No matching movement.',
   'YOUR WEEK, YOUR PACE',
   'Build my starter plan',
   'STACKED UP.',
@@ -62,7 +64,7 @@ if (cssText.includes('@import url(')) failures.push('CSS should not repeat the G
 const appSource = await readFile(path.resolve('src/App.tsx'), 'utf8').catch(() => '');
 const sceneSource = await readFile(path.resolve('src/components/KineticObject.tsx'), 'utf8').catch(() => '');
 const sourceStyles = await readFile(path.resolve('src/styles.css'), 'utf8').catch(() => '');
-for (const sectionId of ['home', 'kinetic-lab', 'approach', 'programs', 'training-path', 'weekly', 'tracker', 'start', 'faq']) {
+for (const sectionId of ['home', 'kinetic-lab', 'approach', 'programs', 'training-path', 'movement-library', 'weekly', 'tracker', 'start', 'faq']) {
   if (!appSource.includes('id="' + sectionId + '"')) failures.push('Missing expected section anchor: #' + sectionId);
 }
 if (!appSource.includes('id="main-content"')) failures.push('Skip-link target is missing.');
