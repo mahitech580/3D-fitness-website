@@ -16,22 +16,23 @@ const plateTones = ['#353d32', '#242b23', '#4b5547'];
 function BarbellModel({ finish }: { finish: Finish }) {
   const accent = finishAccent[finish];
   const body = finishBody[finish];
+  const plates = finish === 'steel' ? ['#d8e0d9', '#aab5ad', '#eef3ef'] : finish === 'carbon' ? ['#242a25', '#101411', '#414a41'] : plateTones;
   return (
     <group rotation={[0.16, 0.18, -0.08]}>
       <mesh rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.075, 0.075, 2.2, 40]} />
-        <meshStandardMaterial color="#cbd3c4" metalness={0.96} roughness={0.2} />
+        <meshStandardMaterial color={finish === 'steel' ? '#f0f4f0' : finish === 'carbon' ? '#59635a' : '#cbd3c4'} metalness={0.96} roughness={0.2} />
       </mesh>
       <mesh>
         <cylinderGeometry args={[0.105, 0.105, 0.42, 32]} />
-        <meshStandardMaterial color="#737e6d" metalness={0.82} roughness={0.28} />
+        <meshStandardMaterial color={finish === 'steel' ? '#d4ddd6' : finish === 'carbon' ? '#343c35' : '#737e6d'} metalness={0.82} roughness={0.28} />
       </mesh>
       {([-1, 1] as const).map((side) => (
         <group key={side} position={[side * 0.95, 0, 0]}>
           {[0, 1, 2].map((layer) => (
             <mesh key={layer} position={[side * layer * 0.14, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
               <cylinderGeometry args={[0.44 - layer * 0.02, 0.44 - layer * 0.02, 0.13, 56]} />
-              <meshStandardMaterial color={plateTones[layer]} metalness={0.82} roughness={0.26} />
+              <meshStandardMaterial color={plates[layer]} metalness={0.82} roughness={0.26} />
             </mesh>
           ))}
           <mesh position={[side * 0.43, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
@@ -40,13 +41,13 @@ function BarbellModel({ finish }: { finish: Finish }) {
           </mesh>
           <mesh position={[side * 0.25, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
             <cylinderGeometry args={[0.04, 0.04, 0.05, 24]} />
-            <meshStandardMaterial color="#bac5b2" metalness={0.88} roughness={0.2} />
+            <meshStandardMaterial color={finish === 'steel' ? '#f0f4f0' : '#bac5b2'} metalness={0.88} roughness={0.2} />
           </mesh>
         </group>
       ))}
       <mesh rotation={[0.78, 0.2, 0.42]}>
         <torusGeometry args={[1.55, 0.012, 8, 140]} />
-        <meshBasicMaterial color="#c8ff62" />
+        <meshBasicMaterial color={accent} />
       </mesh>
       <mesh rotation={[1.1, -0.4, -0.72]}>
         <torusGeometry args={[1.76, 0.007, 8, 140]} />
@@ -54,11 +55,11 @@ function BarbellModel({ finish }: { finish: Finish }) {
       </mesh>
       <mesh position={[1.49, 0.74, 0.12]}>
         <icosahedronGeometry args={[0.075, 1]} />
-        <meshStandardMaterial color="#d9ff91" emissive="#9fcc40" emissiveIntensity={0.6} />
+        <meshStandardMaterial color={accent} emissive={finish === 'steel' ? '#73877a' : '#9fcc40'} emissiveIntensity={0.6} />
       </mesh>
       <mesh position={[-1.55, -0.55, -0.2]}>
         <icosahedronGeometry args={[0.045, 1]} />
-        <meshStandardMaterial color="#d9ff91" emissive="#9fcc40" emissiveIntensity={0.6} />
+        <meshStandardMaterial color={accent} emissive={finish === 'steel' ? '#73877a' : '#9fcc40'} emissiveIntensity={0.6} />
       </mesh>
     </group>
   );
@@ -71,7 +72,7 @@ function DumbbellModel({ finish }: { finish: Finish }) {
     <group rotation={[0.12, 0.2, -0.1]} scale={0.92}>
       <mesh rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.085, 0.085, 1.65, 36]} />
-        <meshStandardMaterial color="#aeb8a7" metalness={0.94} roughness={0.22} />
+        <meshStandardMaterial color={finish === 'steel' ? '#f0f4f0' : finish === 'carbon' ? '#3b453c' : '#aeb8a7'} metalness={0.94} roughness={0.22} />
       </mesh>
       {([-1, 1] as const).map((side) => (
         <group key={side} position={[side * 0.73, 0, 0]}>
@@ -83,13 +84,13 @@ function DumbbellModel({ finish }: { finish: Finish }) {
           ))}
           <mesh position={[side * 0.37, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
             <cylinderGeometry args={[0.13, 0.13, 0.06, 32]} />
-            <meshStandardMaterial color="#c8ff62" metalness={0.48} roughness={0.22} emissive="#496b12" emissiveIntensity={0.32} />
+            <meshStandardMaterial color={accent} metalness={0.48} roughness={0.22} emissive={finish === 'steel' ? '#73877a' : '#496b12'} emissiveIntensity={0.32} />
           </mesh>
         </group>
       ))}
       <mesh rotation={[0.7, 0.2, 0.4]}>
         <torusGeometry args={[1.35, 0.012, 8, 120]} />
-        <meshBasicMaterial color="#c8ff62" />
+        <meshBasicMaterial color={accent} />
       </mesh>
     </group>
   );
@@ -118,11 +119,11 @@ function KettlebellModel({ finish }: { finish: Finish }) {
       </mesh>
       <mesh position={[0, -0.25, 0.56]} rotation={[0, 0, 0]}>
         <circleGeometry args={[0.16, 40]} />
-        <meshBasicMaterial color="#c8ff62" />
+        <meshBasicMaterial color={accent} />
       </mesh>
       <mesh rotation={[0.82, 0.3, -0.25]}>
         <torusGeometry args={[1.18, 0.012, 8, 120]} />
-        <meshBasicMaterial color="#c8ff62" />
+        <meshBasicMaterial color={accent} />
       </mesh>
       <mesh rotation={[1.2, -0.45, 0.6]}>
         <torusGeometry args={[1.42, 0.007, 8, 120]} />
