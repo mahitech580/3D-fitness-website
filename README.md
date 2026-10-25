@@ -9,6 +9,7 @@
 ## Experience
 
 - **3D training lab:** custom barbell, dumbbell, and kettlebell models; drag to orbit, zoom, toggle automatic rotation, and reset the camera.
+- **Live material configurator:** switch the active 3D model between Kinetik lime, matte Carbon, and brushed Steel finishes; the real-time model updates without replacing the WebGL canvas.
 - **Training paths:** goal tabs for strength, conditioning, and mobility, with keyboard navigation and a direct hand-off to the plan builder.
 - **Session blueprint:** four-stage arrive / prepare / practise / reset guide with flexible time ranges and responsive cards.
 - **Movement index:** searchable 12-movement reference with strength, conditioning, and mobility/reset filters, equipment cues, responsive cards, and a clear no-results reset.
