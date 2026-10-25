@@ -140,7 +140,7 @@ function SceneControls({ equipment, autoRotate, resetToken, reducedMotion, camer
 
   useEffect(() => {
     const distance = equipment === 'kettlebell' ? 4.35 : equipment === 'dumbbell' ? 4.7 : 5.1;
-    if (cameraPreset === 'side') camera.position.set(distance, 0.08, 0.25);
+    if (cameraPreset === 'side') camera.position.set(distance * 0.72, 0.12, distance * 0.72);
     else if (cameraPreset === 'front') camera.position.set(0, 0.02, distance);
     else camera.position.set(0.18, 0.38, distance);
     camera.lookAt(0, 0, 0);
