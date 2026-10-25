@@ -249,7 +249,7 @@ function KineticSceneLoader({ equipment, autoRotate, resetToken, finish, lightin
   return <div ref={host} className="kinetic-scene-loader">{nearViewport ? <Suspense fallback={<EquipmentScenePreview equipment={equipment} status="LOADING 3D ENGINE" />}><KineticObject equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} finish={finish} lighting={lighting} cameraPreset={cameraPreset} storyBeat={storyBeat} /></Suspense> : <EquipmentScenePreview equipment={equipment} status="SCENE STANDBY / APPROACH TO ACTIVATE" />}</div>;
 }
 
-function readScenePreset() {
+function readScenePreset(): { equipment?: Equipment; finish?: Finish; lighting?: LightingPreset; cameraPreset?: CameraPreset; storyBeat?: StoryBeat } {
   if (typeof window === 'undefined') return {};
   const params = new URLSearchParams(window.location.search);
   const equipment = params.get('equipment');
