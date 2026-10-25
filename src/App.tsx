@@ -249,14 +249,33 @@ function KineticSceneLoader({ equipment, autoRotate, resetToken, finish, lightin
   return <div ref={host} className="kinetic-scene-loader">{nearViewport ? <Suspense fallback={<EquipmentScenePreview equipment={equipment} status="LOADING 3D ENGINE" />}><KineticObject equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} finish={finish} lighting={lighting} cameraPreset={cameraPreset} storyBeat={storyBeat} /></Suspense> : <EquipmentScenePreview equipment={equipment} status="SCENE STANDBY / APPROACH TO ACTIVATE" />}</div>;
 }
 
+function readScenePreset() {
+  if (typeof window === 'undefined') return {};
+  const params = new URLSearchParams(window.location.search);
+  const equipment = params.get('equipment');
+  const finish = params.get('finish');
+  const lighting = params.get('lighting');
+  const view = params.get('view');
+  const story = Number(params.get('story'));
+  return {
+    equipment: equipment === 'dumbbell' || equipment === 'kettlebell' || equipment === 'barbell' ? equipment : undefined,
+    finish: finish === 'carbon' || finish === 'steel' || finish === 'kinetik' ? finish : undefined,
+    lighting: lighting === 'contrast' || lighting === 'neon' || lighting === 'studio' ? lighting : undefined,
+    cameraPreset: view === 'front' || view === 'side' || view === 'hero' ? view : undefined,
+    storyBeat: story === 1 || story === 2 ? story as StoryBeat : story === 0 ? 0 as StoryBeat : undefined,
+  };
+}
+
 function KineticLab() {
-  const [equipment, setEquipment] = useState<Equipment>('barbell');
+  const [sharedPreset] = useState(readScenePreset);
+  const [equipment, setEquipment] = useState<Equipment>(sharedPreset.equipment ?? 'barbell');
   const [autoRotate, setAutoRotate] = useState(true);
   const [resetToken, setResetToken] = useState(0);
-  const [finish, setFinish] = useState<Finish>('kinetik');
-  const [lighting, setLighting] = useState<LightingPreset>('studio');
-  const [cameraPreset, setCameraPreset] = useState<CameraPreset>('hero');
-  const [storyBeat, setStoryBeat] = useState<StoryBeat>(0);
+  const [finish, setFinish] = useState<Finish>(sharedPreset.finish ?? 'kinetik');
+  const [lighting, setLighting] = useState<LightingPreset>(sharedPreset.lighting ?? 'studio');
+  const [cameraPreset, setCameraPreset] = useState<CameraPreset>(sharedPreset.cameraPreset ?? 'hero');
+  const [storyBeat, setStoryBeat] = useState<StoryBeat>(sharedPreset.storyBeat ?? 0);
+  const [shareStatus, setShareStatus] = useState('');
   const story = storyBeats[storyBeat];
   const active = equipmentInfo[equipment];
   const choices = Object.keys(equipmentInfo) as Equipment[];
@@ -309,6 +328,22 @@ function KineticLab() {
             <div className="kinetic-story-copy" aria-live="polite"><span>{story.eyebrow}</span><h3 id="kinetic-story-title">{story.title}</h3><p>{story.copy}</p><div className="kinetic-story-nav"><button type="button" disabled={storyBeat === 0} onClick={() => setStoryBeat((value) => (value - 1) as StoryBeat)}>← Previous</button><button type="button" disabled={storyBeat === 2} onClick={() => setStoryBeat((value) => (value + 1) as StoryBeat)}>Next detail →</button></div></div>
           </div>
           <div className="kinetic-lab-caption"><span>INTERACTIVE OBJECT STUDY</span><span>SCROLL / SELECT / INSPECT</span><span>DRAG TO ROTATE ↗</span></div>
+          <div className="kinetic-share-row"><p>Keep this exact setup or send it to a training partner.</p><button type="button" className="kinetic-share-button" onClick={async () => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('equipment', equipment);
+            url.searchParams.set('finish', finish);
+            url.searchParams.set('lighting', lighting);
+            url.searchParams.set('view', cameraPreset);
+            url.searchParams.set('story', String(storyBeat));
+            try {
+              await navigator.clipboard.writeText(url.toString());
+              setShareStatus('Setup link copied');
+            } catch {
+              url.hash = 'kinetic-lab';
+              window.prompt('Copy your KINETIK setup link:', url.toString());
+              setShareStatus('Copy the link from the dialog');
+            }
+          }}><span aria-hidden="true">↗</span> Copy setup link</button><span className="kinetic-share-status" role="status" aria-live="polite">{shareStatus}</span></div>
         </Reveal>
       </div>
     </section>
