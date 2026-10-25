@@ -1,7 +1,9 @@
 {
   "name": "KINETIK — Train With Intent",
   "short_name": "KINETIK",
-  "description": "A photo-led fitness concept for strength, conditioning, mobility, and sustainable routines.",
+  "description": "An interactive fitness concept with real-time 3D barbell, dumbbell and kettlebell models, strength paths, conditioning, and recovery.",
+  "lang": "en",
+  "categories": ["fitness", "lifestyle", "health"],
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
