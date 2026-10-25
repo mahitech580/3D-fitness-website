@@ -43,7 +43,7 @@ Production and artifact checks:
 npm run check
 \`\`\`
 
-Browser interaction tests require the Playwright Chromium binary:
+The browser smoke suite covers movement search/filter states, 3D equipment and scene presets, keyboard-accessible tabs, plan generation/copy feedback, local tracker persistence and toggle behavior, image alt attributes, in-page link targets, Escape-to-close mobile navigation, and mobile overflow. Browser interaction tests require the Playwright Chromium binary:
 
 \`\`\`bash
 npx playwright install chromium
@@ -56,7 +56,7 @@ In a second terminal, run the smoke test against the local preview root:
 PREVIEW_URL=http://127.0.0.1:4173/ npm run test:browser
 \`\`\`
 
-\`npm run check:all\` runs both the production checks and browser smoke script once Chromium is installed. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution and verification workflow.
+\`npm run check:all\` runs both the production checks and browser smoke script once Chromium is installed. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution and verification workflow, and [docs/QUALITY-CHECKLIST.md](docs/QUALITY-CHECKLIST.md) for the regression and release checklist.
 
 ## Data, privacy, and limits
 
