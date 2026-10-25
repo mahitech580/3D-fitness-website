@@ -137,3 +137,39 @@ The production bundle checks now verify the finish control labels, and the Playw
 - Test the finish picker and orbit controls on actual touch devices and low-powered GPUs.
 - Consider part-level color controls or a lighting preset only if the interface remains understandable and performance stays acceptable.
 - Keep the scene's first render small and defer heavy effects; do not replace the live model with a video or pre-rendered image and call it interactive.
+
+
+## Deeper technical pass: interaction patterns translated into KINETIK (25 October 2026)
+
+This pass distinguishes actual real-time 3D interaction from surface-level "3D-looking" decoration. The reference set was evaluated for the mechanism that makes the experience work, not only the visual style.
+
+### Reference analysis
+
+- [Utsubo — Best Three.js Websites 2026](https://www.utsubo.com/blog/best-threejs-websites-2026): identifies inertial single-object presentation in Oryzo, scroll-sequenced product reveals in Shopify Editions, and separate product alcoves in Cartier. The useful principle is to keep one object legible and make camera changes purposeful rather than stacking visual effects.
+- [Three.js official examples](https://threejs.org/examples/): the canonical implementation reference for OrbitControls, physical materials, environment maps, light probes, shadows, post-processing, and performance examples. These demonstrate that rendering quality is a combination of material response, light setup, camera controls, and GPU budget.
+- [Mesh3D Gallery](https://www.mesh3d.gallery/): a curated index of current interactive Three.js experiences, including Shopify Editions, Igloo Inc., The Symphony of Vines, ORYZO AI by Lusion, and Cyera AI Guardian by Active Theory. The useful principle is to establish a coherent visual system and a distinct interaction rather than borrow someone else's brand assets.
+- [Undream Studio — Skybag Experience case study](https://www.undreamstudio.com/projects/skybag-experience/): describes a scroll-driven product viewer with rotating and zooming views, close-up feature reveals, blueprint-grid art direction, and performance-conscious 3D assets. The useful principle is to combine camera framing with an engineering-style interface.
+- [Psychoactive Studios — WebGL / interactive 3D studios](https://www.psychoactive.co.nz/content-hub/best-webgl-interactive-3d-agencies): reinforces that high-impact WebGL needs art direction and a performance budget, not just effects.
+- [Three.js post-processing manual](https://threejs.org/manual/pages/post-processing.html): explains that bloom, vignette, blur, and other post-processing require an additional render pipeline. This matters for KINETIK because post-processing is not free; first improve direct lighting and material response before adding a costly effects stack.
+
+### New live interactions
+
+The 3D lab now has two additional control systems:
+
+1. **Camera presets:** Hero angle, Front, and Side profile reposition the actual Three.js camera and reset the orbit target, making it faster to inspect each model without manually dragging to a known view.
+2. **Lighting presets:** Studio, Contrast, and Neon change the real scene's ambient, directional, and point-light intensity and color. They are actual light-rig changes, not background CSS filters or static screenshots.
+
+The existing equipment selector, finish selector, orbit/zoom, auto-rotation, and reset continue to operate together. All selectors expose their selected state with `aria-pressed`; controls are keyboard focusable; reduced-motion handling for auto-rotation remains intact; and the WebGL canvas is not intentionally remounted when changing light rigs or camera angles.
+
+### Verification added
+
+- Production-bundle checks require the lighting and camera control labels and verify that the UI and Three.js scene wire these settings through.
+- Browser smoke tests change all three lighting presets and all three camera presets, check their selected states, and confirm the original WebGL canvas stays connected.
+- The CI job still needs to finish before these new checks can be reported as passing. No claim of successful deployment is made until the corresponding workflow reports success.
+
+### Next high-value investigations
+
+- A scroll-linked camera narrative should be added only if it improves object understanding and remains usable with reduced motion and keyboard navigation.
+- Environment maps/HDR lighting may improve metallic surfaces, but the asset size and load cost must be measured before adding one.
+- GPU profiling and low-end mobile testing should precede expensive shadows, bloom, SSAO, or real-time reflections.
+- Do not copy source code, artwork, logos, or proprietary assets from reference websites; reuse interaction principles and implement KINETIK's own design.
