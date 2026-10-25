@@ -208,3 +208,22 @@
 @media(max-width:900px){.movement-tools{grid-template-columns:1fr}.movement-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.movement-grid{grid-template-columns:1fr}.movement-card{min-height:240px;padding:1.15rem}.movement-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.movement-filter{padding:.65rem .4rem}.movement-heading h2{font-size:clamp(2.5rem,13vw,4rem)}}
 @media(prefers-reduced-motion:reduce){.movement-filter{transition:none}}
+
+
+/* Real-time 3D material finish controls. */
+.kinetic-finish-picker{display:grid;gap:.7rem;padding-top:1rem;margin-top:.5rem;border-top:1px solid var(--line-dark)}
+.kinetic-finish-options{display:grid;grid-template-columns:1fr;gap:.4rem}
+.kinetic-finish-choice{display:flex;align-items:center;gap:.65rem;width:100%;padding:.65rem .7rem;border:1px solid var(--line-dark);background:transparent;color:var(--paper);text-align:left;cursor:pointer;transition:border-color .18s ease,background .18s ease}
+.kinetic-finish-choice:hover,.kinetic-finish-choice--active{border-color:var(--lime);background:rgba(188,244,119,.08)}
+.kinetic-finish-choice:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+.kinetic-finish-swatch{display:block;width:23px;height:23px;flex:0 0 23px;border-radius:50%;border:1px solid rgba(255,255,255,.3);box-shadow:inset -4px -4px 7px rgba(0,0,0,.28)}
+.kinetic-finish-choice--kinetik .kinetic-finish-swatch{background:linear-gradient(135deg,#e0ffa0,#9bd34b 55%,#425a28)}
+.kinetic-finish-choice--carbon .kinetic-finish-swatch{background:linear-gradient(135deg,#687267,#202722 60%,#0d110f)}
+.kinetic-finish-choice--steel .kinetic-finish-swatch{background:linear-gradient(135deg,#fff,#aab8ad 55%,#536158)}
+.kinetic-finish-choice>span:last-child{display:grid;gap:.18rem}
+.kinetic-finish-choice strong{font-size:.78rem;font-weight:700}
+.kinetic-finish-choice small{color:var(--muted-light);font-size:.59rem;letter-spacing:.1em}
+@media(min-width:900px){.kinetic-finish-options{grid-template-columns:1fr}}
+@media(max-width:899px){.kinetic-finish-options{grid-template-columns:repeat(3,minmax(0,1fr))}.kinetic-finish-choice{padding:.6rem .45rem;gap:.4rem}.kinetic-finish-choice strong{font-size:.7rem}.kinetic-finish-choice small{font-size:.55rem}}
+@media(max-width:520px){.kinetic-finish-options{grid-template-columns:1fr}.kinetic-finish-choice{padding:.65rem .7rem}.kinetic-finish-choice strong{font-size:.78rem}}
+@media(prefers-reduced-motion:reduce){.kinetic-finish-choice{transition:none}}
