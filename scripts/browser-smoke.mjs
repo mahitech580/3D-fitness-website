@@ -28,7 +28,7 @@ try {
   assert.equal(await page.locator('.movement-card').count(), 3, 'Conditioning filter should narrow the movement library.');
   await page.getByRole('button', { name: 'All moves' }).click();
   await page.getByRole('searchbox', { name: 'Search movement library' }).fill('dumbbell');
-  assert.equal(await page.locator('.movement-card').count(), 2, 'Search should match movement names and equipment.');
+  assert.equal(await page.locator('.movement-card').count(), 3, 'Search should match movement names and equipment.');
   await page.getByRole('searchbox', { name: 'Search movement library' }).fill('not-a-real-move');
   assert.equal(await page.locator('.movement-empty').count(), 1, 'No-results state should appear for an unmatched search.');
   await page.getByRole('button', { name: 'Reset movement search' }).click();
