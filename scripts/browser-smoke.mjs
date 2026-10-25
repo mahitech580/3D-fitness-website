@@ -132,8 +132,9 @@ try {
   assert.match(await generatedPlan.innerText(), /Conditioning base/i);
   assert.match(await generatedPlan.innerText(), /Bike or brisk-walk intervals/i);
   await generatedPlan.getByRole('button', { name: /Copy plan/i }).click();
-  await page.locator('.plan-copy-status').waitFor();
-  assert.match(await page.locator('.plan-copy-status').innerText(), /Plan copied|Copy was blocked/i, 'Copy action should provide accessible success or fallback feedback.');
+  const copyStatus = page.locator('.plan-copy-status');
+  await page.waitForFunction(() => /Plan copied|Copy was blocked/i.test(document.querySelector('.plan-copy-status')?.textContent ?? ''), null, { timeout: 5000 });
+  assert.match(await copyStatus.innerText(), /Plan copied|Copy was blocked/i, 'Copy action should provide accessible success or fallback feedback within five seconds.');
   await page.getByRole('radio', { name: /Move with ease/i }).check();
   assert.equal(await generatedPlan.count(), 0, 'Changing the builder inputs should clear the stale generated result.');
 
