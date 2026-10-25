@@ -56,6 +56,10 @@ for (const featureText of [
   'CAMERA / VIEW',
   'Hero angle',
   'Side profile',
+  'Built for the basics.',
+  'Made to feel different.',
+  'Find your angle.',
+  'Explore the 3D product story',
   'BARBELL / DUMBBELL / KETTLEBELL',
   'YOUR TRAINING.',
   'MAKE EVERY',
@@ -87,6 +91,7 @@ for (const model of ['BarbellModel', 'DumbbellModel', 'KettlebellModel']) {
 if (!sceneSource.includes('<Canvas') || !sceneSource.includes('OrbitControls') || !sceneSource.includes('autoRotate={autoRotate && !reducedMotion}') || !sceneSource.includes('enableZoom')) failures.push('The 3D lab must include a WebGL canvas, zoom/rotation controls, and reduced-motion-aware auto-rotation.');
 if (!appSource.includes('setResetToken') || !appSource.includes('setAutoRotate') || !appSource.includes('aria-pressed={equipment === choice}')) failures.push('The equipment selector, rotation toggle, or reset controls are missing.');
 if (!appSource.includes('lightingOptions.map') || !appSource.includes('cameraOptions.map') || !sceneSource.includes("lighting === 'neon'") || !sceneSource.includes("cameraPreset === 'side'")) failures.push('The interactive lighting presets and camera presets must be wired into the live 3D scene.');
+if (!appSource.includes('storyBeats.map') || !appSource.includes('storyBeat={storyBeat}') || !sceneSource.includes('storyDistance')) failures.push('The guided product story must be connected to live camera framing.');
 if (!appSource.includes('handleTabKeyDown') || !appSource.includes('aria-controls="path-panel"')) failures.push('Training-path tabs are missing keyboard navigation or panel relationships.');
 if (!appSource.includes('allowedDays.has(day)') || !appSource.includes('candidate.moves')) failures.push('Browser-local state should be validated before use.');
 if (!sourceStyles.includes('.kinetic-lab-stage') || !sourceStyles.includes('.kinetic-object-host') || !sourceStyles.includes('.kinetic-equipment-choice--active')) failures.push('The responsive 3D equipment lab styles are missing.');
