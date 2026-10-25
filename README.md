@@ -1,48 +1,63 @@
 # KINETIK — Train With Intent
 
-KINETIK is a responsive, photo-led fitness website concept with a real-time interactive 3D training lab. It combines a forest-green and lime visual identity, three custom WebGL equipment models, zoom/rotation/reset controls, training-path exploration, and responsive mobile layouts.
+**A photo-led fitness concept with an interactive 3D equipment lab.**
 
-## Experience map
+- Live site: https://mahitech580.github.io/3D-fitness-website/
+- Source: https://github.com/mahitech580/3D-fitness-website
+- [CI workflow](https://github.com/mahitech580/3D-fitness-website/actions/workflows/ci.yml) · [Pages deployment](https://github.com/mahitech580/3D-fitness-website/actions/workflows/deploy.yml)
 
-- Editorial hero: oversized typography, layered fitness photography, and clear calls to explore training.
-- Interactive 3D training lab: custom barbell, dumbbell, and kettlebell models with metallic materials and orbit rings. Visitors can change equipment, drag to rotate, zoom in, toggle automatic rotation, and reset the view. The canvas mounts near the viewport and unmounts offscreen.
-- Sticky navigation, an accessible mobile menu, and smooth in-page navigation.
-- Training philosophy: intent, repeatable effort, and recovery.
-- Three photo-led program cards: strength, conditioning, and mobility.
-- Consistency feature and an interactive training-path explorer with selectable goal tabs.
-- Fitness photo moodboard/gallery with responsive crops and subtle image hover states.
-- Nutrition and recovery section.
-- Filterable example weekly plan: all days, strength, conditioning, or recovery.
-- Local consistency tracker; completed days stay in the current browser.
-- Starter-plan builder with goal, level, and time inputs.
-- Accessible FAQ accordion, visible keyboard focus, skip link, and reduced-motion support.
-- Responsive layouts for desktop, tablet, and phone screens.
+## Experience
 
-## Visual direction
-
-The visual research combines the confident identity and focused calls to action found on Barry's, the lifestyle/editorial sectioning of Equinox, the structured training categories of Rogue, the photo-led green strength-gym reference from Relentless Strength, and current gym UX guidance from Gymdesk and Zarla. KINETIK's page, copy, and code are original; those references informed the broad design direction rather than being copied.
+- **3D training lab:** custom barbell, dumbbell, and kettlebell models; drag to orbit, zoom, toggle automatic rotation, and reset the camera.
+- **Training paths:** goal tabs for strength, conditioning, and mobility, with keyboard navigation and a direct hand-off to the plan builder.
+- **Weekly rhythm:** filterable sample schedule covering strength, conditioning, and recovery days.
+- **Habit tracker:** record sessions for the current local week; check-ins stay in this browser.
+- **Starter-plan builder:** create a transparent, rule-based example routine from goal, starting level, and time available.
+- **Editorial experience:** layered gym photography, oversized typography, scroll reveals, a photo moodboard, recovery content, and responsive layouts.
+- **Accessibility basics:** semantic page sections, keyboard-focus styles, a skip link, reduced-motion support, a mobile navigation menu, and a CSS preview when WebGL is unavailable.
 
 ## Stack
 
-React, TypeScript, Vite, Framer Motion, Three.js, React Three Fiber, Drei, HTML, and CSS. GitHub Pages deploys the production build from main.
+React 19, TypeScript, Vite 8, Framer Motion, Three.js, React Three Fiber, Drei, and Playwright for browser smoke tests. GitHub Pages hosts the static build; GitHub Actions runs checks before the deployment workflow is allowed to publish.
 
 ## Run locally
 
-Use Node.js 20 or newer.
+Use Node.js 24 (the project requires Node.js 20.19 or newer).
 
-1. Install dependencies with npm install.
-2. Start the dev server with npm run dev.
-3. Run type, production-build, and artifact checks with npm run check.
-4. Preview the production build with npm run preview.
+\`\`\`bash
+npm install
+npm run dev
+\`\`\`
 
-The GitHub Actions workflow is configured to run the production checks before deployment.
+Production and artifact checks:
 
-## Data and limitations
+\`\`\`bash
+npm run check
+\`\`\`
 
-This is a website concept, not a real gym or coaching service. There is no backend, user account, real gym directory, booking system, membership checkout, hosted AI coach, or cloud synchronization. The weekly tracker and generated example plan use browser-local storage when available. Example routines are educational starting points, not individualized coaching or medical advice. The site intentionally uses no fabricated member counts, reviews, real prices, or real class bookings.
+Browser interaction tests require the Playwright Chromium binary:
 
-Fitness photographs load remotely from Unsplash and require an internet connection. Review the current Unsplash terms and attribution guidance before using the assets in a commercial service. See docs/ASSET-CREDITS.md for the image inventory and docs/REFERENCE-RESEARCH.md for the design references.
+\`\`\`bash
+npx playwright install chromium
+npm run preview -- --host 127.0.0.1 --port 4173
+\`\`\`
 
-## Further refinement
+In a second terminal, run the smoke test against the local preview root:
 
-The 3D lab is part of the active homepage. Future improvements should focus on validating all equipment controls on real mobile devices, optimizing the WebGL bundle and imagery, and adding further 3D interactions only when they help visitors understand the training concept.
+\`\`\`bash
+PREVIEW_URL=http://127.0.0.1:4173/ npm run test:browser
+\`\`\`
+
+\`npm run check:all\` runs both the production checks and browser smoke script once Chromium is installed. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution and verification workflow.
+
+## Data, privacy, and limits
+
+KINETIK is a website concept, not an operating gym, coaching service, or medical service. It has no account system, backend, bookings, memberships, payment processing, live timetable, hosted AI coach, camera-based tracking, or cloud synchronization. The routine builder is a fixed rule-based template, not AI. Check-ins and generated plans use browser-local storage when available.
+
+The page uses remote Unsplash images, so those photos require an internet connection. Review the applicable [Unsplash license](https://unsplash.com/license) and replace remote photos with appropriately licensed local assets before a commercial deployment. The exact image IDs and layout references are documented in [docs/ASSET-CREDITS.md](docs/ASSET-CREDITS.md) and [docs/REFERENCE-RESEARCH.md](docs/REFERENCE-RESEARCH.md).
+
+## Implementation notes
+
+The active 3D canvas is deferred until the lab approaches the viewport and released while it is offscreen. The renderer uses a bounded device-pixel ratio, reduced-motion-aware rotation, and a styled CSS preview while WebGL initializes or is unavailable. The build separates the on-demand 3D experience from the first page render.
+
+\`npm run check\` validates the built HTML, metadata, generated assets, key sections, responsive styles, and the 3D model source. The CI workflow then installs Chromium and exercises the interactive site in a headless browser before the deployment workflow runs.
