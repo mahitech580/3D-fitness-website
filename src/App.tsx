@@ -602,6 +602,7 @@ function PlanBuilder() {
   const [level, setLevel] = useState('beginner');
   const [duration, setDuration] = useState('45');
   const [plan, setPlan] = useState<PlanResult | null>(loadPlan);
+  const [planStatus, setPlanStatus] = useState('');
 
   function invalidatePlan() {
     setPlan(null);
@@ -624,8 +625,37 @@ function PlanBuilder() {
     return () => window.removeEventListener('kinetik-focus', onFocus);
   }, []);
 
+  async function copyPlan() {
+    if (!plan) return;
+    const text = [plan.title, plan.meta, '', ...plan.moves.map((move, index) => (index + 1) + '. ' + move), '', 'KINETIK sample plan — adapt to your ability.'].join('\\n');
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        throw new Error('Clipboard API unavailable');
+      }
+      setPlanStatus('Plan copied. Paste it into your notes.');
+    } catch {
+      try {
+        const field = document.createElement('textarea');
+        field.value = text;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        const copied = document.execCommand('copy');
+        field.remove();
+        setPlanStatus(copied ? 'Plan copied. Paste it into your notes.' : 'Copy was blocked. Select the plan text and copy it manually.');
+      } catch {
+        setPlanStatus('Copy was blocked. Select the plan text and copy it manually.');
+      }
+    }
+  }
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setPlanStatus('');
     const next: PlanResult = {
       title: goalTitles[goal],
       meta: level[0].toUpperCase() + level.slice(1) + ' level · ' + duration + ' minutes · browser-made sample',
@@ -695,7 +725,11 @@ function PlanBuilder() {
               <p className="plan-meta">{plan.meta}</p>
               <ol>{plan.moves.map((move) => <li key={move}>{move}</li>)}</ol>
               <p className="plan-disclaimer">Educational example only—not individualized medical advice. Adapt movements to your ability and stop if an exercise causes pain.</p>
-              <button type="button" className="clear-plan" onClick={invalidatePlan}>Clear saved plan ×</button>
+              <div className="plan-actions">
+                <button type="button" className="copy-plan" onClick={() => void copyPlan()}>Copy plan ↗</button>
+                <button type="button" className="clear-plan" onClick={() => { invalidatePlan(); setPlanStatus(''); }}>Clear saved plan ×</button>
+              </div>
+              <p className="plan-copy-status" role="status" aria-live="polite">{planStatus}</p>
             </div>
           )}
           <p className="builder-local-note"><span /> Preferences and plan stay in this browser only.</p>
