@@ -184,10 +184,15 @@ try {
   }));
   assert.ok(dimensions.documentWidth <= dimensions.viewportWidth + 2, 'The mobile page should not have horizontal overflow: ' + JSON.stringify(dimensions));
   await page.screenshot({ path: 'artifacts/kinetik-mobile.png', fullPage: false });
-  await page.getByRole('button', { name: 'Open navigation menu' }).click();
+  const openMenu = page.getByRole('button', { name: 'Open navigation menu' });
+  assert.equal(await openMenu.getAttribute('aria-controls'), 'main-navigation', 'The mobile menu button should identify the navigation it controls.');
+  assert.equal(await openMenu.getAttribute('aria-expanded'), 'false', 'The mobile menu should start collapsed.');
+  await openMenu.click();
+  assert.equal(await page.getByRole('button', { name: 'Close navigation menu' }).getAttribute('aria-expanded'), 'true', 'Opening the mobile menu should update its expanded state.');
   assert.equal(await page.getByRole('navigation', { name: 'Main navigation' }).getAttribute('class'), 'main-nav main-nav--open');
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('#main-navigation').getAttribute('class'), 'main-nav', 'Escape should close the mobile navigation even when the closed nav is hidden from the accessibility tree.');
+  assert.equal(await page.getByRole('button', { name: 'Open navigation menu' }).getAttribute('aria-expanded'), 'false', 'Escape should synchronize the menu button state.');
   await page.getByRole('button', { name: 'Open navigation menu' }).click();
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Training paths' }).click();
   assert.match(page.url(), /#programs$/);
