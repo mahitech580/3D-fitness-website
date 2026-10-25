@@ -112,3 +112,28 @@ Research informing the decision:
 - [Hostinger's fitness website examples](https://www.hostinger.com/tutorials/fitness-website-examples/) reinforces clear navigation and informative content as recurring design choices.
 
 Implementation notes: the library is intentionally educational, not a prescription or a claim of professional coaching. It does not fabricate testimonials, reviews, pricing, membership availability, or medical outcomes. The responsive card grid and filter controls include keyboard focus styles and an explicit no-results/reset path. Browser smoke tests exercise the default list, category filtering, search, and reset interaction.
+
+
+## Deep-dive: live 3D interaction references (25 October 2026)
+
+This pass focused specifically on real-time 3D websites and configurators, rather than conventional fitness marketing pages. The objective is to borrow interaction patterns while preserving KINETIK's original visual identity and keeping the scene useful.
+
+- [Three.js Resources showcase](https://threejsresources.com/showcase): a broad catalogue of live Three.js projects across product configurators, creative portfolios, educational projects, games, and immersive experiences. Reference lesson: choose a clear interaction for the scene instead of adding motion without purpose.
+- [Mesh3D Gallery](https://mesh3d.gallery/): curated live Three.js experiences, including Igloo Inc., Shopify Editions, The Symphony of Vines, and work by specialist creative studios. Reference lesson: give the 3D scene a recognizable material and art direction.
+- [Utsubo — Best Three.js Websites 2026](https://www.utsubo.com/blog/best-threejs-websites-2026): technique-focused review of real projects. Reference lesson: interaction should be paired with technical restraint and a reason for the visitor to explore.
+- [WebView3D](https://webview3d.com/): web-based product configurator with rotation, zoom, object highlighting, and custom configuration. Reference lesson: expose a small set of meaningful choices and show the result immediately.
+- [ASRR interactive demos](https://asrr.nl/demos): browser-based house configuration, solar system, galaxy, and physics playground examples. Reference lesson: interactive controls should directly affect the live scene.
+- [Web Design Awards — Three.js sites](https://www.webdesignawards.io/technology/three-js): current nominated-site index and scoring categories. Reference lesson: visual design, usability, accessibility, performance, and multi-device support all matter alongside technical novelty.
+- [Psychoactive Studios — WebGL and interactive 3D agencies](https://www.psychoactive.co.nz/content-hub/best-webgl-interactive-3d-agencies): examples of specialist studios and real-time brand experiences. Reference lesson: use cinematic motion selectively and keep the product or message legible.
+
+### Feature added: live material finishes
+
+The KINETIK 3D lab now lets visitors switch the currently selected barbell, dumbbell, or kettlebell between three material treatments: Kinetik lime, Carbon, and Steel. The chosen finish changes the model's material palette in the live Three.js scene; it is not a screenshot swap. The selector is keyboard accessible, exposes its selected state with `aria-pressed`, adapts to narrow screens, and keeps the existing scene mounted while changing finishes.
+
+The production bundle checks now verify the finish control labels, and the Playwright smoke test exercises all three options and confirms that the WebGL canvas remains present. The scene continues to respect the existing reduced-motion behavior and deferred loading strategy.
+
+### Further investigation priorities
+
+- Test the finish picker and orbit controls on actual touch devices and low-powered GPUs.
+- Consider part-level color controls or a lighting preset only if the interface remains understandable and performance stays acceptable.
+- Keep the scene's first render small and defer heavy effects; do not replace the live model with a video or pre-rendered image and call it interactive.
