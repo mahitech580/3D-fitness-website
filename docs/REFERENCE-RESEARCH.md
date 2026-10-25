@@ -173,3 +173,26 @@ The existing equipment selector, finish selector, orbit/zoom, auto-rotation, and
 - Environment maps/HDR lighting may improve metallic surfaces, but the asset size and load cost must be measured before adding one.
 - GPU profiling and low-end mobile testing should precede expensive shadows, bloom, SSAO, or real-time reflections.
 - Do not copy source code, artwork, logos, or proprietary assets from reference websites; reuse interaction principles and implement KINETIK's own design.
+
+
+## Guided product story implementation — 25 October 2026
+
+A follow-up technical pass translated scroll-storytelling references into a deliberately accessible first implementation. The reference pattern is a continuous scene with distinct narrative beats, but the implementation avoids adding a heavy animation dependency or hijacking native page scroll.
+
+References reviewed:
+- [Marie Tech It — 24 Animated Website Examples & the Tech Behind Them (2026)](https://marietechit.com/24-animated-website-examples-the-tech-behind-them-2026/): contrasts Apple-style scroll-linked product storytelling with always-running 3D, and notes reduced-motion still-image alternatives.
+- [Undream Studio — Skybag Experience](https://www.undreamstudio.com/projects/skybag-experience/): product camera changes and close-ups tied to a blueprint-like product narrative.
+- [Scroll-driven Three.js example](https://github.com/AETumiApp/threejs-scroll-animation/blob/main/examples/scroll-scene.html): deterministic normalized progress, visibility-aware rendering, adaptive quality and a static reduced-motion state.
+- [Eric Jokl — Real-Time City Scene](https://ericjokl.com/work/city-scene): useful caution that an immersive scene should be measured on real devices and removed or reduced when its performance cost outweighs its value.
+- [Motion — Three.js scroll example](https://motion.dev/examples/js-three-scroll): a current example of scroll values driving a real Three.js visual.
+
+### KINETIK implementation choices
+
+- Added three explicit story beats: Form, Finish, and Detail.
+- Added step buttons plus Previous/Next navigation, with selected state, keyboard-operable controls and live text updates.
+- Story beats adjust the actual scene's camera distance and elevation. Users can still drag to orbit, use the existing camera presets, switch equipment, materials and light rigs.
+- Kept native page scrolling intact. The story does not pin the whole page or force-scroll the user, which reduces friction on phones and with assistive technology.
+- Kept the existing single canvas mounted during story navigation.
+- Added browser smoke coverage for selecting beats, advancing and reversing, and retaining the same canvas; added production bundle checks for story content and camera wiring.
+
+This is a guided, user-controlled story rather than a full scroll-scrubbed camera timeline. That is intentional for this iteration: it adds narrative to the existing code without introducing GSAP/ScrollTrigger or a second animation loop before mobile profiling. CI must pass before the feature is considered verified or deployed.
