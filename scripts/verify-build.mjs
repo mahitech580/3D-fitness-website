@@ -47,6 +47,8 @@ for (const featureText of [
   'Reset view',
   'BARBELL / DUMBBELL / KETTLEBELL',
   'YOUR TRAINING.',
+  'MAKE EVERY',
+  'SESSION BLUEPRINT',
   'YOUR WEEK, YOUR PACE',
   'Build my starter plan',
   'STACKED UP.',
