@@ -14,8 +14,11 @@ const check = async (relativePath) => {
 const html = await readFile(path.join(root, 'index.html'), 'utf8').catch(() => '');
 if (!html) failures.push('Production index.html is missing or empty.');
 for (const [needle, message] of [
+  ['<html lang="en">', 'Document language should be declared for assistive technology and search engines.'],
+  ['name="viewport"', 'Responsive viewport metadata is missing.'],
   ['<title>KINETIK — Train With Intent</title>', 'Production page title is missing or outdated.'],
   ['name="description"', 'Search description is missing.'],
+  ['property="og:image:alt"', 'Open Graph preview image needs descriptive alternative text.'],
   ['name="theme-color"', 'Browser theme color is missing.'],
   ['property="og:image"', 'Open Graph preview image is missing.'],
   ['name="twitter:image"', 'Twitter preview image is missing.'],
