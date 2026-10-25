@@ -60,7 +60,7 @@ for (const featureText of [
   'Made to feel different.',
   'Find your angle.',
   'Explore the 3D product story',
-  'BARBELL / DUMBBELL / KETTLEBELL',
+  'SCROLL / SELECT / INSPECT',
   'YOUR TRAINING.',
   'MAKE EVERY',
   'SESSION BLUEPRINT',
