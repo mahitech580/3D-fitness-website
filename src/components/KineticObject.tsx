@@ -135,19 +135,20 @@ function KettlebellModel({ finish }: { finish: Finish }) {
   );
 }
 
-function SceneControls({ equipment, autoRotate, resetToken, reducedMotion, cameraPreset }: { equipment: Equipment; autoRotate: boolean; resetToken: number; reducedMotion: boolean | null; cameraPreset: CameraPreset }) {
+function SceneControls({ equipment, autoRotate, resetToken, reducedMotion, cameraPreset, storyBeat }: { equipment: Equipment; autoRotate: boolean; resetToken: number; reducedMotion: boolean | null; cameraPreset: CameraPreset; storyBeat: StoryBeat }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const { camera } = useThree();
 
   useEffect(() => {
     const distance = equipment === 'kettlebell' ? 4.35 : equipment === 'dumbbell' ? 4.7 : 5.1;
-    if (cameraPreset === 'side') camera.position.set(distance * 0.72, 0.12, distance * 0.72);
-    else if (cameraPreset === 'front') camera.position.set(0, 0.02, distance);
-    else camera.position.set(0.18, 0.38, distance);
+    const storyDistance = storyBeat === 1 ? distance * 0.92 : storyBeat === 2 ? distance * 0.78 : distance;
+    if (cameraPreset === 'side') camera.position.set(storyDistance * 0.72, 0.12, storyDistance * 0.72);
+    else if (cameraPreset === 'front') camera.position.set(0, 0.02, storyDistance);
+    else camera.position.set(0.18, storyBeat === 2 ? 0.12 : 0.38, storyDistance);
     camera.lookAt(0, 0, 0);
     controls.current?.target.set(0, 0, 0);
     controls.current?.update();
-  }, [camera, cameraPreset, equipment, resetToken]);
+  }, [camera, cameraPreset, equipment, resetToken, storyBeat]);
 
   return <OrbitControls ref={controls} enablePan={false} enableZoom enableDamping dampingFactor={0.08} minDistance={3.1} maxDistance={7.2} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI * 3 / 4} autoRotate={autoRotate && !reducedMotion} autoRotateSpeed={0.8} />;
 }
@@ -209,7 +210,7 @@ export default function KineticObject({ equipment, autoRotate, resetToken, finis
             <circleGeometry args={[2.25, 64]} />
             <meshBasicMaterial color="#bfff4b" transparent opacity={0.055} />
           </mesh>
-          <SceneControls equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} reducedMotion={reducedMotion} cameraPreset={cameraPreset} />
+          <SceneControls equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} reducedMotion={reducedMotion} cameraPreset={cameraPreset} storyBeat={storyBeat} />
         </Canvas>
       ) : (
         <SceneFallback equipment={equipment} />
