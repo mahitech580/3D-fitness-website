@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react';
 import { MotionConfig, motion, useReducedMotion } from 'framer-motion';
 const KineticObject = lazy(() => import('./components/KineticObject'));
 
@@ -339,7 +339,7 @@ function PathExplorer() {
     setActive(paths[next]);
   }
 
-  function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, current: Goal) {
+  function handleTabKeyDown(event: ReactKeyboardEvent<HTMLButtonElement>, current: Goal) {
     const currentIndex = goals.indexOf(current);
     let nextIndex = currentIndex;
     if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % goals.length;
