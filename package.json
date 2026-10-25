@@ -1,7 +1,7 @@
 {
   "name": "kinetik-fitness-experience",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit --pretty",
     "check": "npm run build && node scripts/verify-build.mjs",
-    "verify:build": "node scripts/verify-build.mjs"
+    "verify:build": "node scripts/verify-build.mjs",
+    "test:browser": "node scripts/browser-smoke.mjs",
+    "check:all": "npm run check && npm run test:browser"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
@@ -25,9 +27,10 @@
     "@types/three": "^0.186.0",
     "@vitejs/plugin-react": "^6.1.2",
     "typescript": "~7.0.2",
-    "vite": "^8.3.4"
+    "vite": "^8.3.4",
+    "playwright": "1.64.1"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19.0"
   }
 }
