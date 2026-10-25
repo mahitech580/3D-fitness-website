@@ -227,3 +227,23 @@
 @media(max-width:899px){.kinetic-finish-options{grid-template-columns:repeat(3,minmax(0,1fr))}.kinetic-finish-choice{padding:.6rem .45rem;gap:.4rem}.kinetic-finish-choice strong{font-size:.7rem}.kinetic-finish-choice small{font-size:.55rem}}
 @media(max-width:520px){.kinetic-finish-options{grid-template-columns:1fr}.kinetic-finish-choice{padding:.65rem .7rem}.kinetic-finish-choice strong{font-size:.78rem}}
 @media(prefers-reduced-motion:reduce){.kinetic-finish-choice{transition:none}}
+
+
+/* Camera and light-rig controls: real-time scene settings, not decorative toggles. */
+.kinetic-view-picker,.kinetic-lighting-picker{display:grid;gap:.65rem;margin-top:.8rem;padding-top:.8rem;border-top:1px solid var(--line-dark)}
+.kinetic-view-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.35rem}
+.kinetic-view-choice{min-width:0;padding:.6rem .35rem;border:1px solid var(--line-dark);background:transparent;color:var(--paper);font:inherit;font-size:.7rem;line-height:1.25;cursor:pointer}
+.kinetic-view-choice:hover,.kinetic-view-choice--active{border-color:var(--lime);background:rgba(188,244,119,.1);color:var(--lime)}
+.kinetic-view-choice:focus-visible,.kinetic-lighting-choice:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+.kinetic-lighting-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.35rem}
+.kinetic-lighting-choice{display:flex;align-items:center;gap:.45rem;min-width:0;padding:.6rem .45rem;border:1px solid var(--line-dark);background:transparent;color:var(--paper);text-align:left;cursor:pointer;transition:border-color .18s ease,background .18s ease}
+.kinetic-lighting-choice:hover,.kinetic-lighting-choice--active{border-color:var(--lime);background:rgba(188,244,119,.08)}
+.kinetic-lighting-dot{width:15px;height:15px;flex:0 0 15px;border-radius:50%;border:1px solid rgba(255,255,255,.3)}
+.kinetic-lighting-choice--studio .kinetic-lighting-dot{background:linear-gradient(135deg,#f0ffe2 0 50%,#8eaa9b 50%)}
+.kinetic-lighting-choice--contrast .kinetic-lighting-dot{background:linear-gradient(135deg,#fff 0 48%,#252b25 52%)}
+.kinetic-lighting-choice--neon .kinetic-lighting-dot{background:linear-gradient(135deg,#c8ff62 0 48%,#5d82ff 52%)}
+.kinetic-lighting-choice>span:last-child{display:grid;gap:.18rem;min-width:0}
+.kinetic-lighting-choice strong{font-size:.68rem;font-weight:750}
+.kinetic-lighting-choice small{color:var(--muted-light);font-size:.52rem;letter-spacing:.06em}
+@media(max-width:520px){.kinetic-lighting-options{grid-template-columns:1fr}.kinetic-lighting-choice{padding:.65rem .7rem}.kinetic-lighting-choice strong{font-size:.76rem}.kinetic-lighting-choice small{font-size:.58rem}}
+@media(prefers-reduced-motion:reduce){.kinetic-lighting-choice{transition:none}}
