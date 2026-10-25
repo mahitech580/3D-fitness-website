@@ -79,3 +79,23 @@ The active site uses separate Unsplash CDN assets documented in docs/ASSET-CREDI
 ## Verification priorities
 
 Keep testing the equipment switcher on mobile and low-power devices, including WebGL-unavailable fallback behavior. Review the remote photo selection and replace any images that do not fit the finished brand direction with appropriately licensed local assets. Add new 3D interactions only when they improve the visitor's understanding of the training concept.
+
+
+## Additional research pass: turning visual inspiration into useful interactions
+
+The current pass compared the live-site patterns and 2026 design reviews below. The useful common thread is not to copy a specific brand's layout, but to pair a distinct visual identity with clear next steps and practical information.
+
+- [UI Discovery — gym and fitness website patterns](https://uidiscovery.com/websites/gym-fitness): section-level comparison of brands such as Oura, WHOOP, Gymshark, Peloton, and Equinox. Applied as a clear hero-to-features-to-action rhythm rather than a generic block catalogue.
+- [Gymdesk — gym website examples and conversion principles](https://gymdesk.com/blog/9-gym-website-ideas-what-makes-a-good-gym-website): emphasizes quick clarity, mobile usability, and obvious next actions. Applied to the existing section anchors and the new session blueprint; no invented booking, pricing, reviews, or real-gym claims were added.
+- [Zarla — gym design examples](https://www.zarla.com/inspiration/gym): emphasizes identity, a specific audience, and an easy-to-understand user journey. Applied by extending KINETIK's original training-process narrative rather than imitating any brand's wording.
+- [My Personal Trainer Website — gym design examples (2026)](https://mypersonaltrainerwebsite.com/blog/the-20-best-gym-website-designs): highlights premium imagery and clear program navigation. Used as a review checklist for the current photo-led direction and distinct training paths.
+
+### New feature: session blueprint
+
+The new Session Blueprint section adds a four-stage routine—arrive, prepare, practise, reset—with concise guidance and flexible time ranges. It is educational site content, not individualized coaching. It links into the existing starter-plan builder, has responsive two-column/one-column layouts, and disables hover movement under reduced-motion preferences. Browser smoke tests now assert the section and all four cards exist.
+
+### Next review criteria
+
+- Confirm the 3D models visibly render on real mobile hardware, not only that a canvas element exists.
+- Prefer locally hosted, appropriately licensed photos if the site must remain reliable when third-party CDNs are unavailable.
+- Keep example schedule, progress tracking, and generated plans clearly labeled as browser-only concepts.
