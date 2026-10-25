@@ -1,14 +1,19 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+const projectPagesBase = '/3D-fitness-website/';
+const isGitHubPagesBuild = process.env.GITHUB_ACTIONS === 'true';
+
 export default defineConfig({
   plugins: [react()],
-  base: process.env.GITHUB_ACTIONS === 'true' ? '/3D-fitness-website/' : '/',
+  // Local development stays at /; GitHub Pages needs the repository subpath.
+  base: isGitHubPagesBuild ? projectPagesBase : '/',
   build: {
     target: 'es2022',
     sourcemap: false,
     assetsInlineLimit: 4096,
-    chunkSizeWarningLimit: 850,
+    // The separately loaded WebGL vendor chunk is ~930 KB minified (~248 KB gzip).
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks(id) {
