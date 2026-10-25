@@ -139,6 +139,15 @@ try {
   await reopenedAnswer.waitFor();
   assert.match(await reopenedAnswer.innerText(), /KINETIK is a fitness website concept/i, 'The FAQ answer should reopen on click.');
 
+  await page.goto(baseUrl + '?equipment=dumbbell&finish=steel&lighting=neon&view=side&story=2', { waitUntil: 'domcontentloaded' });
+  await page.locator('#kinetic-lab').scrollIntoViewIfNeeded();
+  assert.equal(await page.locator('.kinetic-equipment-choice').filter({ hasText: 'Dumbbell' }).getAttribute('aria-pressed'), 'true', 'Shared URL should restore the equipment.');
+  assert.equal(await page.locator('.kinetic-finish-choice--steel').getAttribute('aria-pressed'), 'true', 'Shared URL should restore the material.');
+  assert.equal(await page.locator('.kinetic-lighting-choice--neon').getAttribute('aria-pressed'), 'true', 'Shared URL should restore the lighting.');
+  assert.equal(await page.locator('.kinetic-view-choice--active').innerText(), 'Side profile', 'Shared URL should restore the camera view.');
+  assert.match(await page.locator('#kinetic-story-title').innerText(), /angle/i, 'Shared URL should restore the story beat.');
+  assert.equal(await page.getByRole('button', { name: /Copy setup link/i }).count(), 1, 'The setup can be shared again from the restored state.');
+
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await page.locator('#hero-title').waitFor();
