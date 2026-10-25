@@ -187,7 +187,7 @@ try {
   await page.getByRole('button', { name: 'Open navigation menu' }).click();
   assert.equal(await page.getByRole('navigation', { name: 'Main navigation' }).getAttribute('class'), 'main-nav main-nav--open');
   await page.keyboard.press('Escape');
-  assert.equal(await page.getByRole('navigation', { name: 'Main navigation' }).getAttribute('class'), 'main-nav', 'Escape should close the mobile navigation.');
+  assert.equal(await page.locator('#main-navigation').getAttribute('class'), 'main-nav', 'Escape should close the mobile navigation even when the closed nav is hidden from the accessibility tree.');
   await page.getByRole('button', { name: 'Open navigation menu' }).click();
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Training paths' }).click();
   assert.match(page.url(), /#programs$/);
