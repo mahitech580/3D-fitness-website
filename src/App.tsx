@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useRef, useState, type FormEvent, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react';
 import { MotionConfig, motion, useReducedMotion } from 'framer-motion';
 const KineticObject = lazy(() => import('./components/KineticObject'));
+const HeroScene = lazy(() => import('./components/HeroScene'));
 
 const photos = {
   hero: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1800&q=85',
@@ -211,7 +212,17 @@ function Hero() {
           <div className="hero-values"><span>01 / SHOW UP</span><span>02 / STAY CURIOUS</span><span>03 / REPEAT</span></div>
         </div>
         <div className="hero-visual">
-          <div className="hero-photo-main"><img src={photos.hero} alt="Modern gym floor with rows of strength and conditioning equipment" fetchPriority="high" decoding="async" /><span className="photo-corner-label">THE WORK / 001</span></div>
+          <div className="hero-photo-main">
+            <img src={photos.hero} alt="Modern gym floor with rows of strength and conditioning equipment" fetchPriority="high" decoding="async" />
+            <div className="hero-three-layer" aria-hidden="true">
+              <div className="hero-three-grid" />
+              <Suspense fallback={<div className="hero-three-fallback"><span className="hero-three-fallback-ring" /><span className="hero-three-fallback-core" /></div>}>
+                <HeroScene />
+              </Suspense>
+              <span className="hero-three-status"><i /> LIVE OBJECT / 3D</span>
+            </div>
+            <span className="photo-corner-label">THE WORK / 001</span>
+          </div>
           <div className="hero-photo-small"><img src={photos.athlete} alt="Athlete focused on strength training" loading="eager" decoding="async" /><span>STRENGTH<br />IN PROGRESS.</span></div>
           <div className="hero-sticker"><span>KEEP</span><strong>SHOWING<br />UP.</strong><i>✳</i></div>
           <div className="hero-vertical-label">TRAINING / CULTURE / EVERY DAY</div>
