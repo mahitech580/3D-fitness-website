@@ -1,6 +1,6 @@
 # Gym website reference research and design decisions
 
-Research reviewed on 24 October 2026. The goal was to study real fitness websites and current gym UX guidance, then apply the strongest general patterns to an original KINETIK concept. This research informed design choices; no source site's copy, exact composition, or source code was copied.
+Research reviewed on 25 October 2026. The goal was to study real fitness websites and current gym UX guidance, then apply the strongest general patterns to an original KINETIK concept. This research informed design choices; no source site's copy, exact composition, or source code was copied.
 
 ## Main website references
 
@@ -60,9 +60,10 @@ The active site uses separate Unsplash CDN assets documented in docs/ASSET-CREDI
 
 - The active page includes three original real-time 3D equipment models—barbell, dumbbell, and kettlebell—built from Three.js geometry and materials through React Three Fiber. It is not a video or a 2D image; pointer/touch dragging rotates the model through Drei's orbit controls.
 - Equipment tabs switch between the three models. Visitors can enable/disable automatic rotation, zoom the view, and reset the camera/object state. Reduced-motion preferences automatically disable camera rotation.
-- The 3D canvas mounts near the section viewport and unmounts again when it is offscreen. This avoids continuously rendering the scene while the visitor reads other sections.
+- The WebGL code is lazy-loaded when the lab approaches the viewport; the canvas is then mounted only while its own viewport observer says the lab is near the screen. This avoids continuously rendering while the visitor reads other sections.
 - Rendering uses a capped device-pixel ratio and a low-power WebGL preference. A CSS barbell study is available while the canvas mounts and as the WebGL fallback.
 - The scene honors the reduced-motion preference by stopping automatic object rotation. The CSS fallback also disables its orbit animation for reduced-motion users.
+- The training-path tabs support Arrow keys, Home, and End, and plan-builder input changes invalidate stale generated results.
 - Accent color is bright lime green against forest/near-black green; cream surfaces keep the long page readable.
 - Real photography is mixed with original typography and flat CSS details; no fake performance metrics or testimonials are used.
 - Motion is intentional: scroll-reveal entrances, a restrained marquee, hover image zooms, and smooth anchor navigation.
@@ -75,6 +76,6 @@ The active site uses separate Unsplash CDN assets documented in docs/ASSET-CREDI
 - [Three.js — Responsive design](https://threejs.org/manual/pages/responsive.html): informed sizing the canvas through the surrounding CSS layout and avoiding unbounded device-pixel rendering on high-density displays.
 - [MDN — prefers-reduced-motion](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/%40media/prefers-reduced-motion): informs the reduced-motion treatment for the scene and CSS placeholder.
 
-## Further refinement
+## Verification priorities
 
-Validate the live 3D interaction on a range of mobile screens, low-power devices, and browsers with WebGL unavailable; optimize the production bundle and imagery based on real device testing; and expand the 3D experience only when the additional interaction is useful.
+Keep testing the equipment switcher on mobile and low-power devices, including WebGL-unavailable fallback behavior. Review the remote photo selection and replace any images that do not fit the finished brand direction with appropriately licensed local assets. Add new 3D interactions only when they improve the visitor's understanding of the training concept.
