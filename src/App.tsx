@@ -630,7 +630,19 @@ function PlanBuilder() {
     const text = [plan.title, plan.meta, '', ...plan.moves.map((move, index) => (index + 1) + '. ' + move), '', 'KINETIK sample plan — adapt to your ability.'].join('\n');
     try {
       if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
+        // Some embedded browsers expose the Clipboard API but leave its promise pending.
+        // Bound the wait so the manual-copy fallback and accessible status always appear.
+        let timeoutId: number | undefined;
+        try {
+          await Promise.race([
+            navigator.clipboard.writeText(text),
+            new Promise<never>((_, reject) => {
+              timeoutId = window.setTimeout(() => reject(new Error('Clipboard write timed out')), 1500);
+            }),
+          ]);
+        } finally {
+          if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+        }
       } else {
         throw new Error('Clipboard API unavailable');
       }
