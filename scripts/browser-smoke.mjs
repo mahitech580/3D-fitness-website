@@ -82,6 +82,17 @@ try {
   await heroView.click();
   assert.equal(await heroView.getAttribute('aria-pressed'), 'true', 'Hero camera preset should be restorable.');
   assert.equal(await canvasHandle.evaluate((element) => element.isConnected), true, 'Camera changes should preserve the live canvas.');
+  const story = page.locator('.kinetic-story');
+  assert.equal(await story.count(), 1, 'The guided 3D story should render once.');
+  const storyFinish = story.getByRole('button', { name: /02/ });
+  await storyFinish.click();
+  assert.equal(await storyFinish.getAttribute('aria-pressed'), 'true', 'The finish story beat should become active.');
+  assert.match(await page.locator('#kinetic-story-title').innerText(), /different/i);
+  await story.getByRole('button', { name: 'Next detail' }).click();
+  assert.match(await page.locator('#kinetic-story-title').innerText(), /angle/i, 'Next should advance the guided story.');
+  await story.getByRole('button', { name: '← Previous' }).click();
+  assert.match(await page.locator('#kinetic-story-title').innerText(), /different/i, 'Previous should reverse the guided story.');
+  assert.equal(await canvasHandle.evaluate((element) => element.isConnected), true, 'Story navigation should preserve the live canvas.');
   assert.equal(await canvasHandle.evaluate((element) => element.isConnected), true, 'Switching the model should not recreate the WebGL canvas.');
 
   const kettlebell = page.locator('.kinetic-equipment-choice').filter({ hasText: 'Kettlebell' });
