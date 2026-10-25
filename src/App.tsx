@@ -30,6 +30,7 @@ const navLinks = [
   { label: '3D training lab', href: '#kinetic-lab' },
   { label: 'Training paths', href: '#programs' },
   { label: 'Session guide', href: '#session-guide' },
+  { label: 'Movement index', href: '#movement-library' },
   { label: 'Weekly rhythm', href: '#weekly' },
   { label: 'Your progress', href: '#tracker' },
 ];
@@ -434,6 +435,71 @@ function SessionGuide() {
   return <section className="session-guide section-pad" id="session-guide" aria-labelledby="session-guide-title"><div className="page-shell"><Reveal className="section-heading section-heading--split"><div><Eyebrow>07 / THE SESSION BLUEPRINT</Eyebrow><h2 id="session-guide-title">MAKE EVERY<br /><em>MINUTE COUNT.</em></h2></div><p>A repeatable structure can make training feel less overwhelming. Use this as a flexible checklist—not a performance test or a fixed prescription.</p></Reveal><div className="session-steps">{steps.map((step, index) => <Reveal key={step.number} delay={index * 0.06}><article className="session-step"><div className="session-step-top"><span>{step.number} / {step.label}</span><span>{step.time}</span></div><div className="session-step-mark" aria-hidden="true">{['↗', '⌁', '◎', '↻'][index]}</div><h3>{step.title}</h3><p>{step.copy}</p></article></Reveal>)}</div><div className="session-guide-foot"><span><i /> FLEXIBLE / BEGINNER-FRIENDLY</span><a className="underlined-link" href="#start">Build a starter session <Arrow /></a></div></div></section>;
 }
 
+
+const movementLibrary = [
+  { name: 'Goblet squat', category: 'STRENGTH', equipment: 'Dumbbell or kettlebell', focus: 'Squat pattern', cue: 'Keep the load close, brace gently, and use a comfortable depth.' },
+  { name: 'Hip hinge drill', category: 'STRENGTH', equipment: 'Bodyweight', focus: 'Hinge pattern', cue: 'Push hips back while keeping the spine comfortable and controlled.' },
+  { name: 'Incline push-up', category: 'STRENGTH', equipment: 'Bench or sturdy elevated surface', focus: 'Push pattern', cue: 'Keep the body in one line and choose an incline that allows smooth reps.' },
+  { name: 'Supported dumbbell row', category: 'STRENGTH', equipment: 'Dumbbell and bench', focus: 'Pull pattern', cue: 'Support your torso and pull without twisting or jerking.' },
+  { name: 'Farmer carry', category: 'STRENGTH', equipment: 'Dumbbells or kettlebells', focus: 'Grip and bracing', cue: 'Walk tall with manageable loads and a clear, obstacle-free path.' },
+  { name: 'Brisk walk intervals', category: 'ENGINE', equipment: 'Walking space', focus: 'Low-impact conditioning', cue: 'Alternate comfortable brisk periods with easier recovery periods.' },
+  { name: 'Step-ups', category: 'ENGINE', equipment: 'Low stable step', focus: 'Steady effort', cue: 'Use a low, stable step and move with control; hold a rail if needed.' },
+  { name: 'March in place', category: 'ENGINE', equipment: 'Bodyweight', focus: 'Accessible conditioning', cue: 'Start at an easy pace and increase only while you can stay comfortable.' },
+  { name: 'Dead bug', category: 'RESTORE', equipment: 'Mat', focus: 'Trunk control', cue: 'Move slowly and keep the range small enough to maintain control.' },
+  { name: 'Cat-cow', category: 'RESTORE', equipment: 'Mat', focus: 'Gentle spinal movement', cue: 'Move smoothly through a comfortable range; avoid forcing end positions.' },
+  { name: 'Ankle rocks', category: 'RESTORE', equipment: 'Wall optional', focus: 'Ankle mobility', cue: 'Keep the heel grounded and use a pain-free range.' },
+  { name: 'Easy breathing reset', category: 'RESTORE', equipment: 'Quiet space', focus: 'Downshift', cue: 'Breathe naturally and slowly without holding your breath or straining.' },
+] as const;
+
+type MovementFilter = 'ALL' | 'STRENGTH' | 'ENGINE' | 'RESTORE';
+
+function MovementExplorer() {
+  const [filter, setFilter] = useState<MovementFilter>('ALL');
+  const [query, setQuery] = useState('');
+  const visibleMoves = movementLibrary.filter((move) =>
+    (filter === 'ALL' || move.category === filter) &&
+    (move.name + ' ' + move.equipment + ' ' + move.focus + ' ' + move.cue).toLowerCase().includes(query.trim().toLowerCase())
+  );
+
+  return (
+    <section className="movement-explorer section-pad" id="movement-library">
+      <div className="page-shell">
+        <Reveal className="movement-heading">
+          <Eyebrow>07 / THE MOVEMENT INDEX</Eyebrow>
+          <h2>KNOW THE MOVE.<br /><em>OWN THE BASICS.</em></h2>
+          <p>A small, searchable reference for common movement patterns. Start with control, use a manageable variation, and build consistency before adding complexity.</p>
+        </Reveal>
+        <div className="movement-tools">
+          <label className="movement-search">
+            <span className="field-label">SEARCH MOVEMENTS</span>
+            <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Try “hinge”, “mat”, or “dumbbell”" aria-label="Search movement library" />
+          </label>
+          <div className="movement-filters" aria-label="Filter movement category">
+            {(['ALL', 'STRENGTH', 'ENGINE', 'RESTORE'] as const).map((item) => (
+              <button key={item} type="button" className={filter === item ? 'movement-filter movement-filter--active' : 'movement-filter'} aria-pressed={filter === item} onClick={() => setFilter(item)}>{item === 'ALL' ? 'All moves' : item === 'ENGINE' ? 'Conditioning' : item === 'RESTORE' ? 'Mobility & reset' : 'Strength'}</button>
+            ))}
+          </div>
+        </div>
+        <p className="movement-count" aria-live="polite">{visibleMoves.length} {visibleMoves.length === 1 ? 'movement' : 'movements'} shown <span> / 12 STARTER REFERENCES</span></p>
+        {visibleMoves.length ? (
+          <div className="movement-grid">
+            {visibleMoves.map((move, index) => (
+              <article className="movement-card" key={move.name}>
+                <div className="movement-card-top"><span>{String(index + 1).padStart(2, '0')}</span><span className={'movement-tag movement-tag--' + move.category.toLowerCase()}>{move.category}</span></div>
+                <h3>{move.name}</h3>
+                <p className="movement-focus">{move.focus}</p>
+                <p>{move.cue}</p>
+                <div className="movement-equipment"><span>EQUIPMENT</span><strong>{move.equipment}</strong></div>
+              </article>
+            ))}
+          </div>
+        ) : <div className="movement-empty"><strong>No matching movement.</strong><p>Try a broader term or reset the filters.</p><button type="button" className="clear-plan" onClick={() => { setQuery(''); setFilter('ALL'); }}>Reset movement search ↺</button></div>}
+        <p className="movement-disclaimer">Educational reference only. This is not a personalized prescription. Choose safe, stable equipment, adapt movements to your ability, and stop if you feel pain or unusual symptoms.</p>
+      </div>
+    </section>
+  );
+}
+
 function WeeklyPlan() {
   const [filter, setFilter] = useState<WeekFilter>('ALL');
   const options: WeekFilter[] = ['ALL', 'STRENGTH', 'ENGINE', 'RESTORE'];
@@ -581,7 +647,7 @@ function Footer() {
 
 export function App() {
   useEffect(() => { document.documentElement.dataset.site = 'kinetik'; }, []);
-  return <MotionConfig reducedMotion="user"><div className="kinetik-app"><a className="skip-link" href="#main-content">Skip to content</a><Header /><main id="main-content"><Hero /><Marquee /><KineticLab /><Approach /><Programs /><FeatureSection /><PathExplorer /><Gallery /><FuelSection /><SessionGuide /><WeeklyPlan /><ProgressTracker /><PlanBuilder /><FAQ /><Closing /></main><Footer /></div></MotionConfig>;
+  return <MotionConfig reducedMotion="user"><div className="kinetik-app"><a className="skip-link" href="#main-content">Skip to content</a><Header /><main id="main-content"><Hero /><Marquee /><KineticLab /><Approach /><Programs /><FeatureSection /><PathExplorer /><Gallery /><FuelSection /><SessionGuide /><MovementExplorer /><WeeklyPlan /><ProgressTracker /><PlanBuilder /><FAQ /><Closing /></main><Footer /></div></MotionConfig>;
 }
 
 export default App;
