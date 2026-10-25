@@ -147,6 +147,15 @@ try {
   assert.equal(await page.getByRole('button', { name: 'Log Monday session' }).getAttribute('aria-pressed'), 'true', 'A check-in should survive a reload in the same browser.');
   await page.getByRole('button', { name: 'Log Monday session' }).click();
   assert.equal((await page.locator('.tracker-counter strong').innerText()).replace(/\s+/g, ' ').trim(), '0 / 7', 'A second click should undo the check-in.');
+  await page.evaluate(() => {
+    const weekStorageKey = Object.keys(localStorage).find((key) => key.startsWith('kinetik-week-'));
+    if (weekStorageKey) localStorage.setItem(weekStorageKey, '{broken json');
+    localStorage.setItem('kinetik-starter-plan', '{broken json');
+  });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.locator('#tracker').scrollIntoViewIfNeeded();
+  assert.equal((await page.locator('.tracker-counter strong').innerText()).replace(/\s+/g, ' ').trim(), '0 / 7', 'Malformed saved check-ins should recover to an empty week.');
+  assert.equal(await page.locator('.generated-plan').count(), 0, 'Malformed saved plans should be ignored safely.');
   await page.locator('#faq').scrollIntoViewIfNeeded();
   const conceptFaq = page.getByRole('button', { name: /Is KINETIK a real gym or membership service/i });
   assert.equal(await conceptFaq.getAttribute('aria-expanded'), 'true', 'The first FAQ should start open.');
