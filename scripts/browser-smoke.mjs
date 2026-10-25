@@ -15,6 +15,14 @@ try {
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await page.locator('#hero-title').waitFor();
   assert.match(await page.title(), /KINETIK.*Train With Intent/i);
+  const imageAudit = await page.locator('img').evaluateAll((images) => images
+    .filter((image) => !image.hasAttribute('alt'))
+    .map((image) => image.getAttribute('src') || image.outerHTML.slice(0, 120)));
+  assert.deepEqual(imageAudit, [], 'Every content image must declare alt text; decorative images should use alt="".');
+  const localAnchorAudit = await page.locator('a[href^="#"]').evaluateAll((links) => links
+    .filter((link) => link.getAttribute('href') !== '#' && !document.querySelector(link.getAttribute('href')))
+    .map((link) => ({ label: link.innerText.trim(), href: link.getAttribute('href') })));
+  assert.deepEqual(localAnchorAudit, [], 'In-page links must point to existing targets.');
   assert.equal(await page.locator('#programs').count(), 1);
   assert.equal(await page.locator('#kinetic-lab').count(), 1);
   assert.equal(await page.locator('#training-path').count(), 1);
