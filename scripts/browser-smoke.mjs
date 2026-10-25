@@ -20,6 +20,8 @@ try {
   assert.equal(await page.locator('#training-path').count(), 1);
   assert.equal(await page.locator('#start').count(), 1);
   assert.equal(await page.locator('#tracker').count(), 1);
+  assert.equal(await page.locator('#session-guide').count(), 1);
+  assert.equal(await page.locator('.session-step').count(), 4);
   assert.equal(await page.locator('.program-card').count(), 3);
   assert.equal(await page.locator('.week-row').count(), 7);
   await mkdir('artifacts', { recursive: true });
