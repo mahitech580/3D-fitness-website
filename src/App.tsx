@@ -627,7 +627,7 @@ function PlanBuilder() {
 
   async function copyPlan() {
     if (!plan) return;
-    const text = [plan.title, plan.meta, '', ...plan.moves.map((move, index) => (index + 1) + '. ' + move), '', 'KINETIK sample plan — adapt to your ability.'].join('\\n');
+    const text = [plan.title, plan.meta, '', ...plan.moves.map((move, index) => (index + 1) + '. ' + move), '', 'KINETIK sample plan — adapt to your ability.'].join('\n');
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(text);
