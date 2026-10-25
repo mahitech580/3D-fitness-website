@@ -20,6 +20,7 @@
 - **Weekly rhythm:** filterable sample schedule covering strength, conditioning, and recovery days.
 - **Habit tracker:** record sessions for the current local week; check-ins stay in this browser.
 - **Starter-plan builder:** create a transparent, rule-based example routine from goal, starting level, and time available.
+- **Portable starter plans:** copy a generated routine as clean, numbered plain text with an accessible status message and a fallback for browsers that block clipboard access.
 - **Editorial experience:** layered gym photography, oversized typography, scroll reveals, a photo moodboard, recovery content, and responsive layouts.
 - **Accessibility basics:** semantic page sections, keyboard-focus styles, a skip link, reduced-motion support, a mobile navigation menu, and a CSS preview when WebGL is unavailable.
 
