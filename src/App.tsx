@@ -29,6 +29,7 @@ const navLinks = [
   { label: 'The method', href: '#approach' },
   { label: '3D training lab', href: '#kinetic-lab' },
   { label: 'Training paths', href: '#programs' },
+  { label: 'Session guide', href: '#session-guide' },
   { label: 'Weekly rhythm', href: '#weekly' },
   { label: 'Your progress', href: '#tracker' },
 ];
@@ -423,6 +424,16 @@ function FuelSection() {
   return <section className="fuel-section"><div className="fuel-image"><img src={photos.nutrition} alt="Colorful balanced meal with vegetables, grains, and fresh ingredients" loading="lazy" decoding="async" /><span>THE WORK CONTINUES OFF THE FLOOR</span></div><div className="fuel-copy"><Reveal><Eyebrow light>06 / BEYOND THE SESSION</Eyebrow><h2>TRAIN HARD.<br />RECOVER <em>SMART.</em></h2><p>Training is one piece of the picture. Build a rhythm around meals that fuel you, sleep that restores you, and rest days you can respect.</p><div className="fuel-tags"><span>MOVE</span><span>FUEL</span><span>REST</span></div><a className="text-link text-link--light" href="#faq">Read the essentials <Arrow /></a></Reveal></div></section>;
 }
 
+function SessionGuide() {
+  const steps = [
+    { number: '01', label: 'ARRIVE', title: 'Set your intention', copy: 'Choose one focus for today. Put your phone away, check your space, and make the session feel manageable.', time: '2—3 MIN' },
+    { number: '02', label: 'PREPARE', title: 'Warm up gradually', copy: 'Start with easy movement, then rehearse the patterns you plan to train. Increase effort progressively.', time: '5—10 MIN' },
+    { number: '03', label: 'PRACTISE', title: 'Work with control', copy: 'Use a pace and load you can manage. Rest when needed and stop if you feel sharp pain, dizziness, or unusual symptoms.', time: 'MAIN SET' },
+    { number: '04', label: 'RESET', title: 'Close the loop', copy: 'Ease down, note what went well, and leave room for food, sleep, and recovery before the next session.', time: '3—5 MIN' },
+  ];
+  return <section className="session-guide section-pad" id="session-guide" aria-labelledby="session-guide-title"><div className="page-shell"><Reveal className="section-heading section-heading--split"><div><Eyebrow>07 / THE SESSION BLUEPRINT</Eyebrow><h2 id="session-guide-title">MAKE EVERY<br /><em>MINUTE COUNT.</em></h2></div><p>A repeatable structure can make training feel less overwhelming. Use this as a flexible checklist—not a performance test or a fixed prescription.</p></Reveal><div className="session-steps">{steps.map((step, index) => <Reveal key={step.number} delay={index * 0.06}><article className="session-step"><div className="session-step-top"><span>{step.number} / {step.label}</span><span>{step.time}</span></div><div className="session-step-mark" aria-hidden="true">{['↗', '⌁', '◎', '↻'][index]}</div><h3>{step.title}</h3><p>{step.copy}</p></article></Reveal>)}</div><div className="session-guide-foot"><span><i /> FLEXIBLE / BEGINNER-FRIENDLY</span><a className="underlined-link" href="#start">Build a starter session <Arrow /></a></div></div></section>;
+}
+
 function WeeklyPlan() {
   const [filter, setFilter] = useState<WeekFilter>('ALL');
   const options: WeekFilter[] = ['ALL', 'STRENGTH', 'ENGINE', 'RESTORE'];
@@ -570,7 +581,7 @@ function Footer() {
 
 export function App() {
   useEffect(() => { document.documentElement.dataset.site = 'kinetik'; }, []);
-  return <MotionConfig reducedMotion="user"><div className="kinetik-app"><a className="skip-link" href="#main-content">Skip to content</a><Header /><main id="main-content"><Hero /><Marquee /><KineticLab /><Approach /><Programs /><FeatureSection /><PathExplorer /><Gallery /><FuelSection /><WeeklyPlan /><ProgressTracker /><PlanBuilder /><FAQ /><Closing /></main><Footer /></div></MotionConfig>;
+  return <MotionConfig reducedMotion="user"><div className="kinetik-app"><a className="skip-link" href="#main-content">Skip to content</a><Header /><main id="main-content"><Hero /><Marquee /><KineticLab /><Approach /><Programs /><FeatureSection /><PathExplorer /><Gallery /><FuelSection /><SessionGuide /><WeeklyPlan /><ProgressTracker /><PlanBuilder /><FAQ /><Closing /></main><Footer /></div></MotionConfig>;
 }
 
 export default App;
