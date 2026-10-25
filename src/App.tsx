@@ -19,6 +19,18 @@ type WeekFilter = 'ALL' | 'STRENGTH' | 'ENGINE' | 'RESTORE';
 
 type Equipment = 'barbell' | 'dumbbell' | 'kettlebell';
 type Finish = 'kinetik' | 'carbon' | 'steel';
+type LightingPreset = 'studio' | 'contrast' | 'neon';
+type CameraPreset = 'hero' | 'front' | 'side';
+const lightingOptions: Array<{ id: LightingPreset; label: string; note: string }> = [
+  { id: 'studio', label: 'Studio', note: 'BALANCED' },
+  { id: 'contrast', label: 'Contrast', note: 'HARD EDGE' },
+  { id: 'neon', label: 'Neon', note: 'LIME / ICE' },
+];
+const cameraOptions: Array<{ id: CameraPreset; label: string }> = [
+  { id: 'hero', label: 'Hero angle' },
+  { id: 'front', label: 'Front' },
+  { id: 'side', label: 'Side profile' },
+];
 const finishOptions: Array<{ id: Finish; label: string; note: string }> = [
   { id: 'kinetik', label: 'Kinetik lime', note: 'SIGNATURE' },
   { id: 'carbon', label: 'Carbon', note: 'MATTE' },
@@ -213,7 +225,7 @@ function EquipmentScenePreview({ equipment, status }: { equipment: Equipment; st
   return <div className="kinetic-object-host" role="img" aria-label={equipmentInfo[equipment].label + ' 3D preview'}><div className="scene-fallback"><span className="scene-ring scene-ring--one" /><span className="scene-ring scene-ring--two" /><span className={'scene-dumbbell scene-dumbbell--' + equipment}><i /><b />{equipment !== 'kettlebell' && <i />}</span><span className="scene-fallback-label">{status}</span></div></div>;
 }
 
-function KineticSceneLoader({ equipment, autoRotate, resetToken, finish }: { equipment: Equipment; autoRotate: boolean; resetToken: number; finish: Finish }) {
+function KineticSceneLoader({ equipment, autoRotate, resetToken, finish, lighting, cameraPreset }: { equipment: Equipment; autoRotate: boolean; resetToken: number; finish: Finish; lighting: LightingPreset; cameraPreset: CameraPreset }) {
   const host = useRef<HTMLDivElement>(null);
   const [nearViewport, setNearViewport] = useState(false);
   useEffect(() => {
@@ -228,7 +240,7 @@ function KineticSceneLoader({ equipment, autoRotate, resetToken, finish }: { equ
     observer.observe(host.current);
     return () => observer.disconnect();
   }, []);
-  return <div ref={host} className="kinetic-scene-loader">{nearViewport ? <Suspense fallback={<EquipmentScenePreview equipment={equipment} status="LOADING 3D ENGINE" />}><KineticObject equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} finish={finish} /></Suspense> : <EquipmentScenePreview equipment={equipment} status="SCENE STANDBY / APPROACH TO ACTIVATE" />}</div>;
+  return <div ref={host} className="kinetic-scene-loader">{nearViewport ? <Suspense fallback={<EquipmentScenePreview equipment={equipment} status="LOADING 3D ENGINE" />}><KineticObject equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} finish={finish} lighting={lighting} cameraPreset={cameraPreset} /></Suspense> : <EquipmentScenePreview equipment={equipment} status="SCENE STANDBY / APPROACH TO ACTIVATE" />}</div>;
 }
 
 function KineticLab() {
@@ -236,6 +248,8 @@ function KineticLab() {
   const [autoRotate, setAutoRotate] = useState(true);
   const [resetToken, setResetToken] = useState(0);
   const [finish, setFinish] = useState<Finish>('kinetik');
+  const [lighting, setLighting] = useState<LightingPreset>('studio');
+  const [cameraPreset, setCameraPreset] = useState<CameraPreset>('hero');
   const active = equipmentInfo[equipment];
   const choices = Object.keys(equipmentInfo) as Equipment[];
 
@@ -266,13 +280,15 @@ function KineticLab() {
               <span className="kinetic-lab-tools-label">SCENE CONTROLS</span>
               <button type="button" className={'kinetic-control' + (autoRotate ? ' kinetic-control--on' : '')} aria-pressed={autoRotate} onClick={() => setAutoRotate((value) => !value)}><span className="kinetic-control-indicator" /> Auto rotate <strong>{autoRotate ? 'ON' : 'OFF'}</strong></button>
               <button type="button" className="kinetic-control" onClick={() => setResetToken((n) => n + 1)}><span aria-hidden="true">↻</span> Reset view</button>
+              <div className="kinetic-view-picker" role="group" aria-label="Choose camera view"><span className="kinetic-lab-tools-label">CAMERA / VIEW</span><div className="kinetic-view-options">{cameraOptions.map((option) => <button key={option.id} type="button" className={'kinetic-view-choice' + (cameraPreset === option.id ? ' kinetic-view-choice--active' : '')} aria-pressed={cameraPreset === option.id} onClick={() => { setCameraPreset(option.id); setResetToken((n) => n + 1); }}>{option.label}</button>)}</div></div>
+              <div className="kinetic-lighting-picker" role="group" aria-label="Choose 3D scene lighting"><span className="kinetic-lab-tools-label">LIGHT RIG</span><div className="kinetic-lighting-options">{lightingOptions.map((option) => <button key={option.id} type="button" className={'kinetic-lighting-choice kinetic-lighting-choice--' + option.id + (lighting === option.id ? ' kinetic-lighting-choice--active' : '')} aria-pressed={lighting === option.id} onClick={() => setLighting(option.id)}><span className="kinetic-lighting-dot" aria-hidden="true" /><span><strong>{option.label}</strong><small>{option.note}</small></span></button>)}</div></div>
               <div className="kinetic-finish-picker" role="group" aria-label="Choose equipment material finish"><span className="kinetic-lab-tools-label">MATERIAL FINISH</span><div className="kinetic-finish-options">{finishOptions.map((option) => <button key={option.id} type="button" className={'kinetic-finish-choice kinetic-finish-choice--' + option.id + (finish === option.id ? ' kinetic-finish-choice--active' : '')} aria-pressed={finish === option.id} onClick={() => setFinish(option.id)}><span className="kinetic-finish-swatch" aria-hidden="true" /><span><strong>{option.label}</strong><small>{option.note}</small></span></button>)}</div></div>
             </div>
           </div>
           <div className="kinetic-lab-stage">
             <div className="kinetic-lab-grid" aria-hidden="true" />
             <div className="kinetic-lab-stage-top"><span>OBJECT / {active.code}</span><span>{active.descriptor}</span></div>
-            <KineticSceneLoader equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} finish={finish} />
+            <KineticSceneLoader equipment={equipment} autoRotate={autoRotate} resetToken={resetToken} finish={finish} lighting={lighting} cameraPreset={cameraPreset} />
             <div className="kinetic-lab-object-info" aria-live="polite"><span>{active.code} / 03</span><strong>{active.title}</strong><p>{active.copy}</p><div className="kinetic-lab-object-tag">{active.focus}</div></div>
             <div className="kinetic-lab-stage-bottom"><span>DRAG TO ORBIT · SCROLL TO EXPLORE</span><span className="kinetic-lab-live"><i /> SCENE READY</span></div>
             <span className="kinetic-lab-cross kinetic-lab-cross--one" aria-hidden="true">＋</span>
