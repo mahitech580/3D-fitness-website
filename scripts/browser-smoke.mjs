@@ -138,8 +138,15 @@ try {
   assert.equal(await generatedPlan.count(), 0, 'Changing the builder inputs should clear the stale generated result.');
 
   await page.locator('#tracker').scrollIntoViewIfNeeded();
+  const mondayCheckin = page.getByRole('button', { name: 'Log Monday session' });
+  await mondayCheckin.click();
+  assert.equal((await page.locator('.tracker-counter strong').innerText()).replace(/\\s+/g, ' ').trim(), '1 / 7');
+  assert.equal(await mondayCheckin.getAttribute('aria-pressed'), 'true', 'A logged session should expose its pressed state.');
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.locator('#tracker').scrollIntoViewIfNeeded();
+  assert.equal(await page.getByRole('button', { name: 'Log Monday session' }).getAttribute('aria-pressed'), 'true', 'A check-in should survive a reload in the same browser.');
   await page.getByRole('button', { name: 'Log Monday session' }).click();
-  assert.equal((await page.locator('.tracker-counter strong').innerText()).replace(/\s+/g, ' ').trim(), '1 / 7');
+  assert.equal((await page.locator('.tracker-counter strong').innerText()).replace(/\\s+/g, ' ').trim(), '0 / 7', 'A second click should undo the check-in.');
   await page.locator('#faq').scrollIntoViewIfNeeded();
   const conceptFaq = page.getByRole('button', { name: /Is KINETIK a real gym or membership service/i });
   assert.equal(await conceptFaq.getAttribute('aria-expanded'), 'true', 'The first FAQ should start open.');
@@ -170,6 +177,9 @@ try {
   await page.screenshot({ path: 'artifacts/kinetik-mobile.png', fullPage: false });
   await page.getByRole('button', { name: 'Open navigation menu' }).click();
   assert.equal(await page.getByRole('navigation', { name: 'Main navigation' }).getAttribute('class'), 'main-nav main-nav--open');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.getByRole('navigation', { name: 'Main navigation' }).getAttribute('class'), 'main-nav', 'Escape should close the mobile navigation.');
+  await page.getByRole('button', { name: 'Open navigation menu' }).click();
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Training paths' }).click();
   assert.match(page.url(), /#programs$/);
 
