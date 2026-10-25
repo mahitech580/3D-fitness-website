@@ -52,6 +52,16 @@ try {
   assert.equal(await dumbbell.getAttribute('aria-pressed'), 'true', 'The dumbbell selector should become active.');
   assert.match(await page.locator('.kinetic-object-host').getAttribute('aria-label'), /dumbbell/i);
   assert.match(await page.locator('.kinetic-lab-object-info').innerText(), /One side at a time/i);
+  const carbonFinish = page.getByRole('button', { name: /Carbon/ });
+  await carbonFinish.click();
+  assert.equal(await carbonFinish.getAttribute('aria-pressed'), 'true', 'The carbon material finish should become active.');
+  assert.equal(await page.locator('#kinetic-lab canvas').count(), 1, 'Changing finishes should preserve the WebGL canvas.');
+  const steelFinish = page.getByRole('button', { name: /Steel/ });
+  await steelFinish.click();
+  assert.equal(await steelFinish.getAttribute('aria-pressed'), 'true', 'The steel material finish should become active.');
+  const signatureFinish = page.getByRole('button', { name: /Kinetik lime/ });
+  await signatureFinish.click();
+  assert.equal(await signatureFinish.getAttribute('aria-pressed'), 'true', 'The signature finish should be restorable.');
   assert.equal(await canvasHandle.evaluate((element) => element.isConnected), true, 'Switching the model should not recreate the WebGL canvas.');
 
   const kettlebell = page.locator('.kinetic-equipment-choice').filter({ hasText: 'Kettlebell' });
