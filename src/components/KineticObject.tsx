@@ -8,7 +8,8 @@ type Equipment = 'barbell' | 'dumbbell' | 'kettlebell';
 type Finish = 'kinetik' | 'carbon' | 'steel';
 type LightingPreset = 'studio' | 'contrast' | 'neon';
 type CameraPreset = 'hero' | 'front' | 'side';
-type KineticObjectProps = { equipment: Equipment; autoRotate: boolean; resetToken: number; finish: Finish; lighting: LightingPreset; cameraPreset: CameraPreset };
+type StoryBeat = 0 | 1 | 2;
+type KineticObjectProps = { equipment: Equipment; autoRotate: boolean; resetToken: number; finish: Finish; lighting: LightingPreset; cameraPreset: CameraPreset; storyBeat: StoryBeat };
 
 const finishAccent: Record<Finish, string> = { kinetik: '#c8ff62', carbon: '#9da991', steel: '#e6eee0' };
 const finishBody: Record<Finish, string> = { kinetik: '#343d30', carbon: '#141916', steel: '#8b9890' };
@@ -168,7 +169,7 @@ function SceneFallback({ equipment, unavailable = false }: { equipment: Equipmen
   );
 }
 
-export default function KineticObject({ equipment, autoRotate, resetToken, finish, lighting, cameraPreset }: KineticObjectProps) {
+export default function KineticObject({ equipment, autoRotate, resetToken, finish, lighting, cameraPreset, storyBeat }: KineticObjectProps) {
   const host = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const reducedMotion = useReducedMotion();
@@ -201,7 +202,9 @@ export default function KineticObject({ equipment, autoRotate, resetToken, finis
           <directionalLight position={[-3, 1, -2]} intensity={lighting === 'contrast' ? 2.4 : lighting === 'neon' ? 3.0 : 0.8} color={lighting === 'contrast' ? '#9da991' : lighting === 'neon' ? '#5d82ff' : '#7293a4'} />
           <pointLight position={[-3, -1.8, 1.2]} intensity={lighting === 'contrast' ? 5 : lighting === 'neon' ? 14 : 11} color={lighting === 'contrast' ? '#e4ebdf' : '#bfff4b'} />
           <pointLight position={[0, 2, -2]} intensity={lighting === 'neon' ? 8 : lighting === 'contrast' ? 2 : 5} color={lighting === 'neon' ? '#5d82ff' : '#7293a4'} />
-          <TrainingObject key={equipment + '-' + finish} equipment={equipment} finish={finish} />
+          <group rotation={[0, storyBeat === 0 ? -0.12 : storyBeat === 1 ? 0.18 : 0.48, 0]} position={[0, storyBeat === 1 ? 0.08 : storyBeat === 2 ? -0.04 : 0, 0]} scale={storyBeat === 1 ? 1.06 : storyBeat === 2 ? 0.96 : 1}>
+            <TrainingObject key={equipment + '-' + finish} equipment={equipment} finish={finish} />
+          </group>
           <mesh position={[0, -1.35, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <circleGeometry args={[2.25, 64]} />
             <meshBasicMaterial color="#bfff4b" transparent opacity={0.055} />
