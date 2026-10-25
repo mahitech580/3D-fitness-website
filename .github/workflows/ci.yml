@@ -10,7 +10,8 @@ permissions:
 
 concurrency:
   group: ci-main
-  cancel-in-progress: true
+  # Keep queued verification runs alive while rapid commits are pushed.
+  cancel-in-progress: false
 
 jobs:
   verify:
