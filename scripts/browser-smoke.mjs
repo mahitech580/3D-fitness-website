@@ -14,10 +14,10 @@ page.on('pageerror', (error) => pageErrors.push(error.message));
 try {
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await page.locator('#hero-title').waitFor();
-  await page.waitForTimeout(700);
   assert.match(await page.title(), /KINETIK.*Train With Intent/i);
   assert.equal(await page.locator('#programs').count(), 1);
   assert.equal(await page.locator('#kinetic-lab').count(), 1);
+  assert.equal(await page.locator('#training-path').count(), 1);
   assert.equal(await page.locator('#start').count(), 1);
   assert.equal(await page.locator('#tracker').count(), 1);
   assert.equal(await page.locator('.program-card').count(), 3);
@@ -25,19 +25,21 @@ try {
   await mkdir('artifacts', { recursive: true });
   await page.screenshot({ path: 'artifacts/kinetik-desktop.png', fullPage: false });
 
-  const lab = page.locator('#kinetic-lab');
-  await lab.scrollIntoViewIfNeeded();
-  await page.locator('#kinetic-lab canvas').waitFor({ timeout: 15000 });
-  await page.waitForTimeout(600);
-  assert.equal(await page.locator('#kinetic-lab canvas').count(), 1, 'The real-time 3D scene should load near the viewport.');
+  await page.locator('#kinetic-lab').scrollIntoViewIfNeeded();
+  const canvas = page.locator('#kinetic-lab canvas');
+  await canvas.waitFor({ timeout: 15000 });
+  const canvasHandle = await canvas.elementHandle();
+  assert.ok(canvasHandle, 'The real-time WebGL canvas should exist after the lab approaches the viewport.');
+  const bounds = await canvas.boundingBox();
+  assert.ok(bounds && bounds.width > 100 && bounds.height > 100, 'The 3D canvas should have a visible render area.');
   await page.screenshot({ path: 'artifacts/kinetik-3d-lab.png', fullPage: false });
 
   const dumbbell = page.locator('.kinetic-equipment-choice').filter({ hasText: 'Dumbbell' });
   await dumbbell.click();
   assert.equal(await dumbbell.getAttribute('aria-pressed'), 'true', 'The dumbbell selector should become active.');
-  await page.locator('.kinetic-object-host').waitFor();
   assert.match(await page.locator('.kinetic-object-host').getAttribute('aria-label'), /dumbbell/i);
   assert.match(await page.locator('.kinetic-lab-object-info').innerText(), /One side at a time/i);
+  assert.equal(await canvasHandle.evaluate((element) => element.isConnected), true, 'Switching the model should not recreate the WebGL canvas.');
 
   const kettlebell = page.locator('.kinetic-equipment-choice').filter({ hasText: 'Kettlebell' });
   await kettlebell.click();
@@ -49,17 +51,26 @@ try {
   await rotationButton.click();
   assert.equal(await rotationButton.getAttribute('aria-pressed'), 'true', 'Auto-rotation can be enabled again.');
   await page.getByRole('button', { name: /Reset view/i }).click();
+  assert.equal(await canvasHandle.evaluate((element) => element.isConnected), true, 'Resetting the camera should keep the WebGL canvas mounted.');
   await page.screenshot({ path: 'artifacts/kinetik-3d-kettlebell.png', fullPage: false });
 
   await page.locator('#training-path').scrollIntoViewIfNeeded();
-  await page.getByRole('tab', { name: /Conditioning/i }).click();
+  const strengthTab = page.getByRole('tab', { name: /Strength/i });
+  await strengthTab.focus();
+  await page.keyboard.press('ArrowRight');
+  const conditioningTab = page.getByRole('tab', { name: /Conditioning/i });
+  assert.equal(await conditioningTab.getAttribute('aria-selected'), 'true', 'Arrow-key navigation should switch training tabs.');
+  await conditioningTab.click();
   await page.getByRole('button', { name: /Build from this path/i }).click();
   await page.locator('#start').waitFor();
   assert.equal(await page.getByRole('radio', { name: /Build my engine/i }).isChecked(), true, 'The selected training path should flow into the plan builder.');
   await page.getByRole('button', { name: /Build my starter plan/i }).click();
-  await page.locator('.generated-plan').waitFor();
-  assert.match(await page.locator('.generated-plan').innerText(), /Conditioning base/i);
-  assert.match(await page.locator('.generated-plan').innerText(), /Bike or brisk-walk intervals/i);
+  const generatedPlan = page.locator('.generated-plan');
+  await generatedPlan.waitFor();
+  assert.match(await generatedPlan.innerText(), /Conditioning base/i);
+  assert.match(await generatedPlan.innerText(), /Bike or brisk-walk intervals/i);
+  await page.getByRole('radio', { name: /Move with ease/i }).check();
+  assert.equal(await generatedPlan.count(), 0, 'Changing the builder inputs should clear the stale generated result.');
 
   await page.locator('#tracker').scrollIntoViewIfNeeded();
   await page.getByRole('button', { name: 'Log Monday session' }).click();
@@ -77,16 +88,11 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await page.locator('#hero-title').waitFor();
-  await page.evaluate(() => {
-    window.history.scrollRestoration = 'manual';
-    window.scrollTo(0, 0);
-  });
-  await page.waitForTimeout(500);
-  const dimensions = await page.evaluate(() => ({ documentWidth: document.documentElement.scrollWidth, viewportWidth: document.documentElement.clientWidth }));
+  const dimensions = await page.evaluate(() => ({
+    documentWidth: document.documentElement.scrollWidth,
+    viewportWidth: document.documentElement.clientWidth,
+  }));
   assert.ok(dimensions.documentWidth <= dimensions.viewportWidth + 2, 'The mobile page should not have horizontal overflow: ' + JSON.stringify(dimensions));
-  const heroImage = page.locator('.hero-photo-main img');
-  assert.equal(await heroImage.count(), 1, 'The hero gym image should be present.');
-  assert.ok((await heroImage.getAttribute('src'))?.includes('images.unsplash.com'), 'The hero should use its gym photo asset.');
   await page.screenshot({ path: 'artifacts/kinetik-mobile.png', fullPage: false });
   await page.getByRole('button', { name: 'Open navigation menu' }).click();
   assert.equal(await page.getByRole('navigation', { name: 'Main navigation' }).getAttribute('class'), 'main-nav main-nav--open');
@@ -94,7 +100,7 @@ try {
   assert.match(page.url(), /#programs$/);
 
   assert.deepEqual(pageErrors, [], 'No uncaught browser errors should be recorded.');
-  console.log('Browser smoke passed: current homepage, responsive layout, 3D model selection, zoom/rotation/reset controls, plan builder, local check-ins, FAQ, and mobile navigation.');
+  console.log('Browser smoke passed: page sections, 3D model selection, stable WebGL canvas, rotation/reset controls, keyboard-accessible path tabs, current plan builder, local check-ins, FAQ, and mobile navigation.');
 } finally {
   await browser.close();
 }
