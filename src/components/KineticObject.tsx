@@ -15,7 +15,6 @@ const plateTones = ['#353d32', '#242b23', '#4b5547'];
 
 function BarbellModel({ finish }: { finish: Finish }) {
   const accent = finishAccent[finish];
-  const body = finishBody[finish];
   const plates = finish === 'steel' ? ['#d8e0d9', '#aab5ad', '#eef3ef'] : finish === 'carbon' ? ['#242a25', '#101411', '#414a41'] : plateTones;
   return (
     <group rotation={[0.16, 0.18, -0.08]}>
